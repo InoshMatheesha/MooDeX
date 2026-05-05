@@ -5,6 +5,8 @@ import threading
 import time
 from datetime import datetime
 import requests
+from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image, ImageOps, ImageDraw
 
 from rawg_api import RAWGApiClient
@@ -52,8 +54,14 @@ FONTS = {
     "stat_num": ("Segoe UI", 28, "bold")
 }
 
-CARD_MIN = 240
+CARD_MIN = 180
 CARD_GAP = 20
+
+# Shared thread pool for image loading (prevents thread explosion)
+_img_executor = ThreadPoolExecutor(max_workers=4)
+
+# Placeholder image cache
+_placeholder_cache = {}
 
 # --- Helpers ---
 def star_str(rating):
@@ -61,13 +69,18 @@ def star_str(rating):
     return "★" * (rating // 2) + "☆" * (5 - (rating // 2)) + f" {rating}/10"
 
 def make_placeholder(w, h):
+    key = (w, h)
+    if key in _placeholder_cache:
+        return _placeholder_cache[key]
     img = Image.new("RGB", (w, h), color="#0d1829")
     draw = ImageDraw.Draw(img)
-    for x in range(0, w, 20):
+    for x in range(0, w, 40):
         draw.line([(x, 0), (x, h)], fill="#1a2236")
-    for y in range(0, h, 20):
+    for y in range(0, h, 40):
         draw.line([(0, y), (w, y)], fill="#1a2236")
-    return ctk.CTkImage(light_image=img, dark_image=img, size=(w, h))
+    result = ctk.CTkImage(light_image=img, dark_image=img, size=(w, h))
+    _placeholder_cache[key] = result
+    return result
 
 # --- Toast ---
 class Toast(ctk.CTkToplevel):
@@ -233,13 +246,13 @@ class GameCard(ctk.CTkFrame):
         self.grid_propagate(False)
         self.pack_propagate(False)
         
-        img_h = 165
-        self.configure(width=card_w, height=275, border_width=1, border_color=T["border"])
+        img_h = int(card_w * 0.75)  # 4:3 ratio — large, clear game art
+        self.configure(width=card_w, height=img_h + 90, border_width=1, border_color=T["border"])
         
         # Image — pinned to exact pixel size so it never over/underflows
         self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h, image=make_placeholder(card_w, img_h))
         self.img_lbl.pack_propagate(False)
-        self.img_lbl.pack(fill="x", expand=False)
+        self.img_lbl.pack(fill="x")
         
         self.load_image(game.get("image_url") or game.get("background_image"), card_w, img_h)
         
@@ -301,27 +314,35 @@ class GameCard(ctk.CTkFrame):
         if not url: return
         cache_key = f"{url}_{w}x{h}"
         if cache_key in self._img_cache:
-            self.img_lbl.configure(image=self._img_cache[cache_key])
+            self.img_lbl.configure(image=self._img_cache[cache_key], text="")
+            self.img_lbl.image = self._img_cache[cache_key]  # prevent garbage collection
             return
             
         def fetch():
             try:
-                resp = requests.get(url, timeout=6)
+                resp = requests.get(url, timeout=6, stream=True)
                 resp.raise_for_status()
-                from io import BytesIO
                 raw = Image.open(BytesIO(resp.content)).convert("RGB")
-                fitted = ImageOps.contain(raw, (w, h), Image.LANCZOS)
-                canvas = Image.new("RGB", (w, h), T["card"])
-                paste_x = (w - fitted.width) // 2
-                paste_y = (h - fitted.height) // 2
-                canvas.paste(fitted, (paste_x, paste_y))
+                # Smart zoom: 10% overscan + center crop (clear, no tiny look)
+                ratio = max(w / raw.width, h / raw.height)
+                new_size = (
+                    int(raw.width * ratio * 1.1),
+                    int(raw.height * ratio * 1.1)
+                )
+                resized = raw.resize(new_size, Image.LANCZOS)
+                left = (resized.width - w) // 2
+                top_off = (resized.height - h) // 2
+                canvas = resized.crop((left, top_off, left + w, top_off + h))
                 ctk_img = ctk.CTkImage(light_image=canvas, dark_image=canvas, size=(w, h))
                 self._img_cache[cache_key] = ctk_img
                 if self.winfo_exists():
-                    self.after(0, lambda: self.img_lbl.configure(image=ctk_img))
+                    def _apply(img=ctk_img):
+                        self.img_lbl.configure(image=img, text="")
+                        self.img_lbl.image = img
+                    self.after(0, _apply)
             except Exception:
                 pass
-        threading.Thread(target=fetch, daemon=True).start()
+        _img_executor.submit(fetch)
 
     def _on_enter(self, e):
         self._hov = True
@@ -535,12 +556,10 @@ class MooDexApp(ctk.CTk):
         self.minsize(680, 520)
         self.configure(fg_color=T["bg"])
         
-        icon_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "icon.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "icon.ico")
         if os.path.exists(icon_path):
             try:
-                from PIL import Image, ImageTk
-                img = ImageTk.PhotoImage(Image.open(icon_path))
-                self.iconphoto(False, img)
+                self.iconbitmap(icon_path)
             except Exception:
                 pass
             
@@ -555,6 +574,7 @@ class MooDexApp(ctk.CTk):
         self._sort = "Recently Added"
         self._lib_search = ""
         self._disc_tab = "popular"
+        self._lib_view_mode = "tile"  # "tile" or "list"
         
         self._cols = 0
         self._rid = None
@@ -563,27 +583,30 @@ class MooDexApp(ctk.CTk):
         self._build_ui()
         self.cards_frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
         self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        self.list_frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
+        self.card_widgets = {}
+        self.list_widgets = {}
+        self.stats_bar = StatsBar(self._scroll, self.dm)
+        self.stats_bar.pack(fill="x", padx=16, pady=(12,8))
         self._update_np()
         self.after(120, self._show_library)
 
     def _calc(self):
-        self.update_idletasks()
         ww = self._scroll.winfo_width()
-        if ww <= 1:
-            ww = self.winfo_width()
 
-        total_gap = CARD_GAP * 2
-        cols = max(1, (ww - total_gap) // (CARD_MIN + CARD_GAP))
-        cols = min(cols, 6)
-        return cols, CARD_MIN
+        if ww <= 1:
+            ww = self.winfo_width() - 250  # subtract sidebar
+
+        # 4 columns — best balance of card size and grid density
+        cols = 4
+
+        card_w = max(140, (ww - (cols * 20)) // cols)
+        return cols, card_w
 
     def _on_resize(self, e):
         if e.widget != self._main: return
-        c, _ = self._calc()
-        if c != self._cols:
-            self._cols = c
-            if self._rid: self.after_cancel(self._rid)
-            self._rid = self.after(90, self._regrid)
+        if self._rid: self.after_cancel(self._rid)
+        self._rid = self.after(200, self._regrid)
 
     def _regrid(self):
         if self._view == "library":
@@ -603,7 +626,7 @@ class MooDexApp(ctk.CTk):
         logo_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "logo with name.png")
         if os.path.exists(logo_path):
             from PIL import Image
-            logo_img = ctk.CTkImage(light_image=Image.open(logo_path), dark_image=Image.open(logo_path), size=(130, 65))
+            logo_img = ctk.CTkImage(light_image=Image.open(logo_path), dark_image=Image.open(logo_path), size=(180, 90))
             self.lbl_brand = ctk.CTkLabel(top, text="", image=logo_img)
         else:
             self.lbl_brand = ctk.CTkLabel(top, text="MooDex", font=FONTS["h1"], text_color=T["accent"])
@@ -669,6 +692,18 @@ class MooDexApp(ctk.CTk):
         self.sort_menu = ctk.CTkOptionMenu(self._bar, values=SORT_OPTIONS, width=160, fg_color=T["surface"], button_color=T["surface2"], command=self._set_sort)
         self.sort_menu.pack(side="right", pady=8)
         
+        # View toggle buttons
+        self.view_toggle_f = ctk.CTkFrame(self._bar, fg_color="transparent")
+        self.view_toggle_f.pack(side="right", padx=(0, 10), pady=8)
+        self.btn_tile = ctk.CTkButton(self.view_toggle_f, text="▦", width=32, height=28, font=FONTS["bold"],
+                                       fg_color=T["accent"], hover_color=T["accent_h"], corner_radius=6,
+                                       command=lambda: self._set_lib_view("tile"))
+        self.btn_tile.pack(side="left", padx=(0, 2))
+        self.btn_list = ctk.CTkButton(self.view_toggle_f, text="☰", width=32, height=28, font=FONTS["bold"],
+                                       fg_color=T["surface2"], hover_color=T["accent_h"], corner_radius=6,
+                                       command=lambda: self._set_lib_view("list"))
+        self.btn_list.pack(side="left")
+        
         # Scroll Area (row 2)
         self._scroll = ctk.CTkScrollableFrame(self._main, fg_color="transparent")
         self._scroll.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
@@ -687,13 +722,23 @@ class MooDexApp(ctk.CTk):
         titles = {"library": "My Library", "discover": "Discover", "stats": "Statistics"}
         self.lbl_title.configure(text=titles[view])
 
+        # Destroy only non-persistent children
+        persistent = {self.cards_frame, self.list_frame, self.stats_bar}
         for w in self._scroll.winfo_children():
-            if w is not self.cards_frame:
+            if w not in persistent:
                 w.destroy()
         
-        if view == "library": self._show_library()
-        elif view == "discover": self._show_discover()
-        elif view == "stats": self._show_stats()
+        if view == "library":
+            self.stats_bar.pack(fill="x", padx=16, pady=(12,8))
+            self._show_library()
+        elif view == "discover":
+            self.stats_bar.pack_forget()
+            self.list_frame.pack_forget()
+            self._show_discover()
+        elif view == "stats":
+            self.stats_bar.pack_forget()
+            self.list_frame.pack_forget()
+            self._show_stats()
 
     def _update_nav_style(self):
         for v, b in self.nav_btns.items():
@@ -737,59 +782,215 @@ class MooDexApp(ctk.CTk):
         self._lib_search = self.search_var.get().strip()
         self._show_library()
 
+    def _set_lib_view(self, mode):
+        self._lib_view_mode = mode
+        if mode == "tile":
+            self.btn_tile.configure(fg_color=T["accent"])
+            self.btn_list.configure(fg_color=T["surface2"])
+        else:
+            self.btn_tile.configure(fg_color=T["surface2"])
+            self.btn_list.configure(fg_color=T["accent"])
+        # Clear both views
+        for w in self.card_widgets.values(): w.destroy()
+        self.card_widgets.clear()
+        for w in self.list_widgets.values(): w.destroy()
+        self.list_widgets.clear()
+        self._show_library()
+
     def _show_library(self):
         if self._view != "library": return
-        self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
-        self.cards_frame.update_idletasks()
-        self.cards_frame.configure(fg_color=T["bg"])  # keeps visual stable
-        for w in self.cards_frame.winfo_children():
-            w.destroy()
-        
-        StatsBar(self._scroll, self.dm).pack(fill="x", padx=16, pady=(12,8))
-        
+
         games = self.dm.get_filtered_sorted(self._filter, self._sort, self._lib_search)
-        if not games:
-            f = ctk.CTkFrame(self.cards_frame, fg_color="transparent")
-            f.pack(fill="both", expand=True, pady=100)
-            ctk.CTkLabel(f, text="🎮", font=("Segoe UI", 48)).pack()
-            ctk.CTkLabel(f, text="Your library is empty", font=FONTS["h2"], text_color=T["text"]).pack(pady=10)
-            ctk.CTkButton(f, text="Go to Discover →", fg_color=T["accent"], command=lambda: self._set_view("discover")).pack(pady=10)
-            return
+
+        if self._lib_view_mode == "tile":
+            self._show_library_tiles(games)
+        else:
+            self._show_library_list(games)
+
+    def _show_library_tiles(self, games):
+        # Hide list, show grid
+        self.list_frame.pack_forget()
+        self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
         cols, cw = self._calc()
         self._cols = cols
-        frame = self.cards_frame
-        frame.pack(fill="x", padx=20, pady=10)
-        frame.update_idletasks()
-        frame.configure(width=self._scroll.winfo_width())
-        try:
-            frame.grid_anchor("n")
-        except AttributeError:
-            pass
-        
-        frame.grid_columnconfigure(tuple(range(cols)), weight=1)
-        for i in range(cols):
-            frame.grid_columnconfigure(i, weight=1, uniform="col")
-            
+
+        # Track existing cards
+        existing = set(self.card_widgets.keys())
+        current = set(g["name"] for g in games)
+
+        # REMOVE deleted cards
+        for name in existing - current:
+            self.card_widgets[name].destroy()
+            del self.card_widgets[name]
+
+        # Reset grid to prevent weird stacking
+        for widget in self.cards_frame.grid_slaves():
+            widget.grid_forget()
+
+        # CREATE / UPDATE cards
         for i, g in enumerate(games):
-            card = GameCard(frame, g, cw, mode="library", on_action=self._card_action)
+            name = g["name"]
+
+            if name not in self.card_widgets:
+                card = GameCard(self.cards_frame, g, cw, mode="library", on_action=self._card_action)
+                self.card_widgets[name] = card
+            else:
+                card = self.card_widgets[name]
+
+                # FIX: update card size dynamically
+                img_h = int(cw * 0.75)
+                card.configure(width=cw, height=img_h + 90)
+                card.img_lbl.configure(width=cw, height=img_h)
+
             card.grid(row=i//cols, column=i%cols, padx=10, pady=12, sticky="nsew")
+
+        # Grid config
+        for i in range(cols):
+            self.cards_frame.grid_columnconfigure(i, weight=1, uniform="col")
+
+    def _show_library_list(self, games):
+        # Hide grid, show list
+        self.cards_frame.pack_forget()
+        self.list_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+        existing = set(self.list_widgets.keys())
+        current = set(g["name"] for g in games)
+
+        # REMOVE deleted rows
+        for name in existing - current:
+            self.list_widgets[name].destroy()
+            del self.list_widgets[name]
+
+        # Unpack all to reorder
+        for w in self.list_frame.pack_slaves():
+            w.pack_forget()
+
+        # Header row
+        if not hasattr(self, '_list_header') or not self._list_header.winfo_exists():
+            self._list_header = ctk.CTkFrame(self.list_frame, fg_color=T["surface"], height=36, corner_radius=6)
+            hdr_cols = [("Game", 0.35), ("Status", 0.15), ("Rating", 0.12), ("Genre", 0.15), ("Released", 0.10), ("Actions", 0.13)]
+            for txt, w_pct in hdr_cols:
+                ctk.CTkLabel(self._list_header, text=txt, font=FONTS["bold"], text_color=T["text2"],
+                             anchor="w").pack(side="left", padx=10, expand=True, fill="x")
+        self._list_header.pack(fill="x", pady=(0, 4))
+
+        for g in games:
+            name = g["name"]
+            if name not in self.list_widgets:
+                row = self._create_list_row(g)
+                self.list_widgets[name] = row
+            self.list_widgets[name].pack(fill="x", pady=2)
+
+    def _create_list_row(self, game):
+        row = ctk.CTkFrame(self.list_frame, fg_color=T["card"], height=52, corner_radius=6,
+                           border_width=1, border_color=T["border"])
+        row.pack_propagate(False)
+
+        # Thumbnail
+        thumb_w, thumb_h = 70, 40
+        thumb_lbl = ctk.CTkLabel(row, text="", width=thumb_w, height=thumb_h,
+                                  image=make_placeholder(thumb_w, thumb_h))
+        thumb_lbl.pack(side="left", padx=(10, 8))
+
+        # Load thumbnail async
+        url = game.get("image_url") or game.get("background_image")
+        if url:
+            cache_key = f"{url}_{thumb_w}x{thumb_h}"
+            if cache_key in GameCard._img_cache:
+                thumb_lbl.configure(image=GameCard._img_cache[cache_key], text="")
+                thumb_lbl.image = GameCard._img_cache[cache_key]
+            else:
+                def _load_thumb(u=url, lbl=thumb_lbl, tw=thumb_w, th=thumb_h, ck=cache_key):
+                    try:
+                        resp = requests.get(u, timeout=6, stream=True)
+                        resp.raise_for_status()
+                        raw = Image.open(BytesIO(resp.content)).convert("RGB")
+                        ratio = max(tw / raw.width, th / raw.height)
+                        new_size = (int(raw.width * ratio * 1.1), int(raw.height * ratio * 1.1))
+                        resized = raw.resize(new_size, Image.LANCZOS)
+                        left = (resized.width - tw) // 2
+                        top_off = (resized.height - th) // 2
+                        canvas = resized.crop((left, top_off, left + tw, top_off + th))
+                        ctk_img = ctk.CTkImage(light_image=canvas, dark_image=canvas, size=(tw, th))
+                        GameCard._img_cache[ck] = ctk_img
+                        if lbl.winfo_exists():
+                            def _apply(img=ctk_img):
+                                lbl.configure(image=img, text="")
+                                lbl.image = img
+                            lbl.after(0, _apply)
+                    except Exception:
+                        pass
+                _img_executor.submit(_load_thumb)
+
+        # Name
+        ctk.CTkLabel(row, text=game["name"][:35], font=FONTS["bold"], text_color=T["text"],
+                     anchor="w", width=180).pack(side="left", padx=8, expand=True, fill="x")
+
+        # Status badge
+        stat = STATUS.get(game["status"], STATUS["Stopped"])
+        stat_f = ctk.CTkFrame(row, fg_color=stat["bg"], corner_radius=4, width=90)
+        stat_f.pack(side="left", padx=8)
+        stat_f.pack_propagate(False)
+        ctk.CTkLabel(stat_f, text=f"{stat['i']} {game['status']}", text_color=stat["c"],
+                     font=FONTS["small"], width=90, height=24).pack(padx=4, pady=2)
+
+        # Rating
+        rating = game.get("rating", 0)
+        r_text = f"★ {rating}/10" if rating else "—"
+        r_color = T["accent"] if rating else T["text3"]
+        ctk.CTkLabel(row, text=r_text, font=FONTS["small"], text_color=r_color,
+                     width=60, anchor="center").pack(side="left", padx=8)
+
+        # Genre
+        genre = game.get("genres", [""])[0] if game.get("genres") else "—"
+        ctk.CTkLabel(row, text=genre, font=FONTS["small"], text_color=T["text2"],
+                     width=80, anchor="w").pack(side="left", padx=8)
+
+        # Release year
+        year = game.get("released", "—")[:4] if game.get("released") else "—"
+        ctk.CTkLabel(row, text=year, font=FONTS["small"], text_color=T["text2"],
+                     width=50, anchor="center").pack(side="left", padx=8)
+
+        # Action buttons
+        btn_f = ctk.CTkFrame(row, fg_color="transparent")
+        btn_f.pack(side="right", padx=10)
+        ctk.CTkButton(btn_f, text="▶", width=28, height=24, fg_color="transparent",
+                      hover_color=T["green"], font=FONTS["small"],
+                      command=lambda: self._card_action("play", game)).pack(side="left", padx=2)
+        ctk.CTkButton(btn_f, text="✎", width=28, height=24, fg_color="transparent",
+                      hover_color=T["accent"], font=FONTS["small"],
+                      command=lambda: self._card_action("edit", game)).pack(side="left", padx=2)
+        ctk.CTkButton(btn_f, text="✕", width=28, height=24, fg_color="transparent",
+                      hover_color=T["red"], font=FONTS["small"],
+                      command=lambda: self._card_action("delete", game)).pack(side="left", padx=2)
+
+        # Hover effect
+        def _enter(e): row.configure(fg_color=T["card_h"], border_color=T["border2"])
+        def _leave(e): row.configure(fg_color=T["card"], border_color=T["border"])
+        row.bind("<Enter>", _enter)
+        row.bind("<Leave>", _leave)
+        for w in row.winfo_children():
+            w.bind("<Enter>", _enter)
+            w.bind("<Leave>", _leave)
+
+        return row
 
     def _card_action(self, action, game):
         name = game["name"]
         if action == "play":
             self.dm.set_playing(name)
             self._update_np()
-            self.after(10, self._show_library)
+            self._show_library()
             Toast(self, f"Now playing {name}", "success")
         elif action == "delete":
             self.dm.remove(name)
             self._update_np()
-            self.after(10, self._show_library)
+            self._show_library()
             Toast(self, f"Removed {name}", "info")
         elif action == "fav":
             self.dm.toggle_favorite(name)
-            self.after(10, self._show_library)
+            self._show_library()
         elif action == "edit":
             EditDialog(self, game, lambda s, r, n: self._save_edit(name, s, r, n))
 

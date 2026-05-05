@@ -1,6 +1,25 @@
 {
   "games": [
     {
+      "name": "Resident Evil 9: Requiem",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-02-27",
+      "image_url": "https://media.rawg.io/media/games/ed6/ed613937e113a4d43fa0db771e527a2f.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
       "name": "Where Winds Meet",
       "status": "Stopped",
       "rating": 8,

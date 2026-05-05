@@ -560,12 +560,13 @@ class MooDexApp(ctk.CTk):
 
     def _calc(self):
         self.update_idletasks()
-        # Subtract more to safely account for scrollbars and internal frame margins
-        avail = self._main.winfo_width() - 80
+        ww = self._main.winfo_width()
+        avail = ww - 60
         if avail < CARD_MIN:
             return 1, CARD_MIN
-        cols = max(1, avail // (CARD_MIN + CARD_GAP))
-        cw = max(CARD_MIN, (avail - cols * CARD_GAP) // cols)
+        cols = max(1, (avail + CARD_GAP) // (CARD_MIN + CARD_GAP))
+        cw = (avail - (cols - 1) * CARD_GAP) // cols
+        cw = max(CARD_MIN, min(cw, 320))
         return cols, cw
 
     def _on_resize(self, e):
@@ -761,7 +762,11 @@ class MooDexApp(ctk.CTk):
         cols, cw = self._calc()
         self._cols = cols
         frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        frame.pack(fill="both", expand=True, padx=8)
+        frame.pack(fill="both", expand=True, padx=20)
+        try:
+            frame.grid_anchor("nw")
+        except AttributeError:
+            pass
         
         for i in range(cols):
             frame.grid_columnconfigure(i, weight=0, uniform="cards")
@@ -840,7 +845,11 @@ class MooDexApp(ctk.CTk):
         self.d_lbl.pack(fill="x", padx=16, pady=(10,0))
         
         self._rf = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        self._rf.pack(fill="both", expand=True, padx=8)
+        self._rf.pack(fill="both", expand=True, padx=20)
+        try:
+            self._rf.grid_anchor("nw")
+        except AttributeError:
+            pass
         
         self._load_discover()
 

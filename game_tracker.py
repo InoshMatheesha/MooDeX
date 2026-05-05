@@ -52,7 +52,7 @@ FONTS = {
     "stat_num": ("Segoe UI", 28, "bold")
 }
 
-CARD_MIN = 220
+CARD_MIN = 240
 CARD_GAP = 20
 
 # --- Helpers ---
@@ -230,15 +230,14 @@ class GameCard(ctk.CTkFrame):
         self.on_action = on_action
         self._hov = False
         
-        self.pack_propagate(False)
         self.grid_propagate(False)
+        self.pack_propagate(False)
         
-        img_h = 150
-        self.configure(width=card_w, height=240, border_width=1, border_color=T["border"])
+        img_h = 165
+        self.configure(width=card_w, height=275, border_width=1, border_color=T["border"])
         
         # Image — pinned to exact pixel size so it never over/underflows
-        self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h,
-                                    image=make_placeholder(card_w, img_h))
+        self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h, image=make_placeholder(card_w, img_h))
         self.img_lbl.pack_propagate(False)
         self.img_lbl.pack(fill="x", expand=False)
         
@@ -311,8 +310,12 @@ class GameCard(ctk.CTkFrame):
                 resp.raise_for_status()
                 from io import BytesIO
                 raw = Image.open(BytesIO(resp.content)).convert("RGB")
-                cropped = ImageOps.fit(raw, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
-                ctk_img = ctk.CTkImage(light_image=cropped, dark_image=cropped, size=(w, h))
+                fitted = ImageOps.contain(raw, (w, h), Image.LANCZOS)
+                canvas = Image.new("RGB", (w, h), T["card"])
+                paste_x = (w - fitted.width) // 2
+                paste_y = (h - fitted.height) // 2
+                canvas.paste(fitted, (paste_x, paste_y))
+                ctk_img = ctk.CTkImage(light_image=canvas, dark_image=canvas, size=(w, h))
                 self._img_cache[cache_key] = ctk_img
                 if self.winfo_exists():
                     self.after(0, lambda: self.img_lbl.configure(image=ctk_img))
@@ -535,7 +538,9 @@ class MooDexApp(ctk.CTk):
         icon_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "icon.png")
         if os.path.exists(icon_path):
             try:
-                self.iconbitmap(icon_path)
+                from PIL import Image, ImageTk
+                img = ImageTk.PhotoImage(Image.open(icon_path))
+                self.iconphoto(False, img)
             except Exception:
                 pass
             
@@ -553,7 +558,6 @@ class MooDexApp(ctk.CTk):
         
         self._cols = 0
         self._rid = None
-        self._sb_expanded = True
         self._rf = None # For discover thread safety
         
         self._build_ui()
@@ -562,13 +566,14 @@ class MooDexApp(ctk.CTk):
 
     def _calc(self):
         self.update_idletasks()
-        # Use actual scroll inner width minus a generous buffer for scrollbar + padding
         ww = self._scroll.winfo_width()
-        avail = max(ww - 60, 260)   # 60px: scrollbar (16) + left pad (20) + right pad (20) + extra
-        cols = max(1, avail // (260 + CARD_GAP))
+        if ww <= 1:
+            ww = self.winfo_width()
+
+        total_gap = CARD_GAP * 2
+        cols = max(1, (ww - total_gap) // (CARD_MIN + CARD_GAP))
         cols = min(cols, 6)
-        cw = 260
-        return cols, cw
+        return cols, CARD_MIN
 
     def _on_resize(self, e):
         if e.widget != self._main: return
@@ -593,14 +598,18 @@ class MooDexApp(ctk.CTk):
         top = ctk.CTkFrame(self._sidebar, fg_color="transparent")
         top.pack(fill="x", padx=10, pady=20)
         
-        self.btn_toggle = ctk.CTkButton(top, text="☰", width=30, fg_color="transparent", hover_color=T["surface2"], font=FONTS["h2"], command=self._toggle_sidebar)
-        self.btn_toggle.pack(side="left")
-        self.lbl_brand = ctk.CTkLabel(top, text="MooDex", font=FONTS["h1"], text_color=T["accent"])
+        logo_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "logo with name.png")
+        if os.path.exists(logo_path):
+            from PIL import Image
+            logo_img = ctk.CTkImage(light_image=Image.open(logo_path), dark_image=Image.open(logo_path), size=(130, 65))
+            self.lbl_brand = ctk.CTkLabel(top, text="", image=logo_img)
+        else:
+            self.lbl_brand = ctk.CTkLabel(top, text="MooDex", font=FONTS["h1"], text_color=T["accent"])
         self.lbl_brand.pack(side="left", padx=10)
         
         self.nav_btns = {}
         for icon, txt, view in [("📚", "My Library", "library"), ("🔍", "Discover", "discover"), ("📊", "Stats", "stats")]:
-            b = ctk.CTkButton(self._sidebar, text=f"{icon}  {txt}" if self._sb_expanded else icon, 
+            b = ctk.CTkButton(self._sidebar, text=f"{icon}  {txt}", 
                               fg_color="transparent", text_color=T["text"], font=FONTS["bold"], anchor="w",
                               command=lambda v=view: self._set_view(v))
             b.pack(fill="x", padx=10, pady=5)
@@ -662,30 +671,6 @@ class MooDexApp(ctk.CTk):
         self._scroll = ctk.CTkScrollableFrame(self._main, fg_color="transparent")
         self._scroll.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
 
-    def _toggle_sidebar(self):
-        self._sb_expanded = not self._sb_expanded
-        w = 230 if self._sb_expanded else 68
-        self._sidebar.configure(width=w)
-        
-        if self._sb_expanded:
-            self.lbl_brand.pack(side="left", padx=10)
-            self.btn_add.configure(text="+ Add Game")
-            if self.dm.data.get("now_playing"):
-                self.np_frame.pack(fill="x", padx=10, pady=20)
-            for view, b in self.nav_btns.items():
-                icon = {"library": "📚", "discover": "🔍", "stats": "📊"}[view]
-                txt = {"library": "My Library", "discover": "Discover", "stats": "Stats"}[view]
-                b.configure(text=f"{icon}  {txt}")
-        else:
-            self.lbl_brand.pack_forget()
-            self.btn_add.configure(text="+")
-            self.np_frame.pack_forget()
-            for view, b in self.nav_btns.items():
-                icon = {"library": "📚", "discover": "🔍", "stats": "📊"}[view]
-                b.configure(text=icon)
-                
-        self.after(80, self._regrid)
-
     def _set_view(self, view):
         self._view = view
         self._rf = None
@@ -711,7 +696,7 @@ class MooDexApp(ctk.CTk):
 
     def _update_np(self):
         np = self.dm.data.get("now_playing")
-        if np and self._sb_expanded:
+        if np:
             self.np_frame.pack(fill="x", padx=10, pady=20)
             self.np_lbl.configure(text=np)
         else:
@@ -763,21 +748,22 @@ class MooDexApp(ctk.CTk):
         cols, cw = self._calc()
         self._cols = cols
         frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        frame.pack(anchor="nw", padx=20, pady=10)
+        frame.pack(fill="x", anchor="nw", padx=20, pady=10)
         
-        self.update_idletasks()
-        frame.configure(width=self._scroll.winfo_width() - 40)
+        frame.update_idletasks()
+        frame.configure(width=self._scroll.winfo_width())
         try:
             frame.grid_anchor("n")
         except AttributeError:
             pass
         
+        frame.grid_columnconfigure(tuple(range(cols)), weight=1)
         for i in range(cols):
-            frame.grid_columnconfigure(i, weight=0)
+            frame.grid_columnconfigure(i, weight=1, uniform="col")
             
         for i, g in enumerate(games):
             card = GameCard(frame, g, cw, mode="library", on_action=self._card_action)
-            card.grid(row=i//cols, column=i%cols, padx=12, pady=14)
+            card.grid(row=i//cols, column=i%cols, padx=10, pady=12, sticky="nsew")
 
     def _card_action(self, action, game):
         name = game["name"]
@@ -911,12 +897,13 @@ class MooDexApp(ctk.CTk):
             return
             
         cols, cw = self._calc()
+        self._rf.grid_columnconfigure(tuple(range(cols)), weight=1)
         for i in range(cols):
-            self._rf.grid_columnconfigure(i, weight=0)
+            self._rf.grid_columnconfigure(i, weight=1, uniform="col")
             
         for i, g in enumerate(games):
             card = GameCard(self._rf, g, cw, mode="discover", on_action=self._disc_action)
-            card.grid(row=i//cols, column=i%cols, padx=12, pady=14)
+            card.grid(row=i//cols, column=i%cols, padx=10, pady=12, sticky="nsew")
 
     def _disc_action(self, action, game):
         if action == "add":

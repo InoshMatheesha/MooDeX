@@ -233,12 +233,14 @@ class GameCard(ctk.CTkFrame):
         self.pack_propagate(False)
         self.grid_propagate(False)
         
-        img_h = max(120, int(card_w * 9 / 16))
-        self.configure(height=img_h + 90, border_width=1, border_color=T["border"])
+        img_h = 150
+        self.configure(width=card_w, height=240, border_width=1, border_color=T["border"])
         
-        # Image
-        self.img_lbl = ctk.CTkLabel(self, text="", image=make_placeholder(card_w, img_h))
-        self.img_lbl.pack(fill="x")
+        # Image — pinned to exact pixel size so it never over/underflows
+        self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h,
+                                    image=make_placeholder(card_w, img_h))
+        self.img_lbl.pack_propagate(False)
+        self.img_lbl.pack(fill="x", expand=False)
         
         self.load_image(game.get("image_url") or game.get("background_image"), card_w, img_h)
         
@@ -269,10 +271,10 @@ class GameCard(ctk.CTkFrame):
             
         # Meta info
         meta_f = ctk.CTkFrame(self, fg_color="transparent")
-        meta_f.pack(fill="both", expand=True, padx=10, pady=8)
+        meta_f.pack(fill="x", padx=10, pady=8)
         
-        name = game["name"]
-        title_lbl = ctk.CTkLabel(meta_f, text=name, font=FONTS["bold"], text_color=T["text"], anchor="w", justify="left", wraplength=card_w - 28)
+        name = game["name"][:30]
+        title_lbl = ctk.CTkLabel(meta_f, text=name, font=FONTS["bold"], text_color=T["text"], anchor="w", justify="left", wraplength=card_w - 28, height=40)
         title_lbl.pack(fill="x")
         
         bot_f = ctk.CTkFrame(meta_f, fg_color="transparent")
@@ -309,7 +311,7 @@ class GameCard(ctk.CTkFrame):
                 resp.raise_for_status()
                 from io import BytesIO
                 raw = Image.open(BytesIO(resp.content)).convert("RGB")
-                cropped = ImageOps.fit(raw, (w, h), Image.LANCZOS)
+                cropped = ImageOps.fit(raw, (w, h), Image.LANCZOS, centering=(0.5, 0.5))
                 ctk_img = ctk.CTkImage(light_image=cropped, dark_image=cropped, size=(w, h))
                 self._img_cache[cache_key] = ctk_img
                 if self.winfo_exists():
@@ -560,13 +562,12 @@ class MooDexApp(ctk.CTk):
 
     def _calc(self):
         self.update_idletasks()
-        ww = self._main.winfo_width()
-        avail = ww - 60
-        if avail < CARD_MIN:
-            return 1, CARD_MIN
-        cols = max(1, (avail + CARD_GAP) // (CARD_MIN + CARD_GAP))
-        cw = (avail - (cols - 1) * CARD_GAP) // cols
-        cw = max(CARD_MIN, min(cw, 320))
+        # Use actual scroll inner width minus a generous buffer for scrollbar + padding
+        ww = self._scroll.winfo_width()
+        avail = max(ww - 60, 260)   # 60px: scrollbar (16) + left pad (20) + right pad (20) + extra
+        cols = max(1, avail // (260 + CARD_GAP))
+        cols = min(cols, 6)
+        cw = 260
         return cols, cw
 
     def _on_resize(self, e):
@@ -762,18 +763,21 @@ class MooDexApp(ctk.CTk):
         cols, cw = self._calc()
         self._cols = cols
         frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        frame.pack(fill="both", expand=True, padx=20)
+        frame.pack(anchor="nw", padx=20, pady=10)
+        
+        self.update_idletasks()
+        frame.configure(width=self._scroll.winfo_width() - 40)
         try:
-            frame.grid_anchor("nw")
+            frame.grid_anchor("n")
         except AttributeError:
             pass
         
         for i in range(cols):
-            frame.grid_columnconfigure(i, weight=0, uniform="cards")
+            frame.grid_columnconfigure(i, weight=0)
             
         for i, g in enumerate(games):
             card = GameCard(frame, g, cw, mode="library", on_action=self._card_action)
-            card.grid(row=i//cols, column=i%cols, padx=10, pady=10)
+            card.grid(row=i//cols, column=i%cols, padx=12, pady=14)
 
     def _card_action(self, action, game):
         name = game["name"]
@@ -845,9 +849,12 @@ class MooDexApp(ctk.CTk):
         self.d_lbl.pack(fill="x", padx=16, pady=(10,0))
         
         self._rf = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        self._rf.pack(fill="both", expand=True, padx=20)
+        self._rf.pack(anchor="nw", padx=20, pady=10)
+        
+        self.update_idletasks()
+        self._rf.configure(width=self._scroll.winfo_width() - 40)
         try:
-            self._rf.grid_anchor("nw")
+            self._rf.grid_anchor("n")
         except AttributeError:
             pass
         
@@ -905,11 +912,11 @@ class MooDexApp(ctk.CTk):
             
         cols, cw = self._calc()
         for i in range(cols):
-            self._rf.grid_columnconfigure(i, weight=0, uniform="cards")
+            self._rf.grid_columnconfigure(i, weight=0)
             
         for i, g in enumerate(games):
             card = GameCard(self._rf, g, cw, mode="discover", on_action=self._disc_action)
-            card.grid(row=i//cols, column=i%cols, padx=10, pady=10)
+            card.grid(row=i//cols, column=i%cols, padx=12, pady=14)
 
     def _disc_action(self, action, game):
         if action == "add":

@@ -1,9 +1,225 @@
 {
   "games": [
     {
-      "name": "Resident Evil 9: Requiem",
+      "name": "Delta Force: Hawk Ops",
       "status": "Like to Play",
       "rating": 0,
+      "released": "2024-12-05",
+      "image_url": "https://media.rawg.io/media/games/5dd/5ddd987371db1c87858a8cfe41807fc7.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Shooter",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X",
+        "iOS"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Marvel's Spider-Man: Miles Morales",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2020-11-12",
+      "image_url": "https://media.rawg.io/media/games/048/048b46cdc66cbc7e235e1f359c2a77ec.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "PlayStation 4"
+      ],
+      "playtime": 9,
+      "favorite": false
+    },
+    {
+      "name": "Marvel's Spider-Man 2 PC Port",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2025-01-30",
+      "image_url": "https://media.rawg.io/media/screenshots/ae3/ae335c07a04a883220a9ca1d14572177.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Marvel's Spider-Man 2",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2023-10-20",
+      "image_url": "https://media.rawg.io/media/games/7ae/7ae5a14cdb4ab222a134c15f4629e430.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5"
+      ],
+      "playtime": 26,
+      "favorite": false
+    },
+    {
+      "name": "Marvel's Spider-Man Remastered",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2020-11-12",
+      "image_url": "https://media.rawg.io/media/games/5f1/5f1399f755ed3a40b04a9195f4c06be5.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Casual",
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5"
+      ],
+      "playtime": 13,
+      "favorite": false
+    },
+    {
+      "name": "Batman: Arkham Knight",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2015-06-23",
+      "image_url": "https://media.rawg.io/media/games/310/3106b0e012271c5ffb16497b070be739.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Nintendo Switch"
+      ],
+      "playtime": 19,
+      "favorite": false
+    },
+    {
+      "name": "Marvel's Spider-Man",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2018-09-07",
+      "image_url": "https://media.rawg.io/media/games/9aa/9aa42d16d425fa6f179fc9dc2f763647.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "PlayStation 4"
+      ],
+      "playtime": 6,
+      "favorite": false
+    },
+    {
+      "name": "DmC: Devil May Cry",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2013-01-15",
+      "image_url": "https://media.rawg.io/media/games/295/295eb868c241e6ad32ac033b8e6a2ede.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Xbox 360"
+      ],
+      "playtime": 6,
+      "favorite": false
+    },
+    {
+      "name": "Devil May Cry 5",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2019-03-08",
+      "image_url": "https://media.rawg.io/media/games/9fb/9fbf956a16249def7625ab5dc3d09515.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 9,
+      "favorite": false
+    },
+    {
+      "name": "Ghost of Tsushima Director's Cut",
+      "status": "Playing",
+      "rating": 10,
+      "released": "2021-08-20",
+      "image_url": "https://media.rawg.io/media/games/193/193c9fe23ca026914fdf41d551ff3df9.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "PlayStation 4"
+      ],
+      "playtime": 4,
+      "favorite": false
+    },
+    {
+      "name": "Ghost of Yotei",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2025-10-02",
+      "image_url": "https://media.rawg.io/media/games/30b/30b195c2321d763f807366967ffad793.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PlayStation 5"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Resident Evil 9: Requiem",
+      "status": "Playing",
+      "rating": 7,
       "released": "2026-02-27",
       "image_url": "https://media.rawg.io/media/games/ed6/ed613937e113a4d43fa0db771e527a2f.jpg",
       "added": "2026-05-05",
@@ -122,8 +338,8 @@
     },
     {
       "name": "Assassin's Creed Odyssey",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 8,
       "released": "2018-10-05",
       "image_url": "https://media.rawg.io/media/games/c6b/c6bd26767c1053fef2b10bb852943559.jpg",
       "added": "2026-05-05",
@@ -143,8 +359,8 @@
     },
     {
       "name": "Assassin’s Creed Rogue",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 8,
       "released": "2014-11-11",
       "image_url": "https://media.rawg.io/media/games/3c4/3c4a44ed99c87c56e0cdcfaaaf5c3628.jpg",
       "added": "2026-05-05",
@@ -164,8 +380,8 @@
     },
     {
       "name": "Assassin's Creed Revelations",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 10,
       "released": "2011-11-15",
       "image_url": "https://media.rawg.io/media/games/193/19390fa5e75e9048b22c9a736cf9992f.jpg",
       "added": "2026-05-05",
@@ -184,8 +400,8 @@
     },
     {
       "name": "Assassin's Creed Unity",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Stopped",
+      "rating": 7,
       "released": "2014-11-11",
       "image_url": "https://media.rawg.io/media/games/59f/59fc1c5de1d29cb9234741c97d250150.jpg",
       "added": "2026-05-05",
@@ -203,8 +419,8 @@
     },
     {
       "name": "Assassin's Creed Valhalla",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Stopped",
+      "rating": 5,
       "released": "2020-11-10",
       "image_url": "https://media.rawg.io/media/games/934/9346092ae11bf7582c883869468171cc.jpg",
       "added": "2026-05-05",
@@ -225,8 +441,8 @@
     },
     {
       "name": "Assassin's Creed Origins",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 7,
       "released": "2017-10-27",
       "image_url": "https://media.rawg.io/media/games/336/336c6bd63d83cf8e59937ab8895d1240.jpg",
       "added": "2026-05-05",
@@ -245,8 +461,8 @@
     },
     {
       "name": "Assassin's Creed",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Stopped",
+      "rating": 6,
       "released": "2007-11-13",
       "image_url": "https://media.rawg.io/media/games/0bc/0bcc108295a244b488d5c25f7d867220.jpg",
       "added": "2026-05-05",
@@ -265,8 +481,8 @@
     },
     {
       "name": "Crimson Desert",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 9,
       "released": "2026-03-19",
       "image_url": "https://media.rawg.io/media/games/dac/dacfcdeaef957a36416f4e6d5ec76229.jpg",
       "added": "2026-05-05",
@@ -363,5 +579,5 @@
       "favorite": false
     }
   ],
-  "now_playing": "Black Myth: Wukong"
+  "now_playing": "Ghost of Tsushima Director's Cut"
 }

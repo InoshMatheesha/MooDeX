@@ -246,8 +246,8 @@ class GameCard(ctk.CTkFrame):
         self.grid_propagate(False)
         self.pack_propagate(False)
         
-        img_h = int(card_w * 0.75)  # 4:3 ratio — large, clear game art
-        self.configure(width=card_w, height=img_h + 90, border_width=1, border_color=T["border"])
+        img_h = int(card_w * 0.56)  # 16:9 ratio — perfect for game art, prevents zoom cropping
+        self.configure(width=card_w, height=img_h + 120, border_width=1, border_color=T["border"])
         
         # Image — pinned to exact pixel size so it never over/underflows
         self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h, image=make_placeholder(card_w, img_h))
@@ -311,42 +311,36 @@ class GameCard(ctk.CTkFrame):
             w.bind("<Leave>", self._on_leave)
 
     def load_image(self, url, w, h):
-        if not url: return
+        if not url:
+            return
+
         cache_key = f"{url}_{w}x{h}"
         if cache_key in self._img_cache:
-            self.img_lbl.configure(image=self._img_cache[cache_key], text="")
-            self.img_lbl.image = self._img_cache[cache_key]  # prevent garbage collection
+            self.img_lbl.configure(image=self._img_cache[cache_key])
             return
-            
+
         def fetch():
             try:
-                resp = requests.get(url, timeout=6, stream=True)
-                resp.raise_for_status()
-                raw = Image.open(BytesIO(resp.content)).convert("RGB")
-                # Smart zoom: 10% overscan + center crop (clear, no tiny look)
-                ratio = max(w / raw.width, h / raw.height)
-                new_size = (
-                    int(raw.width * ratio * 1.1),
-                    int(raw.height * ratio * 1.1)
-                )
-                resized = raw.resize(new_size, Image.LANCZOS)
-                left = (resized.width - w) // 2
-                top_off = (resized.height - h) // 2
-                canvas = resized.crop((left, top_off, left + w, top_off + h))
-                ctk_img = ctk.CTkImage(light_image=canvas, dark_image=canvas, size=(w, h))
+                resp = requests.get(url, timeout=5)
+                img = Image.open(BytesIO(resp.content)).convert("RGB")
+
+                img = ImageOps.fit(img, (w, h))
+
+                ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(w, h))
                 self._img_cache[cache_key] = ctk_img
+
                 if self.winfo_exists():
-                    def _apply(img=ctk_img):
-                        self.img_lbl.configure(image=img, text="")
-                        self.img_lbl.image = img
-                    self.after(0, _apply)
-            except Exception:
+                    self.img_lbl.after(0, lambda: self.img_lbl.configure(image=ctk_img))
+
+            except:
                 pass
+
         _img_executor.submit(fetch)
 
     def _on_enter(self, e):
+        if not self._hov:
+            self.configure(fg_color=T["card_h"])
         self._hov = True
-        self.configure(fg_color=T["card_h"], border_color=T["border2"])
         if self.mode == "library":
             self.overlay.place(relx=1, rely=0, anchor="ne")
 
@@ -436,15 +430,22 @@ class EditDialog(ctk.CTkToplevel):
         # Buttons
         btn_f = ctk.CTkFrame(self, fg_color="transparent")
         btn_f.pack(fill="x", padx=30, pady=(0, 20))
-        ctk.CTkButton(btn_f, text="Cancel", fg_color=T["surface2"], hover_color=T["border"], command=self.destroy, width=100).pack(side="left")
+        ctk.CTkButton(btn_f, text="Cancel", fg_color=T["surface2"], hover_color=T["border"], command=lambda: self.after(10, self.destroy), width=100).pack(side="left")
         ctk.CTkButton(btn_f, text="Save Changes", fg_color=T["accent"], hover_color=T["accent_h"], command=lambda: self._save(on_save)).pack(side="right")
 
     def _update_rating(self, val):
         self.rating_lbl.configure(text=star_str(int(val)))
 
     def _save(self, on_save):
-        on_save(self.status_var.get(), int(self.rating_var.get()), self.notes.get("1.0", "end-1c"))
-        self.destroy()
+        s = self.status_var.get()
+        r = int(self.rating_var.get())
+        n = self.notes.get("1.0", "end-1c")
+        
+        def _execute():
+            self.destroy()
+            on_save(s, r, n)
+            
+        self.after(10, _execute)
 
 class AddDialog(ctk.CTkToplevel):
     def __init__(self, parent, api, on_add):
@@ -495,7 +496,7 @@ class AddDialog(ctk.CTkToplevel):
         
         btn_f = ctk.CTkFrame(self, fg_color="transparent")
         btn_f.pack(fill="x", padx=20, pady=(0, 20))
-        ctk.CTkButton(btn_f, text="Cancel", fg_color=T["surface2"], hover_color=T["border"], command=self.destroy, width=100).pack(side="left")
+        ctk.CTkButton(btn_f, text="Cancel", fg_color=T["surface2"], hover_color=T["border"], command=lambda: self.after(10, self.destroy), width=100).pack(side="left")
         self.add_btn = ctk.CTkButton(btn_f, text="Add to Library", fg_color=T["accent"], hover_color=T["accent_h"], state="disabled", command=self._do_add)
         self.add_btn.pack(side="right")
 
@@ -543,9 +544,16 @@ class AddDialog(ctk.CTkToplevel):
         self.add_btn.configure(state="normal")
 
     def _do_add(self):
-        if self._selected:
-            self.on_add(self._selected, self.status_var.get(), int(self.rating_var.get()))
-        self.destroy()
+        s = self.status_var.get()
+        r = int(self.rating_var.get())
+        sel = self._selected
+        
+        def _execute():
+            self.destroy()
+            if sel:
+                self.on_add(sel, s, r)
+                
+        self.after(10, _execute)
 
 # --- App ---
 class MooDexApp(ctk.CTk):
@@ -579,6 +587,7 @@ class MooDexApp(ctk.CTk):
         self._cols = 0
         self._rid = None
         self._rf = None # For discover thread safety
+        self._discover_request_id = 0
         
         self._build_ui()
         self.cards_frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
@@ -595,18 +604,23 @@ class MooDexApp(ctk.CTk):
         ww = self._scroll.winfo_width()
 
         if ww <= 1:
-            ww = self.winfo_width() - 250  # subtract sidebar
+            ww = self.winfo_width() - 250
 
-        # 4 columns — best balance of card size and grid density
-        cols = 4
+        # Dynamic columns (prevents wasted space + lag)
+        cols = max(2, ww // 260)
+        CARD_GAP = 20
 
-        card_w = max(140, (ww - (cols * 20)) // cols)
+        card_w = (ww - (cols * CARD_GAP)) // cols
         return cols, card_w
 
     def _on_resize(self, e):
-        if e.widget != self._main: return
-        if self._rid: self.after_cancel(self._rid)
-        self._rid = self.after(200, self._regrid)
+        if e.widget != self._main:
+            return
+
+        if hasattr(self, "_resize_job"):
+            self.after_cancel(self._resize_job)
+
+        self._resize_job = self.after(150, self._regrid)
 
     def _regrid(self):
         if self._view == "library":
@@ -707,6 +721,7 @@ class MooDexApp(ctk.CTk):
         # Scroll Area (row 2)
         self._scroll = ctk.CTkScrollableFrame(self._main, fg_color="transparent")
         self._scroll.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
+        self._scroll._parent_canvas.configure(yscrollincrement=10)
 
     def _set_view(self, view):
         self._view = view
@@ -723,21 +738,20 @@ class MooDexApp(ctk.CTk):
         self.lbl_title.configure(text=titles[view])
 
         # Destroy only non-persistent children
-        persistent = {self.cards_frame, self.list_frame, self.stats_bar}
         for w in self._scroll.winfo_children():
-            if w not in persistent:
+            if w is not self.cards_frame and w is not self.list_frame and w is not self.stats_bar:
                 w.destroy()
+        
+        self.stats_bar.pack_forget()
+        self.list_frame.pack_forget()
+        self.cards_frame.pack_forget()
         
         if view == "library":
             self.stats_bar.pack(fill="x", padx=16, pady=(12,8))
             self._show_library()
         elif view == "discover":
-            self.stats_bar.pack_forget()
-            self.list_frame.pack_forget()
             self._show_discover()
         elif view == "stats":
-            self.stats_bar.pack_forget()
-            self.list_frame.pack_forget()
             self._show_stats()
 
     def _update_nav_style(self):
@@ -775,8 +789,10 @@ class MooDexApp(ctk.CTk):
         self._show_library()
 
     def _on_lib_search(self, e):
-        if self._lib_search_rid: self.after_cancel(self._lib_search_rid)
-        self._lib_search_rid = self.after(300, self._do_lib_search)
+        if hasattr(self, "_search_job"):
+            self.after_cancel(self._search_job)
+
+        self._search_job = self.after(250, self._do_lib_search)
 
     def _do_lib_search(self):
         self._lib_search = self.search_var.get().strip()
@@ -808,27 +824,27 @@ class MooDexApp(ctk.CTk):
             self._show_library_list(games)
 
     def _show_library_tiles(self, games):
-        # Hide list, show grid
         self.list_frame.pack_forget()
         self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
         cols, cw = self._calc()
+
+        if cols != getattr(self, "_last_cols", None):
+            for widget in self.cards_frame.winfo_children():
+                widget.grid_forget()
+            self._last_cols = cols
+
         self._cols = cols
 
-        # Track existing cards
         existing = set(self.card_widgets.keys())
         current = set(g["name"] for g in games)
 
-        # REMOVE deleted cards
+        # REMOVE only what's needed
         for name in existing - current:
             self.card_widgets[name].destroy()
             del self.card_widgets[name]
 
-        # Reset grid to prevent weird stacking
-        for widget in self.cards_frame.grid_slaves():
-            widget.grid_forget()
-
-        # CREATE / UPDATE cards
+        # CREATE or UPDATE
         for i, g in enumerate(games):
             name = g["name"]
 
@@ -838,16 +854,10 @@ class MooDexApp(ctk.CTk):
             else:
                 card = self.card_widgets[name]
 
-                # FIX: update card size dynamically
-                img_h = int(cw * 0.75)
-                card.configure(width=cw, height=img_h + 90)
-                card.img_lbl.configure(width=cw, height=img_h)
+            card.grid(row=i // cols, column=i % cols, padx=10, pady=12, sticky="nsew")
 
-            card.grid(row=i//cols, column=i%cols, padx=10, pady=12, sticky="nsew")
-
-        # Grid config
         for i in range(cols):
-            self.cards_frame.grid_columnconfigure(i, weight=1, uniform="col")
+            self.cards_frame.grid_columnconfigure(i, weight=1)
 
     def _show_library_list(self, games):
         # Hide grid, show list
@@ -903,15 +913,16 @@ class MooDexApp(ctk.CTk):
             else:
                 def _load_thumb(u=url, lbl=thumb_lbl, tw=thumb_w, th=thumb_h, ck=cache_key):
                     try:
-                        resp = requests.get(u, timeout=6, stream=True)
+                        resp = requests.get(u, timeout=6)
                         resp.raise_for_status()
                         raw = Image.open(BytesIO(resp.content)).convert("RGB")
-                        ratio = max(tw / raw.width, th / raw.height)
-                        new_size = (int(raw.width * ratio * 1.1), int(raw.height * ratio * 1.1))
-                        resized = raw.resize(new_size, Image.LANCZOS)
-                        left = (resized.width - tw) // 2
-                        top_off = (resized.height - th) // 2
-                        canvas = resized.crop((left, top_off, left + tw, top_off + th))
+                        
+                        if hasattr(Image, 'Resampling'):
+                            resample_method = Image.Resampling.LANCZOS
+                        else:
+                            resample_method = Image.LANCZOS
+                            
+                        canvas = ImageOps.fit(raw, (tw, th), method=resample_method)
                         ctk_img = ctk.CTkImage(light_image=canvas, dark_image=canvas, size=(tw, th))
                         GameCard._img_cache[ck] = ctk_img
                         if lbl.winfo_exists():
@@ -976,26 +987,39 @@ class MooDexApp(ctk.CTk):
 
         return row
 
+    def _evict_cache(self, name):
+        self._last_games = None
+        if name in self.card_widgets:
+            self.card_widgets[name].destroy()
+            del self.card_widgets[name]
+        if name in self.list_widgets:
+            self.list_widgets[name].destroy()
+            del self.list_widgets[name]
+
     def _card_action(self, action, game):
         name = game["name"]
         if action == "play":
             self.dm.set_playing(name)
+            self._evict_cache(name)
             self._update_np()
             self._show_library()
             Toast(self, f"Now playing {name}", "success")
         elif action == "delete":
             self.dm.remove(name)
+            self._evict_cache(name)
             self._update_np()
             self._show_library()
             Toast(self, f"Removed {name}", "info")
         elif action == "fav":
             self.dm.toggle_favorite(name)
+            self._evict_cache(name)
             self._show_library()
         elif action == "edit":
             EditDialog(self, game, lambda s, r, n: self._save_edit(name, s, r, n))
 
     def _save_edit(self, name, status, rating, notes):
         self.dm.update(name, status, rating, notes)
+        self._evict_cache(name)
         self._update_np()
         self._show_library()
         Toast(self, "Game updated", "success")
@@ -1023,7 +1047,7 @@ class MooDexApp(ctk.CTk):
     def _show_discover(self):
         if self._view != "discover": return
         for w in self._scroll.winfo_children():
-            if w is not self.cards_frame:
+            if w is not self.cards_frame and w is not self.list_frame and w is not self.stats_bar:
                 w.destroy()
         
         top_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
@@ -1078,9 +1102,14 @@ class MooDexApp(ctk.CTk):
         for w in self._rf.winfo_children(): w.destroy()
         ctk.CTkLabel(self._rf, text="Searching...", text_color=T["text2"]).pack(pady=40)
         
+        self._discover_request_id += 1
+        req_id = self._discover_request_id
+        
         def fetch():
             res = self.api.search_games(q, count=12)
-            self._safe_render(res)
+            if req_id != self._discover_request_id:
+                return  # ignore outdated response
+            self.after(0, lambda: self._render_discover(res))
         threading.Thread(target=fetch, daemon=True).start()
 
     def _load_discover(self):
@@ -1090,27 +1119,32 @@ class MooDexApp(ctk.CTk):
         titles = {"popular": "🔥 Top Rated Games", "upcoming": "📅 Upcoming Releases", "trending": "⚡ Trending Now"}
         self.d_lbl.configure(text=titles[self._disc_tab])
         
+        self._discover_request_id += 1
+        req_id = self._discover_request_id
+        
         def fetch():
             if self._disc_tab == "popular": res = self.api.get_popular_games()
             elif self._disc_tab == "upcoming": res = self.api.get_upcoming_games()
             else: res = self.api.get_trending_games()
-            self._safe_render(res)
+            if req_id != self._discover_request_id:
+                return  # ignore outdated response
+            self.after(0, lambda: self._render_discover(res))
         threading.Thread(target=fetch, daemon=True).start()
-
-    def _safe_render(self, games):
-        if self._rf and self._rf.winfo_exists():
-            self.after(0, lambda: self._render_discover(games))
 
     def _render_discover(self, games):
         if not self._rf or not self._rf.winfo_exists(): return
-        for w in self._rf.winfo_children(): w.destroy()
+        
+        for widget in self._rf.winfo_children():
+            widget.destroy()
         
         if not games:
             ctk.CTkLabel(self._rf, text="No games found.", text_color=T["text2"]).pack(pady=40)
             return
             
         cols, cw = self._calc()
-        self._rf.grid_columnconfigure(tuple(range(cols)), weight=1)
+        # Reset old grid columns to stop scroll glitch
+        for i in range(self._rf.grid_size()[0]):
+            self._rf.grid_columnconfigure(i, weight=0, uniform="")
         for i in range(cols):
             self._rf.grid_columnconfigure(i, weight=1, uniform="col")
             
@@ -1126,7 +1160,7 @@ class MooDexApp(ctk.CTk):
     def _show_stats(self):
         if self._view != "stats": return
         for w in self._scroll.winfo_children():
-            if w is not self.cards_frame:
+            if w is not self.cards_frame and w is not self.list_frame and w is not self.stats_bar:
                 w.destroy()
         
         stats = self.dm.stats()

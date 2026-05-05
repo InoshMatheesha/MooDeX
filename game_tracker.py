@@ -561,6 +561,8 @@ class MooDexApp(ctk.CTk):
         self._rf = None # For discover thread safety
         
         self._build_ui()
+        self.cards_frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
+        self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
         self._update_np()
         self.after(120, self._show_library)
 
@@ -677,11 +679,17 @@ class MooDexApp(ctk.CTk):
         self._update_nav_style()
         self.search_entry.pack(side="right", pady=12) if view == "library" else self.search_entry.pack_forget()
         self._bar.grid(row=1, column=0, sticky="ew", padx=20) if view == "library" else self._bar.grid_forget()
+        if view == "library":
+            self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        else:
+            self.cards_frame.pack_forget()
         
         titles = {"library": "My Library", "discover": "Discover", "stats": "Statistics"}
         self.lbl_title.configure(text=titles[view])
-        
-        for w in self._scroll.winfo_children(): w.destroy()
+
+        for w in self._scroll.winfo_children():
+            if w is not self.cards_frame:
+                w.destroy()
         
         if view == "library": self._show_library()
         elif view == "discover": self._show_discover()
@@ -731,14 +739,17 @@ class MooDexApp(ctk.CTk):
 
     def _show_library(self):
         if self._view != "library": return
-        for w in self._scroll.winfo_children(): w.destroy()
-        self.update_idletasks()
+        self.cards_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        self.cards_frame.update_idletasks()
+        self.cards_frame.configure(fg_color=T["bg"])  # keeps visual stable
+        for w in self.cards_frame.winfo_children():
+            w.destroy()
         
         StatsBar(self._scroll, self.dm).pack(fill="x", padx=16, pady=(12,8))
         
         games = self.dm.get_filtered_sorted(self._filter, self._sort, self._lib_search)
         if not games:
-            f = ctk.CTkFrame(self._scroll, fg_color="transparent")
+            f = ctk.CTkFrame(self.cards_frame, fg_color="transparent")
             f.pack(fill="both", expand=True, pady=100)
             ctk.CTkLabel(f, text="🎮", font=("Segoe UI", 48)).pack()
             ctk.CTkLabel(f, text="Your library is empty", font=FONTS["h2"], text_color=T["text"]).pack(pady=10)
@@ -747,9 +758,8 @@ class MooDexApp(ctk.CTk):
 
         cols, cw = self._calc()
         self._cols = cols
-        frame = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        frame.pack(fill="x", anchor="nw", padx=20, pady=10)
-        
+        frame = self.cards_frame
+        frame.pack(fill="x", padx=20, pady=10)
         frame.update_idletasks()
         frame.configure(width=self._scroll.winfo_width())
         try:
@@ -770,16 +780,16 @@ class MooDexApp(ctk.CTk):
         if action == "play":
             self.dm.set_playing(name)
             self._update_np()
-            self._show_library()
+            self.after(10, self._show_library)
             Toast(self, f"Now playing {name}", "success")
         elif action == "delete":
             self.dm.remove(name)
             self._update_np()
-            self._show_library()
+            self.after(10, self._show_library)
             Toast(self, f"Removed {name}", "info")
         elif action == "fav":
             self.dm.toggle_favorite(name)
-            self._show_library()
+            self.after(10, self._show_library)
         elif action == "edit":
             EditDialog(self, game, lambda s, r, n: self._save_edit(name, s, r, n))
 
@@ -811,7 +821,9 @@ class MooDexApp(ctk.CTk):
 
     def _show_discover(self):
         if self._view != "discover": return
-        for w in self._scroll.winfo_children(): w.destroy()
+        for w in self._scroll.winfo_children():
+            if w is not self.cards_frame:
+                w.destroy()
         
         top_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
         top_f.pack(fill="x", padx=16, pady=10)
@@ -912,7 +924,9 @@ class MooDexApp(ctk.CTk):
     # --- Stats View ---
     def _show_stats(self):
         if self._view != "stats": return
-        for w in self._scroll.winfo_children(): w.destroy()
+        for w in self._scroll.winfo_children():
+            if w is not self.cards_frame:
+                w.destroy()
         
         stats = self.dm.stats()
         

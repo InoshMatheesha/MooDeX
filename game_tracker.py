@@ -321,7 +321,9 @@ class GameCard(ctk.CTkFrame):
 
         def fetch():
             try:
-                resp = requests.get(url, timeout=5)
+                headers = {"User-Agent": "MooDeX/1.0"}
+                resp = requests.get(url, timeout=10, headers=headers)
+                resp.raise_for_status()
                 img = Image.open(BytesIO(resp.content)).convert("RGB")
 
                 img = ImageOps.fit(img, (w, h))
@@ -606,8 +608,8 @@ class MooDexApp(ctk.CTk):
         if ww <= 1:
             ww = self.winfo_width() - 250
 
-        # Dynamic columns (prevents wasted space + lag)
-        cols = max(2, ww // 260)
+        # Force 5 columns as requested
+        cols = 5
         CARD_GAP = 20
 
         card_w = (ww - (cols * CARD_GAP)) // cols
@@ -913,7 +915,8 @@ class MooDexApp(ctk.CTk):
             else:
                 def _load_thumb(u=url, lbl=thumb_lbl, tw=thumb_w, th=thumb_h, ck=cache_key):
                     try:
-                        resp = requests.get(u, timeout=6)
+                        headers = {"User-Agent": "MooDeX/1.0"}
+                        resp = requests.get(u, timeout=10, headers=headers)
                         resp.raise_for_status()
                         raw = Image.open(BytesIO(resp.content)).convert("RGB")
                         

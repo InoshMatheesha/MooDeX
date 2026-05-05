@@ -1,6 +1,250 @@
 {
   "games": [
     {
+      "name": "Where Winds Meet",
+      "status": "Stopped",
+      "rating": 8,
+      "released": "2025-11-14",
+      "image_url": "https://media.rawg.io/media/screenshots/8a7/8a797083d6dd0f810a42bb2fa379a23a.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5"
+      ],
+      "playtime": 3,
+      "favorite": false
+    },
+    {
+      "name": "Black Myth: Wukong",
+      "status": "Playing",
+      "rating": 8,
+      "released": "2024-08-20",
+      "image_url": "https://media.rawg.io/media/games/779/77988e89f7862afeede524420aa251b0.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Back Flag Resynced",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-07-09",
+      "image_url": "https://media.rawg.io/media/screenshots/990/99088f6f170459244defd7afd9fce096.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Shadows",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2025-03-20",
+      "image_url": "https://media.rawg.io/media/games/526/526881e0f5f8c1550e51df3801f96ea3.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X",
+        "macOS"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Syndicate",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2015-10-23",
+      "image_url": "https://media.rawg.io/media/games/9f1/9f189c639f70f91166df415811a8b525.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 22,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Odyssey",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2018-10-05",
+      "image_url": "https://media.rawg.io/media/games/c6b/c6bd26767c1053fef2b10bb852943559.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Nintendo Switch"
+      ],
+      "playtime": 31,
+      "favorite": false
+    },
+    {
+      "name": "Assassin’s Creed Rogue",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2014-11-11",
+      "image_url": "https://media.rawg.io/media/games/3c4/3c4a44ed99c87c56e0cdcfaaaf5c3628.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Nintendo Switch"
+      ],
+      "playtime": 12,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Revelations",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2011-11-15",
+      "image_url": "https://media.rawg.io/media/games/193/19390fa5e75e9048b22c9a736cf9992f.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4",
+        "Xbox 360"
+      ],
+      "playtime": 14,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Unity",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2014-11-11",
+      "image_url": "https://media.rawg.io/media/games/59f/59fc1c5de1d29cb9234741c97d250150.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 14,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Valhalla",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2020-11-10",
+      "image_url": "https://media.rawg.io/media/games/934/9346092ae11bf7582c883869468171cc.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Adventure",
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 5,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Origins",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2017-10-27",
+      "image_url": "https://media.rawg.io/media/games/336/336c6bd63d83cf8e59937ab8895d1240.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 28,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2007-11-13",
+      "image_url": "https://media.rawg.io/media/games/0bc/0bcc108295a244b488d5c25f7d867220.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "Xbox One",
+        "Xbox 360",
+        "PlayStation 3"
+      ],
+      "playtime": 5,
+      "favorite": false
+    },
+    {
       "name": "Crimson Desert",
       "status": "Like to Play",
       "rating": 0,
@@ -23,8 +267,8 @@
     },
     {
       "name": "Samson",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Stopped",
+      "rating": 3,
       "released": "2026-04-08",
       "image_url": "https://media.rawg.io/media/games/89d/89dd76fda9a181482f32fc02f3f63164.jpeg",
       "added": "2026-05-05",
@@ -63,8 +307,8 @@
     },
     {
       "name": "Assassin's Creed Mirage",
-      "status": "Like to Play",
-      "rating": 0,
+      "status": "Completed",
+      "rating": 7,
       "released": "2023-10-05",
       "image_url": "https://media.rawg.io/media/games/fbd/fbd0128013b7965904be571e75fb30c0.jpg",
       "added": "2026-05-05",
@@ -100,5 +344,5 @@
       "favorite": false
     }
   ],
-  "now_playing": null
+  "now_playing": "Black Myth: Wukong"
 }

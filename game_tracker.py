@@ -285,7 +285,7 @@ class GameCard(ctk.CTkFrame):
         meta_f = ctk.CTkFrame(self, fg_color="transparent")
         meta_f.pack(fill="x", padx=10, pady=8)
         
-        name = game["name"][:30]
+        name = game["name"]
         title_lbl = ctk.CTkLabel(meta_f, text=name, font=FONTS["bold"], text_color=T["text"], anchor="w", justify="left", wraplength=card_w - 28, height=40)
         title_lbl.pack(fill="x")
         
@@ -938,7 +938,7 @@ class MooDexApp(ctk.CTk):
                 _img_executor.submit(_load_thumb)
 
         # Name
-        ctk.CTkLabel(row, text=game["name"][:35], font=FONTS["bold"], text_color=T["text"],
+        ctk.CTkLabel(row, text=game["name"], font=FONTS["bold"], text_color=T["text"],
                      anchor="w", width=180).pack(side="left", padx=8, expand=True, fill="x")
 
         # Status badge

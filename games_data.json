@@ -1,0 +1,104 @@
+{
+  "games": [
+    {
+      "name": "Crimson Desert",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-03-19",
+      "image_url": "https://media.rawg.io/media/games/dac/dacfcdeaef957a36416f4e6d5ec76229.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action",
+        "RPG"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Samson",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-04-08",
+      "image_url": "https://media.rawg.io/media/games/89d/89dd76fda9a181482f32fc02f3f63164.jpeg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Racing",
+        "Adventure",
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Pragmata",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-04-17",
+      "image_url": "https://media.rawg.io/media/games/9b2/9b20adbf00491d56ad6793654067f2fd.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    },
+    {
+      "name": "Assassin's Creed Mirage",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2023-10-05",
+      "image_url": "https://media.rawg.io/media/games/fbd/fbd0128013b7965904be571e75fb30c0.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PC",
+        "PlayStation 5",
+        "Xbox One",
+        "PlayStation 4"
+      ],
+      "playtime": 8,
+      "favorite": false
+    },
+    {
+      "name": "Grand Theft Auto VI",
+      "status": "Like to Play",
+      "rating": 0,
+      "released": "2026-11-19",
+      "image_url": "https://media.rawg.io/media/games/734/7342a1cd82c8997ec620084ae4c2e7e4.jpg",
+      "added": "2026-05-05",
+      "notes": "",
+      "genres": [
+        "Action"
+      ],
+      "platforms": [
+        "PlayStation 5",
+        "Xbox Series S/X"
+      ],
+      "playtime": 0,
+      "favorite": false
+    }
+  ],
+  "now_playing": null
+}

@@ -1,0 +1,621 @@
+{
+  "_popular": {
+    "ts": 1777970614.567001,
+    "data": [
+      {
+        "name": "The Legend of Zelda: Ocarina of Time",
+        "released": "1998-11-21",
+        "rating": 4.38,
+        "background_image": "https://media.rawg.io/media/games/3a0/3a0c8e9ed3a711c542218831b893a0fa.jpg",
+        "metacritic": 99,
+        "genres": [
+          "Adventure",
+          "Action",
+          "RPG"
+        ],
+        "platforms": [
+          "Nintendo Switch",
+          "Nintendo 64"
+        ],
+        "slug": "the-legend-of-zelda-ocarina-of-time",
+        "playtime": 7
+      },
+      {
+        "name": "Soulcalibur (1998)",
+        "released": "1998-07-30",
+        "rating": 0.0,
+        "background_image": "",
+        "metacritic": 98,
+        "genres": [
+          "Fighting"
+        ],
+        "platforms": [
+          "Xbox 360",
+          "Dreamcast"
+        ],
+        "slug": "soulcalibur-1998",
+        "playtime": 0
+      },
+      {
+        "name": "Soulcalibur",
+        "released": "1998-07-30",
+        "rating": 4.38,
+        "background_image": "https://media.rawg.io/media/games/743/7430f1846ba6ce836f169d936c89819e.jpg",
+        "metacritic": 98,
+        "genres": [
+          "Action",
+          "Fighting"
+        ],
+        "platforms": [
+          "Xbox One",
+          "iOS",
+          "Android",
+          "Xbox 360"
+        ],
+        "slug": "soulcalibur",
+        "playtime": 6
+      },
+      {
+        "name": "Super Mario Galaxy",
+        "released": "2007-11-01",
+        "rating": 4.35,
+        "background_image": "https://media.rawg.io/media/games/936/936f0ffac0b3c9f5c8d185f610ed2631.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Platformer"
+        ],
+        "platforms": [
+          "Nintendo Switch",
+          "Wii"
+        ],
+        "slug": "super-mario-galaxy",
+        "playtime": 28
+      },
+      {
+        "name": "Metroid Prime",
+        "released": "2002-11-17",
+        "rating": 4.35,
+        "background_image": "https://media.rawg.io/media/games/c86/c86bc047ba949959a90fe24209d59439.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Shooter",
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "Wii",
+          "GameCube"
+        ],
+        "slug": "metroid-prime",
+        "playtime": 2
+      },
+      {
+        "name": "Super Mario Galaxy 2",
+        "released": "2010-05-23",
+        "rating": 4.34,
+        "background_image": "https://media.rawg.io/media/games/578/578ff52303d0e2563e28a4149f1485c2.jpeg",
+        "metacritic": 97,
+        "genres": [
+          "Platformer"
+        ],
+        "platforms": [
+          "Nintendo Switch",
+          "Wii U",
+          "Wii"
+        ],
+        "slug": "super-mario-galaxy-2",
+        "playtime": 18
+      },
+      {
+        "name": "Super Mario Odyssey",
+        "released": "2017-10-27",
+        "rating": 4.42,
+        "background_image": "https://media.rawg.io/media/games/267/267bd0dbc496f52692487d07d014c061.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Platformer",
+          "Arcade"
+        ],
+        "platforms": [
+          "Nintendo Switch"
+        ],
+        "slug": "super-mario-odyssey",
+        "playtime": 0
+      },
+      {
+        "name": "Perfect Dark",
+        "released": "2000-05-22",
+        "rating": 3.98,
+        "background_image": "https://media.rawg.io/media/games/f62/f62d090119e5ff05c59036480123fd83.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Shooter",
+          "Action"
+        ],
+        "platforms": [
+          "Xbox 360",
+          "Nintendo 64"
+        ],
+        "slug": "perfect-dark",
+        "playtime": 10
+      },
+      {
+        "name": "The Legend of Zelda: Breath of the Wild",
+        "released": "2017-03-03",
+        "rating": 4.47,
+        "background_image": "https://media.rawg.io/media/games/cc1/cc196a5ad763955d6532cdba236f730c.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Adventure",
+          "Action",
+          "RPG"
+        ],
+        "platforms": [
+          "Nintendo Switch",
+          "Wii U"
+        ],
+        "slug": "the-legend-of-zelda-breath-of-the-wild",
+        "playtime": 121
+      },
+      {
+        "name": "Baldur's Gate III",
+        "released": "2023-08-03",
+        "rating": 4.44,
+        "background_image": "https://media.rawg.io/media/games/699/69907ecf13f172e9e144069769c3be73.jpg",
+        "metacritic": 97,
+        "genres": [
+          "Strategy",
+          "Adventure",
+          "RPG"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X",
+          "macOS"
+        ],
+        "slug": "baldurs-gate-3",
+        "playtime": 20
+      },
+      {
+        "name": "The Legend of Zelda: Tears of the Kingdom",
+        "released": "2023-05-12",
+        "rating": 4.37,
+        "background_image": "https://media.rawg.io/media/games/556/55684bfd048706f4266d331d70050b37.jpg",
+        "metacritic": 96,
+        "genres": [
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "Nintendo Switch"
+        ],
+        "slug": "the-legend-of-zelda-breath-of-the-wild-sequel",
+        "playtime": 0
+      },
+      {
+        "name": "GoldenEye 007 (1997)",
+        "released": "1997-08-23",
+        "rating": 4.37,
+        "background_image": "https://media.rawg.io/media/games/5a1/5a145fe3002fc988140f7f00edcb9715.jpg",
+        "metacritic": 96,
+        "genres": [
+          "Shooter"
+        ],
+        "platforms": [
+          "Nintendo 64"
+        ],
+        "slug": "goldeneye-007-1997",
+        "playtime": 0
+      }
+    ]
+  },
+  "_upcoming": {
+    "ts": 1777970620.7441406,
+    "data": [
+      {
+        "name": "Prince of Persia: The Sands of Time Remake",
+        "released": "2026-12-31",
+        "rating": 3.75,
+        "background_image": "https://media.rawg.io/media/games/b92/b92b55aeab9ed1777104f71f4b22a613.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox One",
+          "PlayStation 4"
+        ],
+        "slug": "prince-of-persia-the-sands-of-time-remake",
+        "playtime": 0
+      },
+      {
+        "name": "Grand Theft Auto VI",
+        "released": "2026-11-19",
+        "rating": 3.69,
+        "background_image": "https://media.rawg.io/media/games/734/7342a1cd82c8997ec620084ae4c2e7e4.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "grand-theft-aito-vi",
+        "playtime": 0
+      },
+      {
+        "name": "Fable",
+        "released": "2026-10-31",
+        "rating": 3.78,
+        "background_image": "https://media.rawg.io/media/games/705/7052ebf19b7b57ada5eeb21dea59f0e7.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action",
+          "RPG"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "fable2020",
+        "playtime": 0
+      },
+      {
+        "name": "Marvel's Wolverine",
+        "released": "2026-09-15",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/games/28d/28d61be51ec0411e24c28f71122dcaaf.jpeg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PlayStation 5"
+        ],
+        "slug": "wolverine-2022",
+        "playtime": 0
+      },
+      {
+        "name": "007 First Light",
+        "released": "2026-05-27",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/games/86f/86f2dc1b9671f25a13ff92e069b51786.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X",
+          "Nintendo Switch"
+        ],
+        "slug": "007-first-light",
+        "playtime": 0
+      },
+      {
+        "name": "Gothic 1 Remake",
+        "released": "2026-06-05",
+        "rating": 3.36,
+        "background_image": "https://media.rawg.io/media/games/f24/f24d20c6fddb77fe83d39cbfd7d4687f.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action",
+          "RPG"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox One",
+          "PlayStation 4"
+        ],
+        "slug": "gothic-1-remake",
+        "playtime": 0
+      },
+      {
+        "name": "Phantom Blade Zero",
+        "released": "2026-09-09",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/games/25f/25f536a977488f12ef8a6d013e50fda1.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5"
+        ],
+        "slug": "phantom-blade-zero",
+        "playtime": 0
+      },
+      {
+        "name": "Directive 8020",
+        "released": "2026-05-12",
+        "rating": 2.33,
+        "background_image": "https://media.rawg.io/media/games/10d/10dd957940dbaedc77a08730995194c7.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "the-dark-pictures-directive-8020",
+        "playtime": 0
+      },
+      {
+        "name": "The Blood Of Dawnwalker",
+        "released": "2026-09-03",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/games/319/319d18680fd0233e0ff724f234c97d17.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action",
+          "RPG"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "the-blood-of-dawnwalker",
+        "playtime": 0
+      },
+      {
+        "name": "Forza Horizon 6",
+        "released": "2026-05-19",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/games/d74/d744a3b0f6f0f0bc63f5ceb9b5e63230.jpeg",
+        "metacritic": 0,
+        "genres": [
+          "Racing"
+        ],
+        "platforms": [
+          "PC",
+          "Xbox Series S/X"
+        ],
+        "slug": "forza-horizon-6",
+        "playtime": 0
+      },
+      {
+        "name": "Control Resonant",
+        "released": "2026-12-31",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/screenshots/5b8/5b812f73e4c5df28630747c52f57170b.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "control-resonant",
+        "playtime": 0
+      },
+      {
+        "name": "Tomb Raider: Legacy of Atlantis",
+        "released": "2026-12-31",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/screenshots/800/80071c998f39d56db9e18d27fd558b97.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "tomb-raider-legacy-of-atlantis",
+        "playtime": 0
+      }
+    ]
+  },
+  "_trending": {
+    "ts": 1777970754.6414342,
+    "data": [
+      {
+        "name": "Pragmata",
+        "released": "2026-04-17",
+        "rating": 4.56,
+        "background_image": "https://media.rawg.io/media/games/9b2/9b20adbf00491d56ad6793654067f2fd.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "pragmata",
+        "playtime": 0
+      },
+      {
+        "name": "Atomic Heart: Blood on Crystal",
+        "released": "2026-04-16",
+        "rating": 4.0,
+        "background_image": "",
+        "metacritic": 0,
+        "genres": [
+          "Shooter"
+        ],
+        "platforms": [],
+        "slug": "atomic-heart-blood-on-crystal",
+        "playtime": 0
+      },
+      {
+        "name": "MOUSE: P.I. For Hire",
+        "released": "2026-04-16",
+        "rating": 3.78,
+        "background_image": "https://media.rawg.io/media/games/cf1/cf13436dea02745b8844d98bfa887740.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Indie",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox One",
+          "PlayStation 4"
+        ],
+        "slug": "mouse-pi-for-hire",
+        "playtime": 0
+      },
+      {
+        "name": "MОUSE",
+        "released": "2026-04-16",
+        "rating": 3.56,
+        "background_image": "https://media.rawg.io/media/screenshots/f47/f47de914dea47278808fdb39dac48273.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Shooter",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox One",
+          "PlayStation 4"
+        ],
+        "slug": "mouse-3",
+        "playtime": 0
+      },
+      {
+        "name": "Replaced",
+        "released": "2026-04-14",
+        "rating": 3.54,
+        "background_image": "https://media.rawg.io/media/games/041/041e04184322bc859d617b790d8bfab9.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Platformer",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "Xbox One",
+          "Xbox Series S/X"
+        ],
+        "slug": "replaced",
+        "playtime": 0
+      },
+      {
+        "name": "Samson",
+        "released": "2026-04-08",
+        "rating": 1.83,
+        "background_image": "https://media.rawg.io/media/games/89d/89dd76fda9a181482f32fc02f3f63164.jpeg",
+        "metacritic": 0,
+        "genres": [
+          "Racing",
+          "Adventure",
+          "Action"
+        ],
+        "platforms": [
+          "PC",
+          "PlayStation 5",
+          "Xbox Series S/X"
+        ],
+        "slug": "samson",
+        "playtime": 0
+      },
+      {
+        "name": "Arcadia Fallen II",
+        "released": "2026-04-08",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/screenshots/1db/1db02be099abda846541e517f6181e58.jpg",
+        "metacritic": 0,
+        "genres": [],
+        "platforms": [
+          "PC",
+          "macOS",
+          "Linux"
+        ],
+        "slug": "arcadia-fallen-ii",
+        "playtime": 0
+      },
+      {
+        "name": "Elementallis",
+        "released": "2026-04-27",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/screenshots/c0a/c0a0cc0680ddca9ed649e0cbf225ee70.jpg",
+        "metacritic": 0,
+        "genres": [],
+        "platforms": [
+          "PC",
+          "macOS",
+          "Linux"
+        ],
+        "slug": "elementallis-2",
+        "playtime": 0
+      },
+      {
+        "name": "Seeds of Calamity - Farmhouse Supporter Pack",
+        "released": "2026-04-12",
+        "rating": 0.0,
+        "background_image": "",
+        "metacritic": 0,
+        "genres": [],
+        "platforms": [
+          "PC"
+        ],
+        "slug": "seeds-of-calamity-farmhouse-supporter-pack",
+        "playtime": 0
+      },
+      {
+        "name": "Liz and Rose’s Alchemy Factory",
+        "released": "2026-04-22",
+        "rating": 0.0,
+        "background_image": "",
+        "metacritic": 0,
+        "genres": [],
+        "platforms": [
+          "PC"
+        ],
+        "slug": "liz-and-roses-alchemy-factory",
+        "playtime": 0
+      },
+      {
+        "name": "Titanium Court with a Side of Soundtrack",
+        "released": "2026-04-22",
+        "rating": 0.0,
+        "background_image": "",
+        "metacritic": 0,
+        "genres": [],
+        "platforms": [
+          "PC",
+          "macOS"
+        ],
+        "slug": "titanium-court-with-a-side-of-soundtrack",
+        "playtime": 0
+      },
+      {
+        "name": "The Bible Roguelike Deckbuilder",
+        "released": "2026-04-23",
+        "rating": 0.0,
+        "background_image": "https://media.rawg.io/media/screenshots/002/0028c593e6f592979d197b7dcb2fb5cf.jpg",
+        "metacritic": 0,
+        "genres": [
+          "Indie"
+        ],
+        "platforms": [
+          "PC"
+        ],
+        "slug": "the-bible-roguelike-deckbuilder",
+        "playtime": 0
+      }
+    ]
+  }
+}

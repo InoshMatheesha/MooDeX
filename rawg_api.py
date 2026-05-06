@@ -1,156 +1,96 @@
-"""
-rawg_api.py — RAWG Video Games Database API Client
-Provides search, discovery (popular / upcoming / trending), and caching.
-"""
+import json
+import os
+import time
+import requests
+from PySide6.QtCore import QObject, QThread, Signal, QRunnable, QThreadPool
 
-import json, os, time, requests
-from datetime import datetime, timedelta
+class RawgApi(QObject):
+    def __init__(self, cache_file="api_cache.json"):
+        super().__init__()
+        self.cache_file = cache_file
+        self.cache = self._load_cache()
+        self.ttl = 6 * 3600  # 6 hours
+        self.pool = QThreadPool.globalInstance()
+        self._workers = []
 
-API_KEY    = "3e485ee2b0a54eae8eb1dcb3a93760ec"
-BASE_URL   = "https://api.rawg.io/api/games"
-CACHE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "api_cache.json")
-CACHE_TTL  = 6 * 3600  # 6 hours in seconds
-
-
-class RAWGApiClient:
-    """Thin wrapper around the RAWG API with local JSON cache."""
-
-    def __init__(self):
-        self._cache = self._load_cache()
-
-    # ── cache helpers ────────────────────────────────────────────────
-    def _load_cache(self) -> dict:
-        try:
-            if os.path.exists(CACHE_FILE):
-                with open(CACHE_FILE, "r", encoding="utf-8") as f:
+    def _load_cache(self):
+        if os.path.exists(self.cache_file):
+            try:
+                with open(self.cache_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            pass
+            except:
+                pass
         return {}
 
     def _save_cache(self):
         try:
-            with open(CACHE_FILE, "w", encoding="utf-8") as f:
-                json.dump(self._cache, f, ensure_ascii=False, indent=2)
-        except IOError:
+            with open(self.cache_file, 'w', encoding='utf-8') as f:
+                json.dump(self.cache, f)
+        except:
             pass
 
-    def _get_cached(self, key: str):
-        entry = self._cache.get(key)
-        if entry and time.time() - entry.get("ts", 0) < CACHE_TTL:
-            return entry.get("data")
-        return None
-
-    def _set_cached(self, key: str, data):
-        self._cache[key] = {"ts": time.time(), "data": data}
-        self._save_cache()
-
-    # ── normalise a single API result into our standard dict ────────
-    @staticmethod
-    def _normalise(raw: dict) -> dict:
-        genres = []
-        for g in (raw.get("genres") or []):
-            genres.append(g.get("name", ""))
-
-        platforms = []
-        for p in (raw.get("platforms") or [])[:4]:
-            plat = p.get("platform") or {}
-            platforms.append(plat.get("name", ""))
-
-        released = raw.get("released") or "Unknown"
-        if released in ("", None):
-            released = "TBA"
-
-        return {
-            "name":             raw.get("name", "Unknown"),
-            "released":         released,
-            "rating":           raw.get("rating", 0.0),
-            "background_image": raw.get("background_image") or "",
-            "metacritic":       raw.get("metacritic") or 0,
-            "genres":           genres,
-            "platforms":        platforms,
-            "slug":             raw.get("slug", ""),
-            "playtime":         raw.get("playtime") or 0,
-        }
-
-    # ── API fetch ────────────────────────────────────────────────────
-    def _fetch(self, params: dict) -> list[dict]:
-        params["key"] = API_KEY
+    def _get_cached_or_fetch(self, url):
+        now = time.time()
+        if url in self.cache:
+            entry = self.cache[url]
+            if now - entry['time'] < self.ttl:
+                return entry['data']
+        
         try:
-            resp = requests.get(BASE_URL, params=params, timeout=10)
-            resp.raise_for_status()
-            results = resp.json().get("results", [])
-            return [self._normalise(r) for r in results]
-        except (requests.RequestException, ValueError, KeyError):
-            return []
-
-    # ── public methods ───────────────────────────────────────────────
-    def search_game(self, name: str) -> dict | None:
-        """Return a single game result, cached by lowercase name."""
-        key = name.strip().lower()
-        if not key:
-            return None
-        cached = self._get_cached(key)
-        if cached:
-            return cached
-        results = self._fetch({"search": name, "page_size": 1})
-        if results:
-            self._set_cached(key, results[0])
-            return results[0]
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                data = response.json()
+                self.cache[url] = {'time': now, 'data': data}
+                self._save_cache()
+                return data
+        except Exception as e:
+            print("API Error:", e)
         return None
 
-    def search_games(self, name: str, count: int = 8) -> list[dict]:
-        """Multi-result search — never cached (live search)."""
-        if not name.strip():
-            return []
-        return self._fetch({"search": name, "page_size": count})
+    def fetch_async(self, query_type, search_query="", callback=None):
+        class Worker(QRunnable):
+            def __init__(self, api, q_type, s_query):
+                super().__init__()
+                self.api = api
+                self.q_type = q_type
+                self.s_query = s_query
+                self.signals = WorkerSignals()
 
-    def get_popular_games(self, count: int = 12) -> list[dict]:
-        cached = self._get_cached("_popular")
-        if cached:
-            return cached
-        data = self._fetch({
-            "ordering":  "-metacritic",
-            "metacritic": "80,100",
-            "page_size":  count,
-        })
-        if data:
-            self._set_cached("_popular", data)
-        return data
+            def run(self):
+                API_KEY = "3e485ee2b0a54eae8eb1dcb3a93760ec"
+                url = f"https://api.rawg.io/api/games?key={API_KEY}"
+                
+                if self.q_type == "search" and self.s_query:
+                    url += f"&search={self.s_query}"
+                elif self.q_type == "trending":
+                    url += "&dates=2025-01-01,2026-05-05&ordering=-rating"
+                elif self.q_type == "popular":
+                    url += "&ordering=-added"
+                elif self.q_type == "upcoming":
+                    url += "&dates=2026-05-05,2028-12-31&ordering=released"
+                
+                data = self.api._get_cached_or_fetch(url)
+                normalized = []
+                if data and 'results' in data:
+                    for item in data['results']:
+                        normalized.append({
+                            "name": item.get("name"),
+                            "released": item.get("released", ""),
+                            "rating": item.get("rating", 0),
+                            "background_image": item.get("background_image", ""),
+                            "genres": [g["name"] for g in item.get("genres", [])]
+                        })
+                self.signals.finished.emit(normalized)
 
-    def get_upcoming_games(self, count: int = 12) -> list[dict]:
-        cached = self._get_cached("_upcoming")
-        if cached:
-            return cached
-        today = datetime.now().strftime("%Y-%m-%d")
-        future = (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d")
-        data = self._fetch({
-            "dates":     f"{today},{future}",
-            "ordering":  "-added",
-            "page_size": count,
-        })
-        if data:
-            self._set_cached("_upcoming", data)
-        return data
+        worker = Worker(self, query_type, search_query)
+        if callback:
+            worker.signals.finished.connect(callback)
+        
+        # Keep python reference alive until signal is processed
+        self._workers.append(worker)
+        worker.signals.finished.connect(lambda _: self._workers.remove(worker) if worker in self._workers else None)
+        
+        self.pool.start(worker)
 
-    def get_trending_games(self, count: int = 12) -> list[dict]:
-        cached = self._get_cached("_trending")
-        if cached:
-            return cached
-        end = datetime.now().strftime("%Y-%m-%d")
-        start = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
-        data = self._fetch({
-            "dates":     f"{start},{end}",
-            "ordering":  "-added",
-            "page_size": count,
-        })
-        if data:
-            self._set_cached("_trending", data)
-        return data
-
-    @staticmethod
-    def convert_rating_to_10(rawg_rating: float) -> int:
-        """Convert RAWG 0-5 scale → 1-10 integer."""
-        if rawg_rating <= 0:
-            return 0
-        return max(1, min(10, round(rawg_rating * 2)))
+class WorkerSignals(QObject):
+    finished = Signal(list)

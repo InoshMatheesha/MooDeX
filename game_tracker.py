@@ -246,8 +246,8 @@ class GameCard(ctk.CTkFrame):
         self.grid_propagate(False)
         self.pack_propagate(False)
         
-        img_h = int(card_w * 0.56)  # 16:9 ratio — perfect for game art, prevents zoom cropping
-        self.configure(width=card_w, height=img_h + 120, border_width=1, border_color=T["border"])
+        img_h = int(card_w * 0.60)   # slightly taller like your screenshot
+        self.configure(width=card_w, height=img_h + 110, border_width=1, border_color=T["border"])
         
         # Image — pinned to exact pixel size so it never over/underflows
         self.img_lbl = ctk.CTkLabel(self, text="", width=card_w, height=img_h, image=make_placeholder(card_w, img_h))
@@ -286,6 +286,9 @@ class GameCard(ctk.CTkFrame):
         meta_f.pack(fill="x", padx=10, pady=8)
         
         name = game["name"]
+        if len(name) > 42:
+            name = name[:40] + "..."
+            
         title_lbl = ctk.CTkLabel(meta_f, text=name, font=FONTS["bold"], text_color=T["text"], anchor="w", justify="left", wraplength=card_w - 28, height=40)
         title_lbl.pack(fill="x")
         
@@ -608,11 +611,15 @@ class MooDexApp(ctk.CTk):
         if ww <= 1:
             ww = self.winfo_width() - 250
 
-        # Force 5 columns as requested
-        cols = 5
-        CARD_GAP = 20
+        GAP = 20
+        SIDE_PADDING = 40   # left + right padding
 
-        card_w = (ww - (cols * CARD_GAP)) // cols
+        # exact 5 columns like your screenshot
+        cols = 5
+
+        usable = ww - SIDE_PADDING
+        card_w = (usable - (GAP * (cols - 1))) // cols
+
         return cols, card_w
 
     def _on_resize(self, e):
@@ -856,7 +863,21 @@ class MooDexApp(ctk.CTk):
             else:
                 card = self.card_widgets[name]
 
-            card.grid(row=i // cols, column=i % cols, padx=10, pady=12, sticky="nsew")
+            card.grid(
+                row=i // cols,
+                column=i % cols,
+                padx=(10, 10),
+                pady=(12, 12),
+                sticky="n"
+            )
+
+        # center the whole grid
+        total_width = (cw * cols) + (20 * (cols - 1))
+        container_width = self._scroll.winfo_width()
+
+        left_space = max(0, (container_width - total_width) // 2)
+
+        self.cards_frame.pack_configure(padx=(left_space, left_space))
 
         for i in range(cols):
             self.cards_frame.grid_columnconfigure(i, weight=1)
@@ -1063,15 +1084,28 @@ class MooDexApp(ctk.CTk):
         ctk.CTkButton(top_f, text="Search", height=40, fg_color=T["accent"], command=self._do_disc_search).pack(side="right")
         self._disc_search_rid = None
         
+        # Beautiful segmented control for tabs
         tab_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        tab_f.pack(fill="x", padx=16, pady=10)
-        for t, lbl in [("popular", "🔥 Popular"), ("upcoming", "📅 Upcoming"), ("trending", "⚡ Trending")]:
-            color = T["accent"] if self._disc_tab == t else "transparent"
-            t_color = T["text"] if self._disc_tab == t else T["text2"]
-            b = ctk.CTkButton(tab_f, text=lbl, fg_color=color, text_color=t_color, hover_color=T["surface2"], command=lambda x=t: self._set_disc_tab(x))
-            b.pack(side="left", padx=5)
+        tab_f.pack(fill="x", padx=16, pady=(10, 20))
+        
+        tab_bg = ctk.CTkFrame(tab_f, fg_color=T["surface"], corner_radius=20)
+        tab_bg.pack(side="left")
+        
+        for t, icon, lbl, acc in [("popular", "🔥", "Popular", T["red"]), ("upcoming", "📅", "Upcoming", T["amber"]), ("trending", "⚡", "Trending", T["purple"])]:
+            is_active = (self._disc_tab == t)
+            bg_color = acc if is_active else "transparent"
+            text_col = "#ffffff" if is_active else T["text2"]
+            hover_col = acc if is_active else T["surface2"]
             
-        self.d_lbl = ctk.CTkLabel(self._scroll, text="", font=FONTS["h2"], text_color=T["text"], anchor="w")
+            b = ctk.CTkButton(
+                tab_bg, text=f"{icon} {lbl}", font=("Segoe UI", 14, "bold" if is_active else "normal"),
+                fg_color=bg_color, text_color=text_col, hover_color=hover_col,
+                corner_radius=16, height=36, width=120,
+                command=lambda x=t: self._set_disc_tab(x)
+            )
+            b.pack(side="left", padx=4, pady=4)
+            
+        self.d_lbl = ctk.CTkLabel(self._scroll, text="", font=("Segoe UI", 24, "bold"), text_color=T["text"], anchor="w")
         self.d_lbl.pack(fill="x", padx=16, pady=(10,0))
         
         self._rf = ctk.CTkFrame(self._scroll, fg_color="transparent")
@@ -1167,73 +1201,162 @@ class MooDexApp(ctk.CTk):
                 w.destroy()
         
         stats = self.dm.stats()
+        games = self.dm.data.get("games", [])
         
-        # Big cards
-        cards_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        cards_f.pack(fill="x", padx=16, pady=20)
+        genre_counts = {}
+        plat_counts = {}
+        for g in games:
+            for genre in g.get("genres", []):
+                if genre: genre_counts[genre] = genre_counts.get(genre, 0) + 1
+            for plat in g.get("platforms", []):
+                if plat: plat_counts[plat] = plat_counts.get(plat, 0) + 1
+                
+        fav_genre = max(genre_counts, key=genre_counts.get) if genre_counts else "None"
+        total_playtime = sum(g.get("playtime", 0) for g in games)
         
-        items = [
-            ("🎮", str(stats["total"]), "Total Games", T["text"]),
-            ("▶", str(stats["by_status"].get("Playing", 0)), "Playing", T["green"]),
-            ("✓", str(stats["by_status"].get("Completed", 0)), "Completed", T["purple"]),
-            ("⭐", f"{stats['avg_rating']}/10", "Average Rating", T["accent"])
-        ]
+        # --- Hero Section ---
+        hero = ctk.CTkFrame(self._scroll, fg_color=T["surface"], corner_radius=16)
+        hero.pack(fill="x", padx=16, pady=(10, 20))
         
-        for i, (icon, val, lbl, color) in enumerate(items):
-            cards_f.grid_columnconfigure(i, weight=1)
-            c = ctk.CTkFrame(cards_f, fg_color=T["surface"], corner_radius=12)
-            c.grid(row=0, column=i, padx=8, sticky="ew")
-            ctk.CTkLabel(c, text=icon, font=("Segoe UI", 36), text_color=color).pack(pady=(20, 5))
-            ctk.CTkLabel(c, text=val, font=("Segoe UI", 32, "bold"), text_color=T["text"]).pack()
-            ctk.CTkLabel(c, text=lbl, font=FONTS["body"], text_color=T["text2"]).pack(pady=(0, 20))
+        hl = ctk.CTkFrame(hero, fg_color="transparent")
+        hl.pack(side="left", padx=30, pady=30)
+        
+        logo_path = os.path.join(os.path.dirname(__file__), "Icon Logo", "logo with name.png")
+        if os.path.exists(logo_path):
+            from PIL import Image
+            logo_img = ctk.CTkImage(light_image=Image.open(logo_path), dark_image=Image.open(logo_path), size=(180, 90))
+            ctk.CTkLabel(hl, text="", image=logo_img).pack(anchor="w", pady=(0, 10))
             
-        # Breakdowns
-        bot_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
-        bot_f.pack(fill="both", expand=True, padx=16, pady=10)
-        bot_f.grid_columnconfigure(0, weight=1)
-        bot_f.grid_columnconfigure(1, weight=1)
+        ctk.CTkLabel(hl, text="Your Gaming Journey", font=("Segoe UI", 32, "bold"), text_color=T["text"]).pack(anchor="w")
+        ctk.CTkLabel(hl, text="A comprehensive breakdown of your library and habits.", font=FONTS["body"], text_color=T["text2"]).pack(anchor="w", pady=(5,0))
         
-        # Left: Status Breakdown
-        stat_f = ctk.CTkFrame(bot_f, fg_color=T["surface"], corner_radius=12)
-        stat_f.grid(row=0, column=0, padx=8, sticky="nsew")
-        ctk.CTkLabel(stat_f, text="Library Status", font=FONTS["h2"], text_color=T["text"]).pack(anchor="w", padx=20, pady=20)
+        hr = ctk.CTkFrame(hero, fg_color="transparent")
+        hr.pack(side="right", padx=30, pady=30)
+        ctk.CTkLabel(hr, text="Total Completion", font=FONTS["small"], text_color=T["text2"]).pack(anchor="e")
         
         total = stats["total"] or 1
+        comp = stats["by_status"].get("Completed", 0)
+        pct = int((comp / total) * 100) if stats["total"] else 0
+        
+        comp_frame = ctk.CTkFrame(hr, fg_color="transparent")
+        comp_frame.pack(anchor="e")
+        ctk.CTkLabel(comp_frame, text=f"{pct}%", font=("Segoe UI", 48, "bold"), text_color=T["accent"]).pack(side="left")
+        
+        # --- Big Stat Cards Grid ---
+        cards_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
+        cards_f.pack(fill="x", padx=10)
+        
+        items = [
+            ("🎮", str(stats["total"]), "Total Games", T["accent2"], "#083344"),
+            ("▶", str(stats["by_status"].get("Playing", 0)), "Playing Now", T["green"], "#064e3b"),
+            ("⏱", f"{total_playtime}h", "Playtime", T["purple"], "#4c1d95"),
+            ("⭐", f"{stats['avg_rating']}/10", "Avg Rating", T["amber"], "#78350f"),
+            ("🔥", fav_genre, "Top Genre", T["red"], "#7f1d1d")
+        ]
+        
+        for i, (icon, val, lbl, fg_c, bg_c) in enumerate(items):
+            cards_f.grid_columnconfigure(i, weight=1)
+            c = ctk.CTkFrame(cards_f, fg_color=T["surface"], corner_radius=16)
+            c.grid(row=0, column=i, padx=6, sticky="ew")
+            
+            icon_bg = ctk.CTkFrame(c, fg_color=bg_c, width=50, height=50, corner_radius=12)
+            icon_bg.pack(anchor="w", padx=20, pady=(20, 10))
+            icon_bg.pack_propagate(False)
+            ctk.CTkLabel(icon_bg, text=icon, font=("Segoe UI", 24), text_color=fg_c).place(relx=0.5, rely=0.5, anchor="center")
+            
+            ctk.CTkLabel(c, text=val, font=("Segoe UI", 28, "bold"), text_color=T["text"]).pack(anchor="w", padx=20)
+            ctk.CTkLabel(c, text=lbl, font=FONTS["body"], text_color=T["text2"]).pack(anchor="w", padx=20, pady=(0, 20))
+            
+        # --- Breakdowns (Bottom) ---
+        bot_f = ctk.CTkFrame(self._scroll, fg_color="transparent")
+        bot_f.pack(fill="both", expand=True, padx=10, pady=20)
+        bot_f.grid_columnconfigure(0, weight=1)
+        bot_f.grid_columnconfigure(1, weight=1)
+        bot_f.grid_columnconfigure(2, weight=1)
+        
+        # Left: Status Breakdown
+        stat_f = ctk.CTkFrame(bot_f, fg_color=T["surface"], corner_radius=16)
+        stat_f.grid(row=0, column=0, padx=6, sticky="nsew")
+        ctk.CTkLabel(stat_f, text="Library Status", font=("Segoe UI", 20, "bold"), text_color=T["text"]).pack(anchor="w", padx=24, pady=(24, 10))
+        
         for st, config in STATUS.items():
             count = stats["by_status"].get(st, 0)
-            pct = count / total
+            p = count / total
             
             row = ctk.CTkFrame(stat_f, fg_color="transparent")
-            row.pack(fill="x", padx=20, pady=10)
+            row.pack(fill="x", padx=24, pady=10)
             
             top = ctk.CTkFrame(row, fg_color="transparent")
             top.pack(fill="x")
-            ctk.CTkLabel(top, text=st, font=FONTS["bold"], text_color=config["c"]).pack(side="left")
-            ctk.CTkLabel(top, text=str(count), font=FONTS["body"], text_color=T["text"]).pack(side="right")
+            
+            lbl_f = ctk.CTkFrame(top, fg_color="transparent")
+            lbl_f.pack(side="left")
+            ctk.CTkLabel(lbl_f, text=config["i"], font=FONTS["bold"], text_color=config["c"], width=20).pack(side="left")
+            ctk.CTkLabel(lbl_f, text=st, font=FONTS["bold"], text_color=T["text"]).pack(side="left", padx=5)
+            
+            ctk.CTkLabel(top, text=str(count), font=FONTS["bold"], text_color=T["text2"]).pack(side="right")
             
             bar_bg = ctk.CTkFrame(row, height=8, fg_color=T["border"], corner_radius=4)
-            bar_bg.pack(fill="x", pady=(5,0))
-            if pct > 0:
+            bar_bg.pack(fill="x", pady=(8,0))
+            if p > 0:
                 bar_fg = ctk.CTkFrame(bar_bg, height=8, fg_color=config["c"], corner_radius=4)
-                bar_fg.place(relwidth=pct, relheight=1)
+                bar_fg.place(relwidth=p, relheight=1)
 
-        # Right: Top Rated
-        top_f = ctk.CTkFrame(bot_f, fg_color=T["surface"], corner_radius=12)
-        top_f.grid(row=0, column=1, padx=8, sticky="nsew")
-        ctk.CTkLabel(top_f, text="Top Rated Games", font=FONTS["h2"], text_color=T["text"]).pack(anchor="w", padx=20, pady=20)
+        # Middle: Top Platforms
+        plat_f = ctk.CTkFrame(bot_f, fg_color=T["surface"], corner_radius=16)
+        plat_f.grid(row=0, column=1, padx=6, sticky="nsew")
+        ctk.CTkLabel(plat_f, text="Top Platforms", font=("Segoe UI", 20, "bold"), text_color=T["text"]).pack(anchor="w", padx=24, pady=(24, 10))
         
-        games = [g for g in self.dm.data["games"] if g.get("rating", 0) > 0]
-        games.sort(key=lambda x: x["rating"], reverse=True)
-        
-        for i, g in enumerate(games[:5]):
-            row = ctk.CTkFrame(top_f, fg_color="transparent")
-            row.pack(fill="x", padx=20, pady=10)
-            ctk.CTkLabel(row, text=f"#{i+1}", font=FONTS["bold"], text_color=T["text3"], width=30).pack(side="left")
-            ctk.CTkLabel(row, text=g["name"], font=FONTS["body"], text_color=T["text"]).pack(side="left", padx=10)
-            ctk.CTkLabel(row, text=f"★ {g['rating']}/10", font=FONTS["bold"], text_color=T["amber"]).pack(side="right")
+        sorted_plats = sorted(plat_counts.items(), key=lambda x: x[1], reverse=True)
+        for p_name, count in sorted_plats[:5]:
+            p_pct = count / total
+            if p_pct > 1.0: p_pct = 1.0
             
-        if not games:
-            ctk.CTkLabel(top_f, text="No rated games yet.", text_color=T["text2"]).pack(pady=40)
+            row = ctk.CTkFrame(plat_f, fg_color="transparent")
+            row.pack(fill="x", padx=24, pady=10)
+            
+            top = ctk.CTkFrame(row, fg_color="transparent")
+            top.pack(fill="x")
+            
+            ctk.CTkLabel(top, text=p_name, font=FONTS["bold"], text_color=T["text"]).pack(side="left")
+            ctk.CTkLabel(top, text=str(count), font=FONTS["bold"], text_color=T["text2"]).pack(side="right")
+            
+            bar_bg = ctk.CTkFrame(row, height=8, fg_color=T["border"], corner_radius=4)
+            bar_bg.pack(fill="x", pady=(8,0))
+            if p_pct > 0:
+                bar_fg = ctk.CTkFrame(bar_bg, height=8, fg_color=T["accent2"], corner_radius=4)
+                bar_fg.place(relwidth=p_pct, relheight=1)
+                
+        if not sorted_plats:
+            ctk.CTkLabel(plat_f, text="No platforms found.", font=FONTS["body"], text_color=T["text2"]).pack(pady=40)
+
+        # Right: Hall of Fame
+        top_f = ctk.CTkFrame(bot_f, fg_color=T["surface"], corner_radius=16)
+        top_f.grid(row=0, column=2, padx=6, sticky="nsew")
+        ctk.CTkLabel(top_f, text="Hall of Fame", font=("Segoe UI", 20, "bold"), text_color=T["text"]).pack(anchor="w", padx=24, pady=(24, 10))
+        
+        rated_games = [g for g in games if g.get("rating", 0) > 0]
+        rated_games.sort(key=lambda x: x["rating"], reverse=True)
+        
+        for i, g in enumerate(rated_games[:5]):
+            row = ctk.CTkFrame(top_f, fg_color=T["surface2"], corner_radius=8)
+            row.pack(fill="x", padx=24, pady=6)
+            
+            rank_bg = T["accent"] if i == 0 else (T["amber"] if i == 1 else (T["text3"] if i == 2 else T["border"]))
+            rank_fg = "#ffffff" if i < 3 else T["text2"]
+            rank_f = ctk.CTkFrame(row, fg_color=rank_bg, width=28, height=28, corner_radius=14)
+            rank_f.pack(side="left", padx=10, pady=10)
+            rank_f.pack_propagate(False)
+            ctk.CTkLabel(rank_f, text=str(i+1), font=("Segoe UI", 12, "bold"), text_color=rank_fg).place(relx=0.5, rely=0.5, anchor="center")
+            
+            ctk.CTkLabel(row, text=g["name"], font=FONTS["bold"], text_color=T["text"]).pack(side="left", padx=5)
+            
+            r_frame = ctk.CTkFrame(row, fg_color="#451a03", corner_radius=10)
+            r_frame.pack(side="right", padx=10)
+            ctk.CTkLabel(r_frame, text=f"★ {g['rating']}", font=("Segoe UI", 12, "bold"), text_color=T["amber"]).pack(padx=8, pady=2)
+            
+        if not rated_games:
+            ctk.CTkLabel(top_f, text="No rated games yet. Play and rate some games!", font=FONTS["body"], text_color=T["text2"]).pack(pady=40)
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("dark")

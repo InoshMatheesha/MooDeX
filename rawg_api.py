@@ -138,10 +138,10 @@ class RAWGApiClient:
         if cached:
             return cached
         end = datetime.now().strftime("%Y-%m-%d")
-        start = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        start = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
         data = self._fetch({
             "dates":     f"{start},{end}",
-            "ordering":  "-rating",
+            "ordering":  "-added",
             "page_size": count,
         })
         if data:

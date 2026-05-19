@@ -12,10 +12,14 @@ class IconManager:
         return cls._instance
         
     def __init__(self):
-        self.icons_dir = os.path.join(os.path.dirname(__file__), "assets", "icons")
+        import sys
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(__file__)
+        self.icons_dir = os.path.join(base_path, "assets", "icons")
         os.makedirs(self.icons_dir, exist_ok=True)
         self.icons = {}
-        self._generate_svgs()
         
     def _generate_svgs(self):
         # We programmatically generate these pristine SVG vector icons so the app 

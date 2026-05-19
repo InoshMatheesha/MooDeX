@@ -87,10 +87,35 @@ class DiscoverView(QWidget):
         
         layout.addWidget(self.tabs)
         
-        # Fetch initial data
+        # Lazy Loading Logic
+        from settings_manager import load_settings
+        settings = load_settings()
+        lazy = settings.get("lazy_discover", True)
+        
+        self.loaded_tabs = {"popular": False, "upcoming": False, "trending": False}
+        
         self.load_tab_data("popular", self.popular_tab["layout"])
-        self.load_tab_data("upcoming", self.upcoming_tab["layout"])
-        self.load_tab_data("trending", self.trending_tab["layout"])
+        self.loaded_tabs["popular"] = True
+        
+        if not lazy:
+            self.load_tab_data("upcoming", self.upcoming_tab["layout"])
+            self.loaded_tabs["upcoming"] = True
+            self.load_tab_data("trending", self.trending_tab["layout"])
+            self.loaded_tabs["trending"] = True
+
+        self.tabs.currentChanged.connect(self.on_tab_changed)
+
+    def on_tab_changed(self, index):
+        term = self.search_input.text().strip()
+        if term:
+            return # Let search handle it
+            
+        if index == 1 and not self.loaded_tabs["upcoming"]:
+            self.load_tab_data("upcoming", self.upcoming_tab["layout"])
+            self.loaded_tabs["upcoming"] = True
+        elif index == 2 and not self.loaded_tabs["trending"]:
+            self.load_tab_data("trending", self.trending_tab["layout"])
+            self.loaded_tabs["trending"] = True
 
     def create_grid_tab(self):
         scroll_area = QScrollArea()
@@ -134,6 +159,8 @@ class DiscoverView(QWidget):
                 
             game["status"] = "Like to Play"
             card = GameCard(game)
+            if hasattr(card, "playtime_text"):
+                card.playtime_text.hide()
             card.add_clicked.connect(lambda gd, c=card: self.on_add_game(gd, c))
             card.edit_btn.hide()
             card.del_btn.hide()
@@ -144,11 +171,12 @@ class DiscoverView(QWidget):
                 card.add_btn.setEnabled(False)
                 card.add_btn.setStyleSheet("""
                     QPushButton {
-                        background-color: #2d2e3a;
-                        color: #6b7280;
+                        background-color: #008000;
+                        color: #008000;
                         border-radius: 8px;
                         padding: 0 12px;
                         font-weight: bold;
+                        padding-left: 8px;
                     }
                 """)
                 
@@ -184,11 +212,12 @@ class DiscoverView(QWidget):
                     card.add_btn.setEnabled(False)
                     card.add_btn.setStyleSheet("""
                         QPushButton {
-                            background-color: #2d2e3a;
-                            color: #6b7280;
+                            background-color: #008000;
+                            color: #008000;
                             border-radius: 8px;
                             padding: 0 12px;
                             font-weight: bold;
+                            padding-left: 8px;
                         }
                     """)
                 else:

@@ -101,6 +101,15 @@ class SettingsView(QWidget):
         ))
         layout.addWidget(self._divider())
 
+        self.launch_minimized_toggle = SettingsToggle(initial=self._settings["launch_minimized"])
+        self.launch_minimized_toggle.toggled.connect(self._on_launch_minimized)
+        layout.addWidget(SettingRow(
+            "Launch Minimized",
+            "When opened, MooDeX will start minimized to the system tray.",
+            self.launch_minimized_toggle
+        ))
+        layout.addWidget(self._divider())
+
         # ── Section: Performance ─────────────────────────────────
         self._add_section(layout, "Performance")
 
@@ -122,13 +131,13 @@ class SettingsView(QWidget):
         ))
         layout.addWidget(self._divider())
 
-        # ── Section: About ───────────────────────────────────────
-        self._add_section(layout, "About")
-        about_text = QLabel("MooDeX  ·  v1.0.0  ·  Built with PySide6 + RAWG API")
-        about_text.setStyleSheet("color: #4b5563; font-size: 12px; margin: 8px 0 20px 0;")
-        layout.addWidget(about_text)
-
+        # ── Bottom stretch ───────────────────────────────────────
         layout.addStretch()
+
+        # ── Section: About ───────────────────────────────────────
+        about_text = QLabel("MooDeX  ·  v1.6")
+        about_text.setStyleSheet("color: #4b5563; font-size: 12px; margin: 8px 0 0px 0;")
+        layout.addWidget(about_text, alignment=Qt.AlignBottom | Qt.AlignLeft)
 
     # ── Toggle handlers (save on every change) ───────────────────
     def _on_close_to_tray(self, val):
@@ -138,6 +147,10 @@ class SettingsView(QWidget):
 
     def _on_autostart(self, val):
         self._settings["autostart"] = val
+        save_settings(self._settings)
+
+    def _on_launch_minimized(self, val):
+        self._settings["launch_minimized"] = val
         save_settings(self._settings)
 
     def _on_lazy_discover(self, val):

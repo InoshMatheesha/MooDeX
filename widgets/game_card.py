@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QGraphicsDropShadowEffect, QFrame
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFrame
 from PySide6.QtCore import Qt, Signal, QPropertyAnimation, QEasingCurve, QParallelAnimationGroup, QPoint, QRect, QSize
 from PySide6.QtGui import QPixmap, QColor, QPainter, QPainterPath, QIcon
 from image_loader import ImageLoader
@@ -46,12 +46,6 @@ class GameCard(QWidget):
         """
         self.card_frame.setObjectName("card")
         self.card_frame.setStyleSheet(self.base_style)
-
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(15)
-        self.shadow.setColor(QColor(0, 0, 0, 80))
-        self.shadow.setOffset(0, 4)
-        self.card_frame.setGraphicsEffect(self.shadow)
 
         layout = QVBoxLayout(self.card_frame)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -112,6 +106,28 @@ class GameCard(QWidget):
         self.rating_label.setPixmap(star_pixmap)
         self.rating_text = QLabel(f" {rating}")
         self.rating_text.setStyleSheet("color: #fbbf24; font-weight: bold; font-size: 13px;")
+
+        playtime = float(game_data.get("playtime", 0))
+
+        hours = int(playtime)
+
+        minutes = int((playtime - hours) * 60)
+
+        if hours > 0:
+            playtime_text = f"{hours}h {minutes}m"
+        else:
+            playtime_text = f"{minutes}m"
+
+        self.playtime_text = QLabel(playtime_text)
+
+        if playtime <= 0:
+            self.playtime_text.hide()
+
+        self.playtime_text.setStyleSheet("""
+            color: #cfcfe6;
+            font-size: 14px;
+            font-weight: 600;
+        """)
         
         rating_layout = QHBoxLayout()
         rating_layout.setContentsMargins(0, 0, 0, 0)
@@ -131,8 +147,10 @@ class GameCard(QWidget):
 
         info_vbox = QVBoxLayout()
         info_vbox.setSpacing(2)
+
         info_vbox.addWidget(self.status_label)
         info_vbox.addWidget(self.rating_widget)
+        info_vbox.addWidget(self.playtime_text)
 
         self.action_layout = QHBoxLayout()
         self.action_layout.setSpacing(8)
@@ -163,14 +181,21 @@ class GameCard(QWidget):
 
         self.add_btn.setStyleSheet("""
             QPushButton {
-                background-color: #6366f1;
+                background-color: #10b981;
                 border-radius: 16px;
                 border: none;
                 padding-left: 8px;
                 padding-bottom: 10px;
             }
+
             QPushButton:hover {
-                background-color: #4f46e5;
+                background-color: #34d399;
+                border: 1px solid #6ee7b7;
+            }
+
+            QPushButton:pressed {
+                background-color: #059669;
+                padding-top: 2px;
             }
         """)
 
@@ -183,8 +208,15 @@ class GameCard(QWidget):
                 padding-left: 9px;
                 padding-bottom: 10px;
             }
+
             QPushButton:hover {
                 background-color: #4f46e5;
+                border: 1px solid #818cf8;
+            }
+
+            QPushButton:pressed {
+                background-color: #3730a3;
+                padding-top: 2px;
             }
         """)
         
@@ -196,9 +228,15 @@ class GameCard(QWidget):
                 padding-left: 7px;
                 padding-bottom: 10px;
             }
+
             QPushButton:hover {
-                background-color: rgba(239, 68, 68, 0.15);
+                background-color: rgba(239, 68, 68, 0.2);
                 border: 1px solid #ef4444;
+            }
+
+            QPushButton:pressed {
+                background-color: rgba(239, 68, 68, 0.35);
+                padding-top: 2px;
             }
         """)
 
@@ -216,6 +254,47 @@ class GameCard(QWidget):
         layout.addStretch()
 
         self.setup_animations()
+
+    def update_ui(self, game_data):
+        self.game_data = game_data
+        
+        status = game_data.get("status", "Like to Play")
+        colors = {
+            "Playing": "#10b981",
+            "Completed": "#3b82f6",
+            "Like to Play": "#f59e0b",
+            "Stopped": "#ef4444"
+        }
+        color = colors.get(status, "#ffffff")
+        
+        if "exe_path" in game_data:
+            last_played = game_data.get("last_played", "Never")
+            self.status_label.setText(f"{last_played.upper()}\n")
+            self.status_label.setStyleSheet("color: #a0a0b0; font-weight: 800; font-size: 11px; letter-spacing: 1px;")
+        else:
+            self.status_label.setText(status.upper())
+            self.status_label.setStyleSheet(f"color: {color}; font-weight: 800; font-size: 11px; letter-spacing: 1px;")
+
+        rating = game_data.get("rating", 0.0)
+        self.rating_text.setText(f" {rating}")
+        
+        if status == "Like to Play" or "exe_path" in game_data:
+            self.rating_widget.hide()
+        else:
+            self.rating_widget.show()
+            
+        playtime = float(game_data.get("playtime", 0))
+        hours = int(playtime)
+        minutes = int((playtime - hours) * 60)
+        if hours > 0:
+            self.playtime_text.setText(f"{hours}h {minutes}m")
+        else:
+            self.playtime_text.setText(f"{minutes}m")
+            
+        if playtime <= 0:
+            self.playtime_text.hide()
+        else:
+            self.playtime_text.show()
 
     def set_image(self, pixmap):
         try:
@@ -251,26 +330,27 @@ class GameCard(QWidget):
         self.anim_move = QPropertyAnimation(self.card_frame, b"pos")
         self.anim_move.setEasingCurve(QEasingCurve.OutCubic)
         self.anim_move.setDuration(250)
-
-        self.anim_shadow = QPropertyAnimation(self.shadow, b"blurRadius")
-        self.anim_shadow.setDuration(250)
-
         self.hover_group = QParallelAnimationGroup()
         self.hover_group.addAnimation(self.anim_move)
-        self.hover_group.addAnimation(self.anim_shadow)
 
     def enterEvent(self, event):
-        self.hover_group.stop()
-        self.anim_move.setEndValue(QPoint(5, 0))
-        self.anim_shadow.setEndValue(30)
         self.card_frame.setStyleSheet(self.hover_style)
+
+        self.anim_move.stop()
+        self.anim_move.setStartValue(self.card_frame.pos())
+        self.anim_move.setEndValue(QPoint(5, 0))
         self.hover_group.start()
+
         super().enterEvent(event)
 
     def leaveEvent(self, event):
-        self.hover_group.stop()
-        self.anim_move.setEndValue(QPoint(5, 5))
-        self.anim_shadow.setEndValue(15)
         self.card_frame.setStyleSheet(self.base_style)
+
+        self.anim_move.stop()
+        self.anim_move.setStartValue(self.card_frame.pos())
+        self.anim_move.setEndValue(QPoint(5, 5))
         self.hover_group.start()
+
         super().leaveEvent(event)
+
+

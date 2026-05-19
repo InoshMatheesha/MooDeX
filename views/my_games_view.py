@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QScrollArea, QPushButton, QFileDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QScrollArea, QPushButton, QFileDialog, QComboBox
 from PySide6.QtCore import Qt, QTimer
 from widgets.game_card import GameCard
 from flow_layout import FlowLayout
@@ -11,6 +11,7 @@ class MyGamesView(QWidget):
         super().__init__()
         self.data_manager = data_manager
         self.data_manager.data_changed.connect(self.refresh_grid)
+        self.card_cache = {}
         
         layout = QVBoxLayout(self)
         
@@ -37,13 +38,13 @@ class MyGamesView(QWidget):
         """)
         self.search_input.textChanged.connect(self.filter_games)
         
-        add_btn = QPushButton("+ Manually Add Game")
+        add_btn = QPushButton("╋")
         add_btn.setStyleSheet("""
             QPushButton {
                 background-color: #6366f1; 
                 color: white; 
-                border-radius: 8px; 
-                padding: 8px 15px; 
+                border-radius: 17px; 
+                padding: 8px 12px; 
                 font-weight: bold;
             }
             QPushButton:hover {
@@ -52,8 +53,27 @@ class MyGamesView(QWidget):
         """)
         add_btn.clicked.connect(self.add_local_game_dialog)
         
+        self.sort_combo = QComboBox()
+        self.sort_combo.addItems([
+            "Recently Played",
+            "Playtime",
+            "Name (A-Z)"
+        ])
+        self.sort_combo.setStyleSheet("""
+            QComboBox {
+                background-color: #1c1d24;
+                color: white;
+                border: 1px solid #2d2e3a;
+                border-radius: 12px;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        """)
+        self.sort_combo.currentTextChanged.connect(self.filter_games)
+
         header_layout.addWidget(title)
         header_layout.addStretch()
+        header_layout.addWidget(self.sort_combo)
         header_layout.addWidget(self.search_input)
         header_layout.addWidget(add_btn)
         
@@ -98,135 +118,199 @@ class MyGamesView(QWidget):
                 Toast(self.window(), f"Successfully linked {game_data.get('name')}!", "success").show_toast()
             
     def refresh_grid(self):
+        self.setUpdatesEnabled(False)
+
         scroll_pos = self.scroll_area.verticalScrollBar().value()
-        while self.flow_layout.count():
-            item = self.flow_layout.takeAt(0)
-            if item.widget():
-                item.widget().setParent(None)
-                item.widget().deleteLater()
-                
-        games = self.data_manager.data.get("local_games", [])
-        term = self.search_input.text().lower()
+
+        games = self.data_manager.data.get("local_games", [])[:]
         
+        sort_mode = self.sort_combo.currentText()
+        if sort_mode == "Recently Played":
+            def sort_date(g):
+                lp = g.get("last_played", "Never")
+                return lp if lp != "Never" else ""
+            games.sort(key=sort_date, reverse=True)
+        elif sort_mode == "Playtime":
+            games.sort(key=lambda g: float(g.get("playtime", 0)), reverse=True)
+        elif sort_mode == "Name (A-Z)":
+            games.sort(key=lambda g: g.get("name", "").lower())
+
+        term = self.search_input.text().lower()
+
+        # ----------------------------------------
+        # 1) Prepare new visible paths
+        # ----------------------------------------
+        visible_paths = set()
+
         for game in games:
             if term and term not in game.get("name", "").lower():
                 continue
-            try:
+
+            exe_path = game.get("exe_path")
+            visible_paths.add(exe_path)
+
+        # Instead of removing widgets, we will keep them and reorder the layout's internal itemList.
+
+        # ----------------------------------------
+        # 2) Show/Create cards
+        # ----------------------------------------
+        for game in games:
+            exe_path = game.get("exe_path")
+            
+            # create missing cards
+            if exe_path not in self.card_cache:
                 card = GameCard(game)
-                # Completely clear GameCard's default action layout to build our custom premium row
+                self.card_cache[exe_path] = card
+                self.flow_layout.addWidget(card)
+                
+                # customize header for local games
                 card.add_btn.hide()
                 card.edit_btn.hide()
                 card.del_btn.hide()
+                card.rating_widget.hide()
+
                 while card.action_layout.count():
                     card.action_layout.takeAt(0)
-                
-                card.action_layout.setSpacing(6) # tighter spacing between the premium pills
-                
-                # Play button
+
+                card.action_layout.setSpacing(6)
+
+                # PLAY BUTTON
                 card.play_btn = QPushButton()
                 card.play_btn.setIcon(IconManager.get_instance().get_icon("play"))
                 card.play_btn.setIconSize(QSize(16, 16))
-                card.play_btn.setCursor(Qt.PointingHandCursor)
-                card.play_btn.setToolTip("Play Game")
+                card.play_btn.setFixedSize(32, 32)
+
                 card.play_btn.setStyleSheet("""
                     QPushButton {
-                        background-color: #10b981; 
-                        border-radius: 16px; 
+                        background-color: #2D2E3A;
+                        border-radius: 16px;
                         border: none;
-                        padding-left: 9px;
+                        padding-left: 8px;
                         padding-bottom: 10px;
                     }
-                    QPushButton:hover { 
-                        background-color: #059669; 
+
+                    QPushButton:hover {
+                        background-color: #34d399;
+                        border: 1px solid #6ee7b7;
+                    }
+
+                    QPushButton:pressed {
+                        background-color: #059669;
+                        padding-top: 2px;
                     }
                 """)
-                card.play_btn.setFixedSize(32, 32)
-                card.play_btn.clicked.connect(lambda checked=False, p=game.get("exe_path"): self.launch_game(p))
-                
-                # Relink button
+
+                card.play_btn.clicked.connect(
+                    lambda checked=False, p=exe_path: self.launch_game(p)
+                )
+
+                # RELINK BUTTON
                 card.relink_btn = QPushButton()
                 card.relink_btn.setIcon(IconManager.get_instance().get_icon("relink"))
                 card.relink_btn.setIconSize(QSize(16, 16))
-                card.relink_btn.setCursor(Qt.PointingHandCursor)
-                card.relink_btn.setToolTip("Relink Metadata")
+                card.relink_btn.setFixedSize(32, 32)
+
                 card.relink_btn.setStyleSheet("""
                     QPushButton {
-                        background-color: #4f46e5; 
-                        border-radius: 16px; 
+                        background-color: #2D2E3A;
+                        border-radius: 16px;
                         border: none;
-                        padding-left: 9px;
+                        padding-left: 8px;
                         padding-bottom: 10px;
                     }
-                    QPushButton:hover { 
-                        background-color: #3730a3; 
+
+                    QPushButton:hover {
+                        background-color: #05335e;
+                        border: 1px solid #143968;
+                    }
+
+                    QPushButton:pressed {
+                        background-color: #02025E;
+                        padding-top: 2px;
                     }
                 """)
-                card.relink_btn.setFixedSize(32, 32)
-                card.relink_btn.clicked.connect(lambda checked=False, p=game.get("exe_path"), pt=game.get("playtime", 0), lp=game.get("last_played", "Never"): self.link_game(p, pt, lp))
-                
-                # Unlink button
+                card.relink_btn.clicked.connect(
+                    lambda checked=False,
+                    p=exe_path,
+                    pt=game.get("playtime", 0),
+                    lp=game.get("last_played", "Never"):
+                        self.link_game(p, pt, lp)
+                )
+
+                # UNLINK BUTTON
                 card.unlink_btn = QPushButton()
                 card.unlink_btn.setIcon(IconManager.get_instance().get_icon("unlink"))
                 card.unlink_btn.setIconSize(QSize(16, 16))
-                card.unlink_btn.setCursor(Qt.PointingHandCursor)
-                card.unlink_btn.setToolTip("Unlink Game")
+                card.unlink_btn.setFixedSize(32, 32)
+
                 card.unlink_btn.setStyleSheet("""
                     QPushButton {
-                        background-color: transparent;
-                        border: 1px solid rgba(239, 68, 68, 0.3);
+                        background-color: #2D2E3A;
                         border-radius: 16px;
-                        padding-left: 7px;
+                        border: none;
+                        padding-left: 8px;
                         padding-bottom: 10px;
                     }
-                    QPushButton:hover { 
-                        background-color: rgba(239, 68, 68, 0.15); 
-                        border: 1px solid #ef4444;
+
+                    QPushButton:hover {
+                        background-color: #f87171;
+                        border: 1px solid #fca5a5;
+                    }
+
+                    QPushButton:pressed {
+                        background-color: #ef4444;
+                        padding-top: 2px;
                     }
                 """)
-                card.unlink_btn.setFixedSize(32, 32)
-                card.unlink_btn.clicked.connect(lambda checked=False, p=game.get("exe_path"): self.data_manager.remove_local_game(p))
-                
-                # Inject new premium row
+
+                card.unlink_btn.clicked.connect(
+                    lambda checked=False, p=exe_path:
+                        self.data_manager.remove_local_game(p)
+                )
+
                 card.action_layout.addWidget(card.play_btn)
                 card.action_layout.addWidget(card.relink_btn)
                 card.action_layout.addWidget(card.unlink_btn)
-                
-                # Metadata Indicator
-                has_meta = "id" in game or "background_image" in game
-                indicator = "Linked" if has_meta else "Metadata ⚠️"
-                
-                # Override status label
-                card.status_label.setText(f"{indicator}\n\n{game.get('last_played', 'Never').upper()}\n")
-                card.status_label.setStyleSheet("color: #3b82f6; font-weight: 800; font-size: 11px;")
-                
-                # Override rating with exact playtime (hrs/mins)
-                playtime_raw = float(game.get("playtime", 0))
-                hours = int(playtime_raw)
-                minutes = int((playtime_raw - hours) * 60)
-                time_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
-                
-                clock_pixmap = IconManager.get_instance().get_icon("clock").pixmap(QSize(14, 14))
-                card.rating_label.setPixmap(clock_pixmap)
-                
-                if hasattr(card, 'rating_text'):
-                    card.rating_text.setText(f" {time_str}")
-                    card.rating_text.setStyleSheet("color: #a0a0b0; font-weight: bold; font-size: 13px;")
-                    card.rating_widget.show()
-                else:
-                    # Fallback just in case GameCard hasn't fully upgraded rating_text
-                    card.rating_label.setText(f" {time_str}")
-                    card.rating_label.setStyleSheet("color: #a0a0b0; font-weight: bold; font-size: 13px;")
-                    card.rating_label.show()
-                
-                self.flow_layout.addWidget(card)
-            except Exception as e:
-                print(f"Error rendering game card: {e}")
-            
-        # Force layout update to prevent empty grid glitch
-        self.flow_layout.invalidate()
-        self.grid_widget.updateGeometry()
+
+            # =========================
+            # UPDATE UI
+            # =========================
+            card = self.card_cache[exe_path]
+            card.update_ui(game)
+
+        # ----------------------------------------
+        # REORDER THE LAYOUT
+        # ----------------------------------------
+        new_item_list = []
+        # First append items in sorted 'games' order
+        for game in games:
+            exe_path = game.get("exe_path")
+            card = self.card_cache.get(exe_path)
+            if card:
+                for item in self.flow_layout.itemList:
+                    if item.widget() == card:
+                        new_item_list.append(item)
+                        break
         
-        QTimer.singleShot(0, lambda: self.scroll_area.verticalScrollBar().setValue(scroll_pos))
+        # Then append any remaining items (like removed games that are not in 'games' anymore)
+        for item in self.flow_layout.itemList:
+            if item not in new_item_list:
+                new_item_list.append(item)
+                
+        self.flow_layout.itemList = new_item_list
+
+        # ----------------------------------------
+        # 3) Hide removed/filtered cards
+        # ----------------------------------------
+        for path, card in self.card_cache.items():
+            if path not in visible_paths:
+                card.hide()
+            else:
+                card.show()
+
+        self.flow_layout.invalidate()
+        self.scroll_area.verticalScrollBar().setValue(scroll_pos)
+        self.setUpdatesEnabled(True)
             
     def filter_games(self):
         self.refresh_grid()

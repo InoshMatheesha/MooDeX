@@ -21,7 +21,24 @@ class LibraryView(QWidget):
         self.search_input.textChanged.connect(self.filter_games)
         
         self.filter_combo = QComboBox()
-        self.filter_combo.addItems(["All", "Playing", "Completed", "Like to Play", "Stopped"])
+
+        self.filter_combo.addItems([
+            "All",
+            "Playing",
+            "Completed",
+            "Like to Play",
+            "Stopped",
+
+            "Name (A-Z)",
+            "Name (Z-A)",
+
+            "Rating (Highest)",
+            "Rating (Lowest)",
+
+            "Release Year (Newest)",
+            "Release Year (Oldest)"
+        ])
+
         self.filter_combo.currentTextChanged.connect(self.filter_games)
 
         header_layout.addWidget(title)
@@ -70,19 +87,30 @@ class LibraryView(QWidget):
         layout.addWidget(self.scroll_area)
         
         # Initial population
+        self.card_cache = {}
+        self.games_to_render = []
+        self.creation_timer = QTimer()
+        self.creation_timer.timeout.connect(self._process_render_chunk)
+        
         self.refresh_grid()
 
     def refresh_grid(self):
-        scroll_pos = self.scroll_area.verticalScrollBar().value()
-
-        # Clear existing
-        while self.flow_layout.count():
-            item = self.flow_layout.takeAt(0)
-            if item.widget():
-                item.widget().setParent(None)
-                item.widget().deleteLater()
-
         games = self.data_manager.get_games()
+        selected = self.filter_combo.currentText()
+
+        if selected == "Name (A-Z)":
+            games.sort(key=lambda g: g.get("name", "").lower())
+        elif selected == "Name (Z-A)":
+            games.sort(key=lambda g: g.get("name", "").lower(), reverse=True)
+        elif selected == "Rating (Highest)":
+            games.sort(key=lambda g: g.get("rating", 0), reverse=True)
+        elif selected == "Rating (Lowest)":
+            games.sort(key=lambda g: g.get("rating", 0))
+        elif selected == "Release Year (Newest)":
+            games.sort(key=lambda g: g.get("released", ""), reverse=True)
+        elif selected == "Release Year (Oldest)":
+            games.sort(key=lambda g: g.get("released", ""))
+
         search_term = self.search_input.text().lower()
         filter_status = self.filter_combo.currentText()
 
@@ -90,7 +118,18 @@ class LibraryView(QWidget):
         counts = {s: 0 for s in self.stats_labels.keys()}
         counts["All"] = len(games)
 
+        visible_games = []
+        
+        local_games = self.data_manager.data.get("local_games", [])
+        
         for game in games:
+            # Sync playtime from local_games if available
+            game_name = game.get("name", "").lower()
+            for lg in local_games:
+                if lg.get("name", "").lower() == game_name:
+                    game["playtime"] = lg.get("playtime", 0)
+                    break
+                    
             # Count the stat
             st = game.get("status", "Like to Play")
             if st in counts:
@@ -99,13 +138,14 @@ class LibraryView(QWidget):
             # Filter normally from view bounds
             if search_term and search_term not in game.get("name", "").lower():
                 continue
-            if filter_status != "All" and st != filter_status:
-                continue
+            
+            normal_filters = ["All", "Playing", "Completed", "Like to Play", "Stopped"]
 
-            card = GameCard(game)
-            card.delete_clicked.connect(self.on_delete_game)
-            card.edit_clicked.connect(self.on_edit_game)
-            self.flow_layout.addWidget(card)
+            if filter_status in normal_filters:
+                if filter_status != "All" and st != filter_status:
+                    continue
+                    
+            visible_games.append(game)
 
         # Update the visual labels
         for s, lbl in self.stats_labels.items():
@@ -113,16 +153,74 @@ class LibraryView(QWidget):
                 lbl.setText(f"{s}: <span style='color: #6366f1;'>{counts[s]}</span>")
                 lbl.show()
             else:
-                # Optional: Hide pills with 0, or just show 0
                 lbl.setText(f"{s}: 0")
                 lbl.show()
 
-        # Force layout update
-        self.flow_layout.invalidate()
-        self.grid_widget.updateGeometry()
+        self.visible_games = visible_games
+
+        # Determine missing cards that need to be generated
+        missing_games = [g for g in games if g.get("name") not in self.card_cache]
+
+        if missing_games:
+            self.games_to_render.extend(missing_games)
+            if not self.creation_timer.isActive():
+                self.creation_timer.start(5) # 5ms interval
+        else:
+            self._reorder_and_filter()
+
+    def _process_render_chunk(self):
+        if not self.games_to_render:
+            self.creation_timer.stop()
+            self._reorder_and_filter()
+            return
+            
+        # process up to 10 cards per tick
+        chunk = self.games_to_render[:10]
+        self.games_to_render = self.games_to_render[10:]
         
-        # Restore scroll bar position after event loop processes the new layout
-        QTimer.singleShot(0, lambda: self.scroll_area.verticalScrollBar().setValue(scroll_pos))
+        for game in chunk:
+            name = game.get("name")
+            if name not in self.card_cache:
+                card = GameCard(game)
+                card.delete_clicked.connect(self.on_delete_game)
+                card.edit_clicked.connect(self.on_edit_game)
+                self.card_cache[name] = card
+                self.flow_layout.addWidget(card)
+
+    def _reorder_and_filter(self):
+        scroll_pos = self.scroll_area.verticalScrollBar().value()
+        self.setUpdatesEnabled(False)
+        
+        # Build new item list to enforce sorting order
+        new_item_list = []
+        for game in self.visible_games:
+            name = game.get("name")
+            card = self.card_cache.get(name)
+            if card:
+                card.update_ui(game)
+                for item in self.flow_layout.itemList:
+                    if item.widget() == card:
+                        new_item_list.append(item)
+                        break
+                        
+        # add remaining so we don't lose items
+        for item in self.flow_layout.itemList:
+            if item not in new_item_list:
+                new_item_list.append(item)
+                
+        self.flow_layout.itemList = new_item_list
+        
+        # Show/Hide
+        visible_names = {g.get("name") for g in self.visible_games}
+        for name, card in self.card_cache.items():
+            if name in visible_names:
+                card.show()
+            else:
+                card.hide()
+                
+        self.flow_layout.invalidate()
+        self.scroll_area.verticalScrollBar().setValue(scroll_pos)
+        self.setUpdatesEnabled(True)
 
     def filter_games(self, text=""):
         self.refresh_grid()

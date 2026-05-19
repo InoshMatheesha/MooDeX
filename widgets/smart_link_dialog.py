@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel,
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from rawg_api import RawgApi
+from PySide6.QtCore import QTimer
 import os
 import re
 
@@ -87,18 +88,44 @@ class SmartLinkDialog(QDialog):
         self.layout.addLayout(btn_layout)
         
         self.search_btn.clicked.connect(self.perform_search)
+
+        # REALTIME SEARCH
+        self.search_timer = QTimer()
+        self.search_timer.setSingleShot(True)
+        self.search_timer.timeout.connect(self.perform_search)
+
+        self.search_bar.textChanged.connect(self.on_search_changed)
         self.results_list.itemSelectionChanged.connect(self.on_select)
         
         # Auto trigger
         self.perform_search()
 
     def perform_search(self):
+
         term = self.search_bar.text().strip()
-        if not term: return
+
+        if not term:
+            return
+
         self.results_list.clear()
+
         self.results_list.addItem("Searching global database...")
-        
-        self.api.fetch_async("search", term, self.populate_results)
+
+        self.api.fetch_async(
+            "search",
+            term,
+            self.populate_results
+        )
+
+    def on_search_changed(self):
+
+        text = self.search_bar.text().strip()
+
+        if len(text) < 2:
+            return
+
+        # wait 400ms after typing stops
+        self.search_timer.start(400)
         
     def populate_results(self, games):
         self.results_list.clear()

@@ -26,7 +26,7 @@ class StatsView(QWidget):
             pixmap = QPixmap(logo_path)
             logo_label.setPixmap(pixmap.scaled(180, 90, Qt.KeepAspectRatio, Qt.SmoothTransformation))
         
-        header = QLabel("<h2>Commander Dashboard</h2>")
+        header = QLabel("<h2>Dashboard</h2>")
         header.setStyleSheet("color: white; font-size: 20px; font-weight: 800; letter-spacing: 2px; margin-left: 20px;")
         
         header_layout.addWidget(logo_label)
@@ -41,7 +41,7 @@ class StatsView(QWidget):
         self.total_card = self.create_card("TOTAL GAMES", "0", "#6366f1")
         self.playing_card = self.create_card("PLAYING NOW", "0", "#10b981")
         self.completed_card = self.create_card("COMPLETED", "0", "#3b82f6")
-        self.playtime_card = self.create_card("PLAYTIME (hrs)", "0", "#a855f7")
+        self.playtime_card = self.create_card("PLAYTIME", "0", "#a855f7")
         self.rating_card = self.create_card("AVG RATING", "0.0", "#fbbf24")
 
         # Progress / Status Overview Segment
@@ -68,9 +68,11 @@ class StatsView(QWidget):
             bar.setFixedHeight(12)
             bar.setStyleSheet(f"""
                 QProgressBar {{
-                    border: none;
+                    min-height: 12px;
+                    max-height: 12px;
                     background-color: #1c1d24;
                     border-radius: 6px;
+                    text-align: center;
                 }}
                 QProgressBar::chunk {{
                     background-color: {col};
@@ -92,13 +94,26 @@ class StatsView(QWidget):
 
         middle_layout.addWidget(status_box, stretch=2)
 
-        # Top Platforms Widget
-        self.platforms_box, self.platforms_inner = self.create_container("Top Platforms")
-        self.platforms_layout = QVBoxLayout(self.platforms_inner)
-        self.platforms_layout.setContentsMargins(0, 0, 0, 0)
-        self.platforms_layout.setSpacing(15)
+        # Most Played Game Widget
+        self.most_played_box, self.most_played_inner = self.create_container("Most Played Game")
+        self.most_played_layout = QVBoxLayout(self.most_played_inner)
+        self.most_played_layout.setContentsMargins(0, 0, 0, 0)
+        self.most_played_layout.setSpacing(15)
         
-        middle_layout.addWidget(self.platforms_box, stretch=1)
+        self.most_played_image = QLabel()
+        self.most_played_image.setAlignment(Qt.AlignCenter)
+        self.most_played_image.setStyleSheet("background-color: transparent; border-radius: 12px;")
+        
+        self.most_played_title = QLabel("No data")
+        self.most_played_title.setStyleSheet("color: white; font-weight: bold; font-size: 14px;")
+        self.most_played_title.setAlignment(Qt.AlignCenter)
+        self.most_played_title.setWordWrap(True)
+        
+        self.most_played_layout.addWidget(self.most_played_image)
+        self.most_played_layout.addWidget(self.most_played_title)
+        self.most_played_layout.addStretch()
+        
+        middle_layout.addWidget(self.most_played_box, stretch=1)
 
         layout.addLayout(middle_layout)
         layout.addStretch()
@@ -167,11 +182,22 @@ class StatsView(QWidget):
 
     def update_stats(self):
         games = self.data_manager.get_games()
+        local_games = self.data_manager.data.get("local_games", [])
         total = len(games)
         
         playing = sum(1 for g in games if g.get("status") == "Playing")
         completed = sum(1 for g in games if g.get("status") == "Completed")
-        playtime = sum(g.get("playtime", 0) for g in games)
+        
+        # Calculate distinct total playtime to avoid double-counting local and synced library games
+        playtime = 0
+        counted_names = set()
+        for lg in local_games:
+            playtime += float(lg.get("playtime", 0))
+            counted_names.add(lg.get("name", "").lower())
+            
+        for g in games:
+            if g.get("name", "").lower() not in counted_names:
+                playtime += float(g.get("playtime", 0))
         
         ratings = [g.get("rating", 0) for g in games if g.get("rating", 0) > 0]
         avg_rating = sum(ratings) / len(ratings) if ratings else 0.0
@@ -179,7 +205,12 @@ class StatsView(QWidget):
         self.total_card.setText(str(total))
         self.playing_card.setText(str(playing))
         self.completed_card.setText(str(completed))
-        self.playtime_card.setText(str(playtime))
+        
+        hours = int(playtime)
+        minutes = int((playtime - hours) * 60)
+        self.playtime_card.setText(f"{hours}h {minutes}m")
+        self.playtime_card.setStyleSheet(f"font-size: 24px; font-weight: 900; color: white; border: none;")
+        
         self.rating_card.setText(f"{avg_rating:.1f}")
 
         for st in self.bars.keys():
@@ -189,36 +220,50 @@ class StatsView(QWidget):
             bar.setMaximum(max(total, 1))
             bar.setValue(count)
             
-        # Update Top Platforms
-        while self.platforms_layout.count():
-            item = self.platforms_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
-            elif item.layout():
-                while item.layout().count():
-                    inner_item = item.layout().takeAt(0)
-                    if inner_item.widget(): inner_item.widget().deleteLater()
-                
-        plat_counts = {}
-        for g in games:
-            for p in g.get("platforms", []):
-                if p: plat_counts[p] = plat_counts.get(p, 0) + 1
+        # Update Most Played Game
+        most_played = None
+        max_time = -1
         
-        sorted_plats = sorted(plat_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-        for p, c in sorted_plats:
-            row = QHBoxLayout()
-            lbl = QLabel(p)
-            lbl.setStyleSheet("color: white; font-weight: bold; font-size: 13px;")
-            val = QLabel(str(c))
-            val.setStyleSheet("color: #a0a0b0; font-weight: bold; font-size: 13px;")
-            row.addWidget(lbl)
-            row.addWidget(val, alignment=Qt.AlignRight)
-            self.platforms_layout.addLayout(row)
+        all_games_lookup = {}
+        for lg in local_games:
+            all_games_lookup[lg.get("name", "").lower()] = lg
             
-        if not sorted_plats:
-            empty = QLabel("No platforms found")
-            empty.setStyleSheet("color: #a0a0b0; font-style: italic;")
-            self.platforms_layout.addWidget(empty)
+        for g in games:
+            name_lower = g.get("name", "").lower()
+            if name_lower not in all_games_lookup:
+                all_games_lookup[name_lower] = g
+            else:
+                # Sync playtime if games has more or exist
+                if float(g.get("playtime", 0)) > float(all_games_lookup[name_lower].get("playtime", 0)):
+                    all_games_lookup[name_lower]["playtime"] = g.get("playtime", 0)
+
+        for g in all_games_lookup.values():
+            pt = float(g.get("playtime", 0))
+            if pt > max_time:
+                max_time = pt
+                most_played = g
+                
+        if most_played and max_time > 0:
+            name = most_played.get("name", "Unknown")
+            hours = int(max_time)
+            mins = int((max_time - hours) * 60)
             
-        self.platforms_layout.addStretch()
+            self.most_played_title.setText(f"{name}\n({hours}h {mins}m)")
+            
+            image_url = most_played.get("image_url") or most_played.get("background_image")
+            if image_url:
+                from image_loader import ImageLoader
+                from PySide6.QtGui import QPixmap
+                from PySide6.QtCore import QSize
+                
+                def set_img(pixmap):
+                    if pixmap:
+                        scaled = pixmap.scaled(200, 112, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+                        self.most_played_image.setPixmap(scaled)
+                        
+                ImageLoader.get_instance().load_image(image_url, set_img)
+            else:
+                self.most_played_image.setText("No Image Available")
+        else:
+            self.most_played_title.setText("No games played yet")
+            self.most_played_image.clear()

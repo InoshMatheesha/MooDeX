@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PySide6.QtCore import Qt, QCoreApplication, QTimer
 from PySide6.QtGui import QIcon, QPixmap, QAction
 from data_manager import DataManager
+from PySide6.QtCore import QSharedMemory
 
 class CloseDialog(QDialog):
     """One-time dialog asking the user how they want X to behave."""
@@ -52,8 +53,13 @@ class CloseDialog(QDialog):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            
         self.setWindowTitle("MooDeX")
-        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Icon Logo", "icon.ico")
+        icon_path = os.path.join(base_path, "Icon Logo", "icon.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         self.resize(1200, 800)
@@ -62,7 +68,7 @@ class MainWindow(QMainWindow):
         from settings_manager import load_settings
         _saved = load_settings()
         self._close_to_tray   = _saved["close_to_tray"]
-        self._discover_loaded = False
+        self._launch_minimized = _saved.get("launch_minimized", False)
 
         # ── Data ───────────────────────────────────────────────────
         self.data_manager = DataManager()
@@ -168,7 +174,12 @@ class MainWindow(QMainWindow):
         sidebar_layout.setSpacing(10)
 
         logo = QLabel()
-        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Icon Logo", "logo with name.png")
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(os.path.abspath(__file__))
+            
+        logo_path = os.path.join(base_path, "Icon Logo", "logo with name.png")
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path)
             logo.setPixmap(pixmap.scaled(180, 90, Qt.KeepAspectRatio, Qt.SmoothTransformation))
@@ -201,16 +212,52 @@ class MainWindow(QMainWindow):
 
         sidebar_layout.addStretch()
 
-        add_btn = QPushButton("+ Add Game")
-        add_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #6366f1; color: white;
-                border-radius: 8px; padding: 12px;
-                font-weight: bold; text-align: center;
+        # Last Played Widget
+        self.last_played_widget = QWidget()
+        self.last_played_widget.setStyleSheet("""
+            QWidget {
+                background-color: #1c1d24;
+                border-radius: 8px;
+                border: 1px solid #2d2e3a;
             }
-            QPushButton:hover { background-color: #4f46e5; }
         """)
-        sidebar_layout.addWidget(add_btn)
+        lp_layout = QVBoxLayout(self.last_played_widget)
+        lp_layout.setContentsMargins(15, 12, 15, 12)
+        lp_layout.setSpacing(4)
+        
+        self.lp_title = QLabel("LAST PLAYED")
+        self.lp_title.setStyleSheet("color: #6366f1; font-weight: bold; font-size: 11px; letter-spacing: 1px; border: none;")
+        
+        self.lp_game = QLabel("None")
+        self.lp_game.setStyleSheet("color: white; font-weight: bold; font-size: 13px; border: none;")
+        self.lp_game.setWordWrap(True)
+        
+        lp_layout.addWidget(self.lp_title)
+        lp_layout.addWidget(self.lp_game)
+        sidebar_layout.addWidget(self.last_played_widget)
+
+        def update_last_played():
+            games = self.data_manager.data.get("local_games", [])[:]
+            if not games:
+                self.lp_game.setText("No games played")
+                return
+            
+            played_games = [g for g in games if g.get("last_played", "Never") != "Never"]
+            if played_games:
+                played_games.sort(key=lambda g: g.get("last_played", ""), reverse=True)
+                self.lp_game.setText(played_games[0].get("name", "Unknown Game"))
+            else:
+                self.lp_game.setText(games[0].get("name", "Unknown Game"))
+                
+        update_last_played()
+        self.data_manager.data_changed.connect(update_last_played)
+
+        self.monitor.game_started.connect(
+            lambda name: [self.lp_title.setText("NOW PLAYING"), self.lp_game.setText(name), self.lp_title.setStyleSheet("color: #10b981; font-weight: bold; font-size: 11px; letter-spacing: 1px; border: none;")]
+        )
+        self.monitor.game_stopped.connect(
+            lambda name, dur: [self.lp_title.setText("LAST PLAYED"), update_last_played(), self.lp_title.setStyleSheet("color: #6366f1; font-weight: bold; font-size: 11px; letter-spacing: 1px; border: none;")]
+        )
         main_layout.addWidget(sidebar)
 
         # Stacked Widget
@@ -218,26 +265,27 @@ class MainWindow(QMainWindow):
         self.stack.setStyleSheet("background-color: transparent;")
         main_layout.addWidget(self.stack)
 
-        # ── Views (lazy on Discover) ────────────────────────────────
-        from views.library_view import LibraryView
-        from views.stats_view import StatsView
+        # ── Views (lazy loading) ────────────────────────────────
         from views.my_games_view import MyGamesView
         from views.settings_view import SettingsView
 
         self.my_games_view = MyGamesView(self.data_manager)
-        self.discover_view = None          # created on first visit
-        self.stats_view    = StatsView(self.data_manager)
-        self.library_view  = LibraryView(self.data_manager)
+        self.library_view  = None
+        self.discover_view = None
+        self.stats_view    = None
         self.settings_view = SettingsView()
 
-        # Placeholder for Discover slot
-        self._discover_placeholder = QWidget()
-        self._discover_placeholder.setStyleSheet("background: transparent;")
+        self._lib_placeholder   = QWidget()
+        self._disc_placeholder  = QWidget()
+        self._stats_placeholder = QWidget()
+        self._lib_placeholder.setStyleSheet("background: transparent;")
+        self._disc_placeholder.setStyleSheet("background: transparent;")
+        self._stats_placeholder.setStyleSheet("background: transparent;")
 
         self.stack.addWidget(self.my_games_view)          # index 0
-        self.stack.addWidget(self.library_view)           # index 1
-        self.stack.addWidget(self._discover_placeholder)  # index 2
-        self.stack.addWidget(self.stats_view)             # index 3
+        self.stack.addWidget(self._lib_placeholder)       # index 1
+        self.stack.addWidget(self._disc_placeholder)      # index 2
+        self.stack.addWidget(self._stats_placeholder)     # index 3
         self.stack.addWidget(self.settings_view)          # index 4
 
         # Settings: wire close-to-tray toggle
@@ -248,25 +296,31 @@ class MainWindow(QMainWindow):
         def set_nav_active(index):
             for i, bn in enumerate(self.nav_buttons):
                 bn.setChecked(i == index)
-            # Lazy-load Discover on first visit (slot 2)
-            if index == 2 and not self._discover_loaded:
-                self._load_discover()
+                
+            if index == 1 and self.library_view is None:
+                from views.library_view import LibraryView
+                self.library_view = LibraryView(self.data_manager)
+                self.stack.removeWidget(self._lib_placeholder)
+                self.stack.insertWidget(1, self.library_view)
+
+            if index == 2 and self.discover_view is None:
+                from views.discover_view import DiscoverView
+                self.discover_view = DiscoverView(self.data_manager)
+                self.stack.removeWidget(self._disc_placeholder)
+                self.stack.insertWidget(2, self.discover_view)
+                
+            if index == 3 and self.stats_view is None:
+                from views.stats_view import StatsView
+                self.stats_view = StatsView(self.data_manager)
+                self.stack.removeWidget(self._stats_placeholder)
+                self.stack.insertWidget(3, self.stats_view)
+
             self.stack.setCurrentIndex(index)
 
         for i, (_, _icon, idx) in enumerate(nav_items):
             self.nav_buttons[i].clicked.connect(lambda checked=False, n=i: set_nav_active(n))
 
-        add_btn.clicked.connect(lambda: [set_nav_active(2),
-                                         (self.discover_view.search_input.setFocus()
-                                          if self.discover_view else None)])
 
-    # ── Lazy Discover loader ──────────────────────────────────────────
-    def _load_discover(self):
-        from views.discover_view import DiscoverView
-        self.discover_view = DiscoverView(self.data_manager)
-        self.stack.removeWidget(self._discover_placeholder)
-        self.stack.insertWidget(2, self.discover_view)  # slot 2
-        self._discover_loaded = True
 
     # ── Tray ─────────────────────────────────────────────────────────
     def on_tray_activated(self, reason):
@@ -301,8 +355,66 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+
+    # =========================
+    # SINGLE INSTANCE CHECK
+    # =========================
+
+    shared_memory = QSharedMemory("MooDeX_Unique_Instance")
+
+    if not shared_memory.create(1):
+        print("MooDeX is already running")
+        sys.exit(0)
+
+    # =========================
+    # START APP
+    # =========================
+    
+    # Fix for Windows taskbar icon not showing for compiled exes
+    if os.name == 'nt':
+        try:
+            import ctypes
+            myappid = 'MooDeX.Premium.App.1'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except Exception:
+            pass
+
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)   # keep alive when minimised to tray
+    app.setQuitOnLastWindowClosed(False)
+
+    # GLOBAL APP ICON
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        
+    icon_path = os.path.join(
+        base_path,
+        "Icon Logo",
+        "icon.ico"
+    )
+
+    try:
+        with open("path_debug.log", "w") as f:
+            f.write(f"base_path: {base_path}\n")
+            f.write(f"icon_path: {icon_path}\n")
+            f.write(f"exists: {os.path.exists(icon_path)}\n")
+            f.write(f"frozen: {getattr(sys, 'frozen', False)}\n")
+    except Exception:
+        pass
+
+    app.setWindowIcon(QIcon(icon_path))
+
     window = MainWindow()
-    window.show()
+    
+    # Only launch minimized if it's a system startup and the setting is enabled.
+    # If the user opens the application manually, always show the window.
+    is_startup = "--startup" in sys.argv
+    if is_startup and window._launch_minimized:
+        # Don't show the window, it runs in the background
+        pass
+    else:
+        window.show()
+        window.activateWindow()
+        
     sys.exit(app.exec())

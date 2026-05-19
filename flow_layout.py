@@ -1,4 +1,4 @@
-﻿from PySide6.QtWidgets import QLayout, QWidgetItem, QSizePolicy
+from PySide6.QtWidgets import QLayout, QWidgetItem, QSizePolicy
 from PySide6.QtCore import Qt, QRect, QSize, QPoint
 
 class FlowLayout(QLayout):
@@ -69,6 +69,8 @@ class FlowLayout(QLayout):
         lineHeight = 0
         
         for item in self.itemList:
+            if item.widget() and item.widget().isHidden():
+                continue
             itemWidth = item.sizeHint().width()
             itemHeight = item.sizeHint().height()
 

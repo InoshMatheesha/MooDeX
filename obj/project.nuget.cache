@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "WbK24iKo8qw=",
+  "dgSpecHash": "9rqjIqNwKr8=",
   "success": true,
-  "projectFilePath": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj",
+  "projectFilePath": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Lenovo\\.nuget\\packages\\materialdesigncolors\\5.3.2\\materialdesigncolors.5.3.2.nupkg.sha512",
     "C:\\Users\\Lenovo\\.nuget\\packages\\materialdesignthemes\\5.3.2\\materialdesignthemes.5.3.2.nupkg.sha512",
@@ -14,9 +14,9 @@
       "code": "NU1510",
       "level": "Warning",
       "message": "PackageReference System.Text.Json will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
-      "projectPath": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj",
+      "projectPath": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
       "warningLevel": 1,
-      "filePath": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj",
+      "filePath": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
       "libraryId": "System.Text.Json",
       "targetGraphs": [
         "net10.0-windows7.0"

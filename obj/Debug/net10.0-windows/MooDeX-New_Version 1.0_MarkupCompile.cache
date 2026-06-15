@@ -1,20 +1,20 @@
 ﻿MooDeX-New_Version 1.0
-
+1.0.0.0
 
 winexe
 C#
 .cs
-D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\
+D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\
 MooDeX_New_Version_1._0
 none
 false
 TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
-D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\App.xaml
+D:\SLIIT\GitHub\MooDeX\App.xaml
 61180442650
 22-91328922
-231858981424
+25-242788019
 217-1643796707
 Views\DashboardView.xaml;Views\DiscoverView.xaml;Views\LibraryView.xaml;Views\MainWindow.xaml;Views\MyGamesView.xaml;Views\SettingsView.xaml;
 
-False
+True
 

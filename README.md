@@ -119,7 +119,54 @@ dotnet run
 
 <br>
 
-## 🛠️ Tech Stack
+## Screenshots
+
+A visual tour of MooDeX — from your personal stats hub to the game discovery feed.
+
+<br>
+
+**Dashboard** — Your gaming command centre at a glance
+
+![Dashboard](App%20Screenshots/Dashboard.png)
+
+<br>
+
+**My Library** — Every game you own, beautifully organized
+
+![My Library](App%20Screenshots/My%20Library.png)
+
+<br>
+
+**Discover** — Browse trending, upcoming, and popular titles powered by RAWG
+
+![Discover Games](App%20Screenshots/Discover%20Games.png)
+
+<br>
+
+**My PC Games** — Import local executables and track playtime automatically
+
+![PC Games](App%20Screenshots/PC%20Games.png)
+
+<br>
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Edit Game Details</strong><br/><br/>
+      <img src="App%20Screenshots/Edit%20Game%20Details.png" alt="Edit Game Details" width="340"/>
+      <br/><em>Set status, rate the game, and add personal notes</em>
+    </td>
+    <td align="center" width="50%">
+      <strong>Match Game &amp; Cover</strong><br/><br/>
+      <img src="App%20Screenshots/Match%20Game%20%26%20Cover.png" alt="Match Game and Cover" width="340"/>
+      <br/><em>Auto-match your local .exe to the RAWG database for cover art</em>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -132,7 +179,7 @@ dotnet run
 
 <br>
 
-## ⚙️ Configuration Options
+## Configuration Options
 
 | Setting | Default | Description |
 |---|---|---|
@@ -155,14 +202,37 @@ Every game in your library can be tagged with one of these statuses:
 
 <br>
 
-## 🤝 Contributing
+## Try MooDeX
+
+MooDeX ships as a ready-to-run Windows installer — no configuration required.
+Download, install, and your game library is one click away.
+
+> **System Requirements:** Windows 10 / 11 — .NET 10 Runtime (bundled with the installer)
+
+```
+MooDeX_v1.0 Setup.exe
+```
+
+Once installed you can:
+
+- **Import** your local PC games in seconds
+- **Discover** trending and upcoming titles from the RAWG database
+- **Track** every minute of playtime automatically in the background
+- **Rate and review** your games with a personal score and notes
+- **Set your G.O.A.T.** — the one game that stands above the rest
+
+We would love to hear what you think. If you run into any issues or have ideas for new features, please open an [issue on GitHub](https://github.com/your-username/MooDeX/issues).
+
+<br>
+
+## Contributing
 
 Contributions, issues, and feature requests are welcome!
 
 1. Fork the project  
-2. Create your branch (`git checkout -b feature/cool-feature`)  
-3. Commit your changes (`git commit -m 'Add cool feature'`)  
-4. Push to the branch (`git push origin feature/cool-feature`)  
+2. Create your branch (`git checkout -b feature/your-feature`)  
+3. Commit your changes (`git commit -m 'Add your feature'`)  
+4. Push to the branch (`git push origin feature/your-feature`)  
 5. Open a Pull Request  
 
 
@@ -170,8 +240,10 @@ Contributions, issues, and feature requests are welcome!
 
 <div align="center">
 
-**Developed for modern game library management and tracking**
+<img src="Icon%20Logo/icon.png" alt="MooDeX" width="64"/>
 
-*MooDeX*
+**MooDeX** — Your Games. Your Stats. Your Vibe.
+
+Built with WPF · Powered by RAWG · Designed for gamers
 
 </div>

@@ -65,11 +65,9 @@ MooDeX
 
 ### Quick Install
 
-> Just want to use the app? Run the included installer:
+> Download it Now:
 
-```
 [MooDeX_v1.0 Setup.exe](https://github.com/InoshMatheesha/MooDeX/releases/tag/MooDex)
-```
 
 ### Build from Source
 
@@ -210,9 +208,7 @@ Download, install, and your game library is one click away.
 
 > **System Requirements:** Windows 10 / 11 — .NET 10 Runtime (bundled with the installer)
 
-```
 [MooDeX_v1.0 Setup.exe](https://github.com/InoshMatheesha/MooDeX/releases/tag/MooDex)
-```
 
 Once installed you can:
 

@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🎮 MooDeX
+<img src="Icon%20Logo/icon.png" alt="MooDeX Icon" width="128" height="128"/>
+<br>
+<img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="400"/>
 
 ### *Your Games. Your Stats. Your Vibe.*
 
@@ -18,42 +20,42 @@ organize your collection, discover new titles, track playtime, and launch games 
 
 <br>
 
-## ✨ What is MooDeX?
+## What is MooDeX?
 
 **MooDeX** is a personal game library manager for Windows that lets you keep all your games — whether from your PC or discovered online — in one beautiful, organized hub. Think of it as your own mini-Steam dashboard, designed just for *you*.
 
 <br>
 
-## 🧩 Features at a Glance
+## Features at a Glance
 
 | Feature | Description |
 |---|---|
-| 📊 **Dashboard** | See total games, playtime stats, top 3 most-played games, and pick your all-time **G.O.A.T.** game |
-| 📚 **My Library** | Curated list of games added via search — edit details, rate them (with emoji descriptions!), set status, and add notes |
-| 🖥️ **My PC Games** | Import local `.exe` games, auto-match them via RAWG, and **launch directly** from the app |
-| 🔍 **Discover** | Browse **Trending**, **Upcoming**, and **Popular** games powered by the RAWG API — add any to your library instantly |
-| ⏱️ **Playtime Tracking** | Background process monitor tracks how long you play each game — updated in real time |
-| ⚙️ **Settings** | Minimize to tray, launch at startup, start minimized — your app, your rules |
+| **Dashboard** | See total games, playtime stats, top 3 most-played games, and pick your all-time **G.O.A.T.** game |
+| **My Library** | Curated list of games added via search — edit details, rate them with custom rating descriptions, set status, and add notes |
+| **My PC Games** | Import local `.exe` games, auto-match them via RAWG, and **launch directly** from the app |
+| **Discover** | Browse **Trending**, **Upcoming**, and **Popular** games powered by the RAWG API — add any to your library instantly |
+| **Playtime Tracking** | Background process monitor tracks how long you play each game — updated in real time |
+| **Settings** | Minimize to tray, launch at startup, start minimized — your app, your rules |
 
 <br>
 
-## 🏗️ Architecture
+## Architecture
 
 MooDeX follows the **MVVM** (Model-View-ViewModel) pattern:
 
 ```
-📂 MooDeX
-├── 📁 Models/            # Game, AppSettings — data classes
-├── 📁 Views/             # XAML pages (Dashboard, Library, MyGames, Discover, Settings)
-├── 📁 ViewModels/        # Logic layer — binds data to UI
-├── 📁 Services/          # RAWG API client, Storage (JSON), Process Monitor
-├── 📁 Helpers/           # Image caching, RelayCommand, ObservableCollection extensions
-└── 📁 Icon Logo/         # App icon & branding assets
+MooDeX
+├── Models/            # Game, AppSettings — data classes
+├── Views/             # XAML pages (Dashboard, Library, MyGames, Discover, Settings)
+├── ViewModels/        # Logic layer — binds data to UI
+├── Services/          # RAWG API client, Storage (JSON), Process Monitor
+├── Helpers/           # Image caching, RelayCommand, ObservableCollection extensions
+└── Icon Logo/         # App icon & branding assets
 ```
 
 <br>
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -85,7 +87,7 @@ dotnet run
 
 <br>
 
-## 🎯 How It Works
+## How It Works
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
@@ -106,14 +108,14 @@ dotnet run
 
 <br>
 
-## 🎨 UI Highlights
+## UI Highlights
 
-- 🌑 **Dark theme** with deep purple accents (`#BB86FC`)
-- 🃏 **Card-based layout** with hover animations & elevation effects
-- 🔎 **Debounced search** — fast, responsive, no API spam
-- 📊 **Live status indicator** — shows "Playing Now" or "Last Played" in the sidebar
-- ⭐ **Emoji ratings** — from *"Awful 😠"* to *"Masterpiece! 👑"*
-- 🖱️ **Ultra-thin modern scrollbars** — minimal & clean
+- **Dark theme** with deep purple accents (`#BB86FC`)
+- **Card-based layout** with hover animations & elevation effects
+- **Debounced search** — fast, responsive, no API spam
+- **Live status indicator** — shows "Playing Now" or "Last Played" in the sidebar
+- **Rating system** — from *Awful* to *Masterpiece*
+- **Ultra-thin modern scrollbars** — minimal & clean
 
 <br>
 
@@ -140,16 +142,16 @@ dotnet run
 
 <br>
 
-## 📋 Game Statuses
+## Game Statuses
 
 Every game in your library can be tagged with one of these statuses:
 
 | Status | Meaning |
 |---|---|
-| 🎮 Playing | Currently playing |
-| ✅ Completed | Finished the game |
-| 💜 Like to Play | On your wishlist |
-| ⛔ Stopped | Dropped / paused |
+| Playing | Currently playing |
+| Completed | Finished the game |
+| Like to Play | On your wishlist |
+| Stopped | Dropped / paused |
 
 <br>
 
@@ -168,7 +170,7 @@ Contributions, issues, and feature requests are welcome!
 
 <div align="center">
 
-**Made with 💜 and a lot of late-night gaming sessions**
+**Developed for modern game library management and tracking**
 
 *MooDeX*
 

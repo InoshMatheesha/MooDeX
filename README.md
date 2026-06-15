@@ -163,13 +163,6 @@ Contributions, issues, and feature requests are welcome!
 4. Push to the branch (`git push origin feature/cool-feature`)  
 5. Open a Pull Request  
 
-<br>
-
-## 📜 License
-
-This project is for educational purposes as part of a university project at **SLIIT**.
-
-<br>
 
 ---
 
@@ -177,6 +170,6 @@ This project is for educational purposes as part of a university project at **SL
 
 **Made with 💜 and a lot of late-night gaming sessions**
 
-*MooDeX v1.0*
+*MooDeX*
 
 </div>

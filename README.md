@@ -22,7 +22,8 @@ organize your collection, discover new titles, track playtime, and launch games 
 ## What is MooDeX?
 
 **MooDeX** is a personal game library manager for Windows that lets you keep all your games — whether from your PC or discovered online — in one beautiful, organized hub. Think of it as your own mini-Steam dashboard, designed just for *you*.
-Download Now - [MooDeX_v1.0 Setup.exe](https://github.com/InoshMatheesha/MooDeX/releases/tag/MooDex)
+<br>
+**Download Now** - [MooDeX_v1.0 Setup.exe](https://github.com/InoshMatheesha/MooDeX/releases/tag/MooDex)
 
 <br>
 

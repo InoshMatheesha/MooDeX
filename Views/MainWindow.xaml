@@ -1,0 +1,259 @@
+<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewmodels="clr-namespace:MooDeX_New_Version_1._0.ViewModels"
+        xmlns:views="clr-namespace:MooDeX_New_Version_1._0.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="MooDeX_New_Version_1._0.Views.MainWindow"
+        Title="MooDeX" Height="650" Width="1100"
+        Icon="/Icon Logo/icon.ico"
+        WindowStartupLocation="CenterScreen"
+        Background="#121212"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type viewmodels:DiscoverViewModel}">
+            <views:DiscoverView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:LibraryViewModel}">
+            <views:LibraryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:MyGamesViewModel}">
+            <views:MyGamesView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:DashboardViewModel}">
+            <views:DashboardView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewmodels:SettingsViewModel}">
+            <views:SettingsView />
+        </DataTemplate>
+
+        <!-- Sidebar Button Style -->
+        <Style x:Key="SidebarButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Margin" Value="10,4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#B3B3B3"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="BtnBorder" Background="{TemplateBinding Background}" CornerRadius="12" Padding="12,0">
+                            <Grid>
+                                <!-- Left side indicator line -->
+                                <Border x:Name="Indicator" Width="4" Height="16" Background="#BB86FC" CornerRadius="2" 
+                                        HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-12,0,0,0" Opacity="0"/>
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left" Margin="4,0,0,0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#2A2A2A"/>
+                            </Trigger>
+                            <Trigger Property="Tag" Value="Active">
+                                <Setter TargetName="Indicator" Property="Opacity" Value="1"/>
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#2D2040"/>
+                                <Setter Property="Foreground" Value="#BB86FC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#1E1E1E">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="15,30,15,35" HorizontalAlignment="Center">
+                    <!-- Added a creative drop shadow effect for the logo -->
+                    <Border CornerRadius="8" Background="Transparent">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#30FFFFFF" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
+                        </Border.Effect>
+                        <Image Source="/Icon Logo/logo with name.png" RenderOptions.BitmapScalingMode="HighQuality" Cursor="AppStarting" RenderTransformOrigin="0.52,0.073" IsHitTestVisible="False" Stretch="Fill" OpacityMask="Black">
+                            <Image.Effect>
+                                <DropShadowEffect/>
+                            </Image.Effect>
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform X="0"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1">
+                    <Button Command="{Binding NavigateToDashboardCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SidebarButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Dashboard">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="20" Height="20" Margin="5,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Dashboard" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateToLibraryCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SidebarButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Library">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Bookshelf" Width="20" Height="20" Margin="5,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="My Library" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateToMyGamesCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SidebarButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="MyGames">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FolderPlayOutline" Width="20" Height="20" Margin="5,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="My PC Games" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateToDiscoverCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SidebarButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Discover">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="CompassOutline" Width="20" Height="20" Margin="5,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Discover" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavigateToSettingsCommand}">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource SidebarButtonStyle}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ActiveTab}" Value="Settings">
+                                        <Setter Property="Tag" Value="Active"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Cog" Width="20" Height="20" Margin="5,0,15,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Settings" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" VerticalAlignment="Bottom" Margin="0,0,0,25">
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <!-- Settings Button -->
+                    <!-- Game Status Card -->
+                    <Border Margin="15,0,15,15" Padding="12" CornerRadius="12" Background="#1D1D2C" BorderBrush="#36294A" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <!-- Status text -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                    <Ellipse Width="6" Height="6" Margin="0,0,5,0" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="{x:Type Ellipse}">
+                                                <Setter Property="Fill" Value="#888888"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsGamePlaying}" Value="True">
+                                                        <Setter Property="Fill" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock FontSize="10" FontWeight="Bold" Foreground="#888888">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Text" Value="LAST PLAYED"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsGamePlaying}" Value="True">
+                                                        <Setter Property="Text" Value="PLAYING NOW"/>
+                                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- Game Title -->
+                                <TextBlock Text="{Binding GameStatusTitle}" FontSize="13" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Settings Button -->
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Border Grid.Column="1">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#121214" Offset="0"/>
+                    <GradientStop Color="#181822" Offset="0.5"/>
+                    <GradientStop Color="#0F0F12" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <ContentControl Content="{Binding CurrentView}" />
+        </Border>
+    </Grid>
+</Window>

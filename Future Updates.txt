@@ -1,6 +1,0 @@
-Add feature to launch softwre startup minized
-Remove playtime form my library
-In stats didn't update total playtime, fix it
-In stats that playing bar is not round (In progress bar) 
-There are nothing happens in top platforms in stats
-In settings that about section change positions to below left corner 

@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="Icon%20Logo/icon.png" alt="MooDeX Icon" width="128" height="128"/>
 <br>
 <img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="400"/>
 
@@ -221,7 +220,6 @@ Once installed you can:
 - **Rate and review** your games with a personal score and notes
 - **Set your G.O.A.T.** — the one game that stands above the rest
 
-We would love to hear what you think. If you run into any issues or have ideas for new features, please open an [issue on GitHub](https://github.com/your-username/MooDeX/issues).
 
 <br>
 

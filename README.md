@@ -1,6 +1,11 @@
 <div align="center">
 
+<<<<<<< HEAD
 # 🎮 MooDeX
+=======
+<br> 
+<img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="400"/>
+>>>>>>> 11351dd8a19cb4b87a53fd4afdb1cdd5660c210c
 
 ### *Your Games. Your Stats. Your Vibe.*
 

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MooDeX-New_Version 1.0")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.1.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1+4f3688b71446b45eb458fb6a1a1ee4f39993adb3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.1+3b5a1f3a3488b5d6b1135f5999851a8b99c1be67")]
 [assembly: System.Reflection.AssemblyProductAttribute("MooDeX-New_Version 1.0")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MooDeX-New_Version 1.0")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.1.0.0")]

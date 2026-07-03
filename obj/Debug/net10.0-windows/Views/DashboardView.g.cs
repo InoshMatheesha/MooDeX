@@ -56,7 +56,7 @@ namespace MooDeX_New_Version_1._0.Views {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/MooDeX-New_Version 1.0;V1.1.0.0;component/views/dashboardview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/MooDeX-New_Version 1.0;V1.2.0.0;component/views/dashboardview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\DashboardView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

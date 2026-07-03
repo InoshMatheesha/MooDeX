@@ -11,7 +11,7 @@ organize your collection, discover new titles, track playtime, auto-update, and 
 [![WPF](https://img.shields.io/badge/WPF-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/)
 [![Material Design](https://img.shields.io/badge/Material%20Design-BB86FC?style=for-the-badge&logo=materialdesign&logoColor=white)](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 [![RAWG API](https://img.shields.io/badge/RAWG%20API-1F1F1F?style=for-the-badge&logo=gamepad&logoColor=white)](https://rawg.io/apidocs)
-[![Version](https://img.shields.io/badge/Version-v1.1-brightgreen?style=for-the-badge)](https://github.com/InoshMatheesha/MooDeX/releases)
+[![Version](https://img.shields.io/badge/Version-v1.2-brightgreen?style=for-the-badge)](https://github.com/InoshMatheesha/MooDeX/releases)
 
 ---
 
@@ -80,7 +80,7 @@ MooDeX follows the **MVVM** (Model-View-ViewModel) pattern:
 > Just want to use the app? Run the installer executable from [Releases](https://github.com/InoshMatheesha/MooDeX/releases):
 
 ```
-MooDeX_v1.1.Setup.exe
+MooDeX_v1.2.Setup.exe
 ```
 
 ### Build from Source
@@ -195,6 +195,6 @@ This project is for educational purposes as part of a university project at **SL
 
 **Made with 💜 and a lot of late-night gaming sessions**
 
-*MooDeX v1.1*
+*MooDeX v1.2*
 
 </div>

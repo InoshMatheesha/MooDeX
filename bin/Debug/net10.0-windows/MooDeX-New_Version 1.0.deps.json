@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "MooDeX-New_Version 1.0/1.1": {
+      "MooDeX-New_Version 1.0/1.2": {
         "dependencies": {
           "MaterialDesignThemes": "5.3.2"
         },
@@ -45,7 +45,7 @@
     }
   },
   "libraries": {
-    "MooDeX-New_Version 1.0/1.1": {
+    "MooDeX-New_Version 1.0/1.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

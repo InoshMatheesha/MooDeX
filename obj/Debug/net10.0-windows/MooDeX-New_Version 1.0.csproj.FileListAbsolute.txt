@@ -37,42 +37,44 @@ D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\obj\Debug\net10.0
 D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\MyGamesView.g.cs
 d:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\SettingsView.baml
 d:\SLIIT\Vs Code\MooDeX-New_Version 1.0\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\SettingsView.g.cs
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.exe
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.deps.json
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.runtimeconfig.json
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.dll
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.pdb
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MaterialDesignColors.dll
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\MaterialDesignThemes.Wpf.dll
-D:\SLIIT\GitHub\MooDeX\bin\Debug\net10.0-windows\Microsoft.Xaml.Behaviors.dll
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.csproj.AssemblyReference.cache
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\SettingsView.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\App.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\DashboardView.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\DiscoverView.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\LibraryView.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\MainWindow.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\MyGamesView.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\SettingsView.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\App.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_Content.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_MarkupCompile.cache
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_MarkupCompile.lref
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\DashboardView.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\DiscoverView.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\LibraryView.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\MainWindow.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\Views\MyGamesView.baml
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.g.resources
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.GeneratedMSBuildEditorConfig.editorconfig
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.AssemblyInfoInputs.cache
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.AssemblyInfo.cs
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.csproj.CoreCompileInputs.cache
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.sourcelink.json
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-N.A8719017.Up2Date
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.dll
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\refint\MooDeX-New_Version 1.0.dll
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.pdb
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.genruntimeconfig.cache
-D:\SLIIT\GitHub\MooDeX\obj\Debug\net10.0-windows\ref\MooDeX-New_Version 1.0.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.exe
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.deps.json
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.runtimeconfig.json
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MooDeX-New_Version 1.0.pdb
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MaterialDesignColors.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\MaterialDesignThemes.Wpf.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\bin\Debug\net10.0-windows\Microsoft.Xaml.Behaviors.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.csproj.AssemblyReference.cache
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\SettingsView.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\App.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\DashboardView.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\DiscoverView.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\LibraryView.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\MainWindow.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\MyGamesView.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\SettingsView.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\App.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_Content.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\GeneratedInternalTypeHelper.g.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_MarkupCompile.cache
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0_MarkupCompile.lref
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\DashboardView.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\DiscoverView.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\LibraryView.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\MainWindow.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\MyGamesView.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.g.resources
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.GeneratedMSBuildEditorConfig.editorconfig
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.AssemblyInfoInputs.cache
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.AssemblyInfo.cs
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.csproj.CoreCompileInputs.cache
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.sourcelink.json
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-N.A8719017.Up2Date
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\refint\MooDeX-New_Version 1.0.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.pdb
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\MooDeX-New_Version 1.0.genruntimeconfig.cache
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\ref\MooDeX-New_Version 1.0.dll
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\UpdateDialog.baml
+D:\SLIIT\Vs Code\MooDeX-New_Version 1.0\obj\Debug\net10.0-windows\Views\UpdateDialog.g.cs

@@ -2,8 +2,17 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:MooDeX_New_Version_1._0.Helpers"
              Background="Transparent"
              Foreground="White">
+
+    <!-- Value converters used by the Application Updates section -->
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+        <helpers:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
+    </UserControl.Resources>
+
     <Grid Margin="30">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -76,6 +85,69 @@
                         </Grid>
                     </StackPanel>
                 </materialDesign:Card>
+
+                <!-- Application Updates Section -->
+                <materialDesign:Card UniformCornerRadius="16" Background="#1E1E1E" Padding="25" Margin="0,0,0,20">
+                    <StackPanel>
+                        <!-- Section Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                            <materialDesign:PackIcon Kind="Update" Width="22" Height="22" Foreground="#BB86FC" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="Application Updates" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Update Row: Description + Button -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
+                                <TextBlock Text="Check for Updates" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="Check if a newer version of MooDeX is available for download." FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- Check for Updates Button with optional loading spinner -->
+                            <Button Grid.Column="1"
+                                    Command="{Binding CheckForUpdatesCommand}"
+                                    VerticalAlignment="Center"
+                                    Padding="18,8"
+                                    FontSize="13">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                                        <Setter Property="Background" Value="#BB86FC"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="10"/>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- Spinner: visible only while checking -->
+                                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                                 Width="16" Height="16"
+                                                 IsIndeterminate="True"
+                                                 Foreground="White"
+                                                 Margin="0,0,8,0"
+                                                 Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    <materialDesign:PackIcon Kind="CloudDownloadOutline"
+                                                             Width="18" Height="18"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,8,0"
+                                                             Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                                    <TextBlock Text="Check for Updates" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <!-- Status Text (e.g., "You are using the latest version." or error messages) -->
+                        <TextBlock Text="{Binding UpdateStatusText}"
+                                   FontSize="13"
+                                   Foreground="#8A8A8A"
+                                   Margin="0,6,0,0"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding UpdateStatusText, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                    </StackPanel>
+                </materialDesign:Card>
+
             </StackPanel>
         </ScrollViewer>
 

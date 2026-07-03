@@ -124,14 +124,14 @@ namespace MooDeX_New_Version_1._0.Models
         {
             get
             {
-                if (Rating <= 0) return "Unrated";
-                if (Rating < 3.0) return "Awful";
-                if (Rating < 5.0) return "Poor";
-                if (Rating < 6.5) return "Mediocre";
-                if (Rating < 7.5) return "Decent";
-                if (Rating < 8.5) return "Good";
-                if (Rating < 9.5) return "Great";
-                return "Masterpiece";
+                if (Rating <= 0) return "Unrated ✖";
+                if (Rating < 3.0) return "Awful 😠";
+                if (Rating < 5.0) return "Poor 😞";
+                if (Rating < 6.5) return "Mediocre 😐";
+                if (Rating < 7.5) return "Decent 🙂";
+                if (Rating < 8.5) return "Good 😊";
+                if (Rating < 9.5) return "Great 🤩";
+                return "Masterpiece! 👑";
             }
         }
 

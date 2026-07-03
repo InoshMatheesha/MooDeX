@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj": {}
+    "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj": {}
   },
   "projects": {
-    "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj": {
+    "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj",
+        "projectUniqueName": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
         "projectName": "MooDeX-New_Version 1.0",
-        "projectPath": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\MooDeX-New_Version 1.0.csproj",
+        "projectPath": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "D:\\SLIIT\\Vs Code\\MooDeX-New_Version 1.0\\obj\\",
+        "outputPath": "D:\\SLIIT\\GitHub\\MooDeX\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",

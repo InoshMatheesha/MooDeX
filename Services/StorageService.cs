@@ -106,7 +106,7 @@ namespace MooDeX_New_Version_1._0.Services
                                 Genres = pcGame.Genres,
                                 Notes = pcGame.Notes,
                                 IsLocal = false,
-                                AddedDate = pcGame.AddedDate,
+                                AddedDate = !string.IsNullOrEmpty(pcGame.AddedDate) ? pcGame.AddedDate : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                                 ReleaseDate = pcGame.ReleaseDate,
                                 LastPlayed = pcGame.LastPlayed
                             };

@@ -175,14 +175,27 @@ namespace MooDeX_New_Version_1._0.ViewModels
                 await ApplySortAsync(); // Revert unsaved edits from disk
             });
 
-            DeleteGameCommand = new RelayCommand(async game =>
+            DeleteGameCommand = new RelayCommand(game =>
             {
                 if (game is Game g)
                 {
-                    var libraryGames = await Task.Run(() => _storageService.LoadLibraryGames());
-                    libraryGames.RemoveAll(x => x.Id == g.Id);
-                    await Task.Run(() => _storageService.SaveSubset(libraryGames, "Library"));
-                    await ApplySortAsync();
+                    // Instant visual removal (0ms delay)
+                    var toRemove = MyGames.FirstOrDefault(x => x.Id == g.Id) ?? g;
+                    MyGames.Remove(toRemove);
+
+                    if (SelectedGame?.Id == g.Id)
+                    {
+                        IsDialogOpen = false;
+                        SelectedGame = null;
+                    }
+
+                    // Save to disk in background without blocking UI thread
+                    Task.Run(() =>
+                    {
+                        var libraryGames = _storageService.LoadLibraryGames();
+                        libraryGames.RemoveAll(x => x.Id == g.Id);
+                        _storageService.SaveSubset(libraryGames, "Library");
+                    });
                 }
             });
 
@@ -216,6 +229,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                     {
                         newGame.Status  = "Like to Play";
                         newGame.Source  = "Library"; // strict segregation tag
+                        newGame.AddedDate = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                         libraryGames.Add(newGame);
                         await Task.Run(() => _storageService.SaveSubset(libraryGames, "Library"));
                         await ApplySortAsync(); // refresh the card grid
@@ -275,7 +289,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                     sorted = queryable.OrderBy(g => g.Title);
                     break;
                 case "Recently Added":
-                    sorted = queryable.OrderByDescending(g => g.Id);
+                    sorted = queryable.OrderByDescending(g => g.AddedDateParsed).ThenByDescending(g => g.Id);
                     break;
                 case "Playing":
                     sorted = queryable.Where(g => g.Status == "Playing").OrderBy(g => g.Title);

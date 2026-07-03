@@ -149,6 +149,19 @@ namespace MooDeX_New_Version_1._0.Models
             set => SetProperty(ref _addedDate, value);
         }
 
+        [JsonIgnore]
+        public DateTime AddedDateParsed
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_addedDate) && DateTime.TryParse(_addedDate, out var dt))
+                {
+                    return dt;
+                }
+                return DateTime.MinValue;
+            }
+        }
+
         [JsonPropertyName("released")]
         public string ReleaseDate
         {

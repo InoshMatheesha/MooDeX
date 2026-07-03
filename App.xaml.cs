@@ -1,64 +1,41 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using MooDeX_New_Version_1._0.Services;
-using MooDeX_New_Version_1._0.ViewModels;
 
 namespace MooDeX_New_Version_1._0
 {
     public partial class App : System.Windows.Application
     {
+        private static Mutex? _mutex;
         private ProcessMonitor? _processMonitor;
-        private static System.Threading.Mutex? _mutex = null;
-        private System.Threading.Thread? _listenThread = null;
-        private System.Threading.EventWaitHandle? _eventWaitHandle = null;
+
+        public static readonly int RestoreWindowMessage = RegisterWindowMessage("WM_MOODEX_RESTORE_WINDOW_MSG");
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern int RegisterWindowMessage(string lpString);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+
+        private const int HWND_BROADCAST = 0xffff;
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            const string appName = "MooDeX_SingleInstance_Mutex_v1";
-            bool createdNew;
-
-            _mutex = new System.Threading.Mutex(true, appName, out createdNew);
+            const string mutexName = "MooDeX_SingleInstance_Mutex_9981A";
+            _mutex = new Mutex(true, mutexName, out bool createdNew);
 
             if (!createdNew)
             {
-                // App is already running. Signal the event to bring it to front.
-                try 
-                {
-                    var waitHandle = System.Threading.EventWaitHandle.OpenExisting("MooDeX_BringToFront_Event_v1");
-                    waitHandle.Set();
-                } 
-                catch { }
+                // Another instance of MooDeX is already running in the background or tray!
+                // Broadcast Win32 message so the running instance restores its window
+                PostMessage((IntPtr)HWND_BROADCAST, RestoreWindowMessage, IntPtr.Zero, IntPtr.Zero);
 
-                // Exit this instance
-                System.Windows.Application.Current.Shutdown();
+                // Instantly shut down this second process before creating any UI or System Tray icon
+                Shutdown();
                 return;
             }
-
-            // This is the first instance. Create the wait handle.
-            _eventWaitHandle = new System.Threading.EventWaitHandle(false, System.Threading.EventResetMode.AutoReset, "MooDeX_BringToFront_Event_v1");
-            _listenThread = new System.Threading.Thread(() =>
-            {
-                while (_eventWaitHandle.WaitOne())
-                {
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        var mainWindow = System.Windows.Application.Current.MainWindow;
-                        if (mainWindow != null)
-                        {
-                            mainWindow.Show();
-                            if (mainWindow.WindowState == WindowState.Minimized)
-                            {
-                                mainWindow.WindowState = WindowState.Normal;
-                            }
-                            mainWindow.Activate();
-                            mainWindow.Topmost = true;
-                            mainWindow.Topmost = false;
-                            mainWindow.Focus();
-                        }
-                    });
-                }
-            });
-            _listenThread.IsBackground = true;
-            _listenThread.Start();
 
             base.OnStartup(e);
 
@@ -70,9 +47,15 @@ namespace MooDeX_New_Version_1._0
         protected override void OnExit(ExitEventArgs e)
         {
             _processMonitor?.StopMonitoring();
-            _eventWaitHandle?.Close();
-            _mutex?.ReleaseMutex();
-            _mutex?.Dispose();
+            if (_mutex != null)
+            {
+                try
+                {
+                    _mutex.ReleaseMutex();
+                    _mutex.Dispose();
+                }
+                catch { }
+            }
             base.OnExit(e);
         }
     }

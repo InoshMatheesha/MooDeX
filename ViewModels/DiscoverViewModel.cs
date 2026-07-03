@@ -88,7 +88,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                     newGame.Status = "Like to Play";
                     newGame.UserRating = 0;
                     newGame.Source = "Library"; // ← strict segregation tag
-                    newGame.AddedDate = DateTime.Now.ToString("yyyy-MM-dd");
+                    newGame.AddedDate = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                     libraryGames.Add(newGame);
                     await Task.Run(() => _storageService.SaveSubset(libraryGames, "Library"));

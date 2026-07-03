@@ -200,12 +200,24 @@ namespace MooDeX_New_Version_1._0.ViewModels
 
             SaveGameCommand = new RelayCommand(async _ => await SaveGameAsync());
 
-            RemoveGameCommand = new RelayCommand(async g => {
-                if(g is Game gameToRemove) {
-                    var games = await Task.Run(() => _storageService.LoadPCGames());
-                    games.RemoveAll(x => x.Id == gameToRemove.Id);
-                    await Task.Run(() => _storageService.SaveSubset(games, "PCGames"));
-                    await ApplySortAsync();
+            RemoveGameCommand = new RelayCommand(g => {
+                if (g is Game gameToRemove) {
+                    // Instant visual removal (0ms delay)
+                    var toRemove = InstalledGames.FirstOrDefault(x => x.Id == gameToRemove.Id) ?? gameToRemove;
+                    InstalledGames.Remove(toRemove);
+
+                    if (SelectedGame?.Id == gameToRemove.Id)
+                    {
+                        IsDialogOpen = false;
+                        SelectedGame = null;
+                    }
+
+                    // Save to disk in background without blocking UI thread
+                    Task.Run(() => {
+                        var games = _storageService.LoadPCGames();
+                        games.RemoveAll(x => x.Id == gameToRemove.Id);
+                        _storageService.SaveSubset(games, "PCGames");
+                    });
                 }
             });
 
@@ -514,8 +526,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                     Title          = NewGameName,
                     ExecutableName = string.IsNullOrWhiteSpace(NewExePath) ? string.Empty : Path.GetFileName(NewExePath),
                     ExecutablePath = NewExePath,
-                    CoverUrl       = coverUrl,
-                    AddedDate      = DateTime.Now.ToString("yyyy-MM-dd"),
+                    AddedDate      = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     ReleaseDate    = SelectedMatch != null ? SelectedMatch.ReleaseDate : string.Empty,
                     Status         = "Playing",
                     Playtime       = 0,
@@ -536,6 +547,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                         Id = libId,
                         Title = NewGameName,
                         CoverUrl = coverUrl,
+                        AddedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                         ReleaseDate = SelectedMatch != null ? SelectedMatch.ReleaseDate : string.Empty,
                         Status = "Like to Play",
                         Playtime = 0,
@@ -615,7 +627,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                     sorted = games.OrderBy(g => g.Title).ToList();
                     break;
                 case "Recently Added":
-                    sorted = games.OrderByDescending(g => g.Id).ToList();
+                    sorted = games.OrderByDescending(g => g.AddedDateParsed).ThenByDescending(g => g.Id).ToList();
                     break;
                 case "Recently Played":
                     sorted = games.OrderByDescending(g => g.LastPlayed ?? DateTime.MinValue).ToList();

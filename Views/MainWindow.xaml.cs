@@ -23,9 +23,17 @@ namespace MooDeX_New_Version_1._0.Views
             SetupSystemTray();
         }
 
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
+
+            // Hook into Win32 messages for single instance restore signal
+            var helper = new System.Windows.Interop.WindowInteropHelper(this);
+            var source = System.Windows.Interop.HwndSource.FromHwnd(helper.Handle);
+            source?.AddHook(WndProc);
 
             // Restore last adjusted window size, default to 1340x820
             try
@@ -57,6 +65,16 @@ namespace MooDeX_New_Version_1._0.Views
                     WindowState = WindowState.Minimized;
                 }
             }
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == App.RestoreWindowMessage)
+            {
+                RestoreWindow();
+                handled = true;
+            }
+            return IntPtr.Zero;
         }
 
         private void SetupSystemTray()
@@ -157,8 +175,17 @@ namespace MooDeX_New_Version_1._0.Views
         private void RestoreWindow()
         {
             Show();
-            WindowState = WindowState.Normal;
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
             Activate();
+
+            var helper = new System.Windows.Interop.WindowInteropHelper(this);
+            if (helper.Handle != IntPtr.Zero)
+            {
+                SetForegroundWindow(helper.Handle);
+            }
         }
 
         private void ForceClose()

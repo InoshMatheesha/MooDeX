@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1",
   "release_notes": "What's New in v1.1.0:\n\n• Fixed issue with Recently Added Games in library\n• Improved library scanning performance\n• General UI polish and stability improvements",
   "download_url": "https://github.com/InoshMatheesha/MooDeX/releases/download/MooDeX_v1.1/MooDeX_v1.1.Setup.exe",
   "published_at": "2026-07-03"

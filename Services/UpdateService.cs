@@ -19,22 +19,35 @@ namespace MooDeX_New_Version_1._0.Services
     public class UpdateService
     {
         // ─────────────────────────────────────────────────────────────
-        //  IMPORTANT: Replace this URL with your actual hosted update.json location.
-        //  Common options:
-        //    - GitHub raw URL:  https://raw.githubusercontent.com/<user>/<repo>/main/update.json
-        //    - Your own server: https://yourdomain.com/updates/update.json
+        //  GitHub API endpoint to fetch update.json as raw content.
+        //  We use api.github.com instead of raw.githubusercontent.com
+        //  because some ISPs/networks block the raw domain.
         // ─────────────────────────────────────────────────────────────
         private const string UpdateManifestUrl =
-            "https://raw.githubusercontent.com/InoshMatheesha/MooDeX/main/update.json";
+            "https://api.github.com/repos/InoshMatheesha/MooDeX/contents/update.json";
 
         /// <summary>
         /// Static HttpClient instance — best practice per Microsoft docs.
         /// Creating a new HttpClient per request can exhaust available sockets.
         /// </summary>
-        private static readonly HttpClient _httpClient = new()
+        private static readonly HttpClient _httpClient;
+
+        /// <summary>
+        /// Static constructor to configure HttpClient with required GitHub API headers.
+        /// GitHub API requires a User-Agent header and we use the raw content Accept header
+        /// to get the file content directly (not Base64-encoded).
+        /// </summary>
+        static UpdateService()
         {
-            Timeout = TimeSpan.FromSeconds(15)
-        };
+            _httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+            // GitHub API requires a User-Agent header — requests without one are rejected
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "MooDeX-Updater");
+            // This Accept header tells GitHub to return the raw file content, not the API JSON wrapper
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3.raw");
+        }
 
         /// <summary>
         /// Fetches the remote update.json and deserializes it into an UpdateInfo object.
@@ -48,7 +61,7 @@ namespace MooDeX_New_Version_1._0.Services
         {
             try
             {
-                // Fetch the raw JSON from the remote server
+                // Fetch the raw JSON via GitHub API
                 string json = await _httpClient.GetStringAsync(UpdateManifestUrl);
 
                 // Deserialize into our model — case-insensitive to be forgiving
@@ -80,7 +93,7 @@ namespace MooDeX_New_Version_1._0.Services
             catch (TaskCanceledException ex)
             {
                 throw new UpdateCheckException(
-                    "The update check timed out. Please try again later.", ex);
+                    "The update check timed out. Your internet connection may be slow — please try again.", ex);
             }
             catch (JsonException ex)
             {

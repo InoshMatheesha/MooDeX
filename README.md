@@ -1,7 +1,7 @@
 <div align="center">
 
 <br>
-<img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="400"/>
+<img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="300"/>
 
 ### Your Games. Your Stats. Your Vibe.
 

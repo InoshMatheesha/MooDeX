@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MooDeX &mdash; Your Games. Your Stats. Your Vibe.</title>
+  <meta name="description"
+    content="MooDeX is a sleek desktop game library manager for Windows. Track playtime, discover titles, auto-match artwork, and launch games in one click.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="mesh" aria-hidden="true"></div>
+
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header>
+    <div class="container nav-row">
+      <div class="brand">
+        <div class="brand-logo"><img src="Icon Logo/icon.png" alt="MooDeX icon"></div>
+        <span class="brand-name"> <a href="#hero">MooDeX</a></span>
+      </div>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#features">Features</a>
+        <a href="#showcase">Showcase</a>
+        <a href="#tech">Tech Stack</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/InoshMatheesha" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-primary btn-sm"
+          href="https://github.com/InoshMatheesha/MooDeX/releases/download/MooDeX_v1.2/MooDeX_v1.2.Setup.exe"
+          download>Download</a>
+        <button class="nav-toggle" aria-label="Toggle navigation" id="navToggle">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <line x1="2" y1="5" x2="16" y2="5" />
+            <line x1="2" y1="9" x2="16" y2="9" />
+            <line x1="2" y1="13" x2="16" y2="13" />
+          </svg>
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main ────────────────────────────────────────────────── -->
+  <main>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="hero-label">
+            <span class="eyebrow"><span class="eyebrow-dot"></span>Desktop Game Library Manager for Windows</span>
+          </div>
+          <h1>Play More.<br><span class="gradient-text">Track Everything.</span><br>Stay in Flow.</h1>
+          <p class="hero-desc">The ultimate personal desktop game library manager for Windows. Track playtime, discover
+            titles, auto-match artwork, and launch any game in one click.</p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary"
+              href="https://github.com/InoshMatheesha/MooDeX/releases/download/MooDeX_v1.2/MooDeX_v1.2.Setup.exe"
+              download>
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+                <path d="M7.5 11L1.5 5.5h4V1h4v4.5h4L7.5 11zM1 13h13v1.5H1z" />
+              </svg>
+              Download Setup
+            </a>
+            <a class="btn btn-glass" href="https://github.com/InoshMatheesha/MooDeX" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 .3C5.37.3 0 5.67 0 12.3c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.48.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.3c0 .32.22.69.83.57C20.57 22.1 24 17.6 24 12.3 24 5.67 18.63.3 12 .3z" />
+              </svg>
+              View on GitHub
+            </a>
+          </div>
+          <div class="hero-meta">
+            <span class="hero-meta-item"><span class="meta-dot"></span>Windows 10 / 11</span>
+            <span class="hero-meta-item"><span class="meta-dot"></span>~50 MB installer</span>
+            <span class="hero-meta-item"><span class="meta-dot"></span>Free &amp; Open Source</span>
+          </div>
+        </div>
+        <div>
+          <div class="app-window" id="heroWindow">
+            <div class="window-bar">
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+              <div class="win-dot"></div>
+              <span class="win-title">MooDeX &mdash; Dashboard</span>
+            </div>
+            <img class="window-screenshot" src="App Screenshots/Dashboard.png" alt="MooDeX Dashboard" loading="eager">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Band -->
+    <section class="stats-section">
+      <div class="stats-band">
+        <div class="container">
+          <div class="stats-grid">
+            <div class="stat-divider">
+              <div class="stat-value" data-target="100" data-suffix="%">0%</div>
+              <div class="stat-label">Free &amp; Open Source</div>
+            </div>
+            <div class="stat-divider">
+              <div class="stat-value">0ms</div>
+              <div class="stat-label">Instant UI Response</div>
+            </div>
+            <div class="stat-divider">
+              <div class="stat-value">RAWG</div>
+              <div class="stat-label">API Integration</div>
+            </div>
+            <div class="stat-divider">
+              <div class="stat-value">AUTO</div>
+              <div class="stat-label">Self-Updating Client</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section-pad" id="features">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Core Features</span>
+          <h2>Everything your library needed, in one native app.</h2>
+          <p>Four integrated systems keep your collection organized, your stats accurate, and your next game one click
+            away.</p>
+        </div>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135.42 122.88" class="feature-svg">
+                <path
+                  d="M65.62,14.08H85.85a2,2,0,0,1,2,2V95.56a2,2,0,0,1-2,2H65.62a2,2,0,0,1-2-2V16a2,2,0,0,1,2-2Zm69.8,108.8H9.93v0A9.89,9.89,0,0,1,0,113H0V0H12.69V110.19H135.42v12.69ZM103.05,53.8h20.23a2,2,0,0,1,2,2V95.56a2,2,0,0,1-2,2H103.05a2,2,0,0,1-2-2V55.75a2,2,0,0,1,2-2ZM28.19,29.44H48.42a2,2,0,0,1,1.95,1.95V95.56a2,2,0,0,1-1.95,2H28.19a2,2,0,0,1-2-2V31.39a2,2,0,0,1,2-1.95Z" />
+              </svg>
+            </div>
+            <h3>Dashboard &amp; Playtime Stats</h3>
+            <p>Live playtime tracking, your top 3 most-played titles ranked by session count, and a G.O.A.T selector
+              that crowns your all-time favorite &mdash; updated in real time.</p>
+            <div class="feature-pills">
+              <span class="pill">Playtime tracking</span>
+              <span class="pill">Top 3 played</span>
+              <span class="pill">G.O.A.T selector</span>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 101.91" class="feature-svg">
+                <path
+                  d="M3.34,0h116.2c1.84,0,3.34,1.5,3.34,3.34v76.98c0,1.84-1.5,3.34-3.34,3.34H3.34C1.5,83.66,0,82.16,0,80.32 V3.34C0,1.5,1.5,0,3.34,0L3.34,0L3.34,0z M46.29,88.27h30.3c0.08,5.24,2.24,9.94,8.09,13.63H38.2 C42.88,98.51,46.31,94.39,46.29,88.27L46.29,88.27L46.29,88.27z M61.44,72.41c2.37,0,4.29,1.92,4.29,4.29 c0,2.37-1.92,4.29-4.29,4.29c-2.37,0-4.29-1.92-4.29-4.29C57.15,74.33,59.07,72.41,61.44,72.41L61.44,72.41z M10.05,6.29h102.79 c1.63,0,2.95,1.33,2.95,2.95v57.52c0,1.62-1.33,2.95-2.95,2.95H10.05c-1.62,0-2.95-1.33-2.95-2.95V9.24 C7.09,7.62,8.42,6.29,10.05,6.29L10.05,6.29L10.05,6.29z" />
+              </svg>
+            </div>
+            <h3>One-Click Game Launcher</h3>
+            <p>Import any .exe from your PC, let MooDeX auto-match cover art via RAWG, and launch straight from your
+              library. Playtime is tracked automatically in the background.</p>
+            <div class="feature-pills">
+              <span class="pill">.exe import</span>
+              <span class="pill">RAWG cover match</span>
+              <span class="pill">Auto playtime</span>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 101.91" class="feature-svg">
+                <path
+                  d="M49,49.58l-3.63,3.63V46L49,49.58Zm55.47-28.35h.27a2.51,2.51,0,0,1,1.93.91C118,33.88,124,59.37,122.7,76.43a34.17,34.17,0,0,1-2.83,12c-1.74,3.58-4.25,5.93-7.61,6.55-4.28.79-9.63-1.47-16.06-8-.83-.84-1.69-1.69-2.57-2.56a74.51,74.51,0,0,1-8.83-9.81H38.08a73.06,73.06,0,0,1-8.85,9.84c-.87.86-1.73,1.7-2.55,2.53-6.43,6.55-11.78,8.81-16.06,8C7.26,94.39,4.74,92,3,88.46a34.22,34.22,0,0,1-2.83-12C-1.15,59.29,4.9,33.65,16.4,22a2.48,2.48,0,0,1,1.78-.75h.28c7.09-9.76,23-9.86,30.09,0h7.91C55.85,6.29,60,2.54,66.13,2.12a31.1,31.1,0,0,1,7,.65c4.65.77,9.8,1.62,13.45-2a2.48,2.48,0,0,1,3.54,0,2.5,2.5,0,0,1,0,3.54c-5.47,5.46-12,4.39-17.8,3.42a27.84,27.84,0,0,0-5.89-.59c-3.31.22-5.51,3-5,14.12H74.34c7.07-9.79,23-9.82,30.09,0ZM39.19,37v6.66h6.66c7.54,0,7.54,11.4,0,11.4H39.19v6.66c0,7.54-11.4,7.54-11.4,0V55.07H21.13c-7.54,0-7.54-11.4,0-11.4h6.66V37c0-7.54,11.4-7.54,11.4,0ZM91.27,31.2a5.26,5.26,0,1,1-7.44,0,5.25,5.25,0,0,1,7.44,0Zm0,22.94a5.26,5.26,0,1,1-7.44,0,5.25,5.25,0,0,1,7.44,0Zm12.62-12a5.26,5.26,0,1,1-7.44,0,5.27,5.27,0,0,1,7.44,0Zm-25.25,0a5.26,5.26,0,1,1-7.44,0,5.25,5.25,0,0,1,7.44,0Zm-45-7.88,3.63,3.63H30.05l3.63-3.63ZM18.39,49.58,22,53.21V46l-3.63,3.63ZM33.68,64.86l3.63-3.63H30.05l3.63,3.63Z" />
+              </svg>
+            </div>
+            <h3>Discover Games</h3>
+            <p>Explore Trending, Upcoming, and Popular titles pulled live from the RAWG video game database. Add any
+              title to your library or wishlist instantly with one click.</p>
+            <div class="feature-pills">
+              <span class="pill">Trending</span>
+              <span class="pill">Upcoming</span>
+              <span class="pill">Popular</span>
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122.88 122.88" class="feature-svg4">
+                <path
+                  d="M64.89,32.65,59.81,58.5l-5.16-7.77C43.54,55.19,37.3,62.54,36.38,73.86c-9.13-16-3.59-30.25,8-38.63L39.09,27.3l25.8,5.35ZM61.44,0A61.46,61.46,0,1,1,18,18,61.21,61.21,0,0,1,61.44,0ZM97.56,25.32a51.08,51.08,0,1,0,15,36.12,51,51,0,0,0-15-36.12ZM56.64,91.8,61.72,66l5.16,7.77C78,69.26,84.23,61.91,85.15,50.59c9.13,16,3.59,30.25-8,38.63l5.26,7.93L56.64,91.8Z" />
+              </svg>
+            </div>
+            <h3>Seamless Auto-Updater</h3>
+            <p>MooDeX checks GitHub Releases automatically in the background. When a new version is available, a single
+              click downloads and installs the update &mdash; no manual steps required.</p>
+            <div class="feature-pills">
+              <span class="pill">GitHub Releases</span>
+              <span class="pill">Single-click install</span>
+              <span class="pill">Background check</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcase -->
+    <section class="section-pad" id="showcase">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Interactive Showcase</span>
+          <h2>Every screen inside MooDeX.</h2>
+          <p>Switch between tabs to preview each view &mdash; Dashboard, Library, PC Games, Discover, and Cover Match.
+          </p>
+        </div>
+        <div class="tabs-wrap" role="tablist">
+          <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+          <button class="tab-btn" data-tab="library">My Library</button>
+          <button class="tab-btn" data-tab="pcgames">PC Games</button>
+          <button class="tab-btn" data-tab="discover">Discover</button>
+          <button class="tab-btn" data-tab="covermatch">Cover Match &amp; Edit</button>
+        </div>
+
+        <div class="gallery-panel active" data-panel="dashboard">
+          <div class="panel-bar">
+            <div class="panel-bar-left">
+              <h4>Dashboard</h4>
+              <p>Your library at a glance &mdash; playtime, top games, and your G.O.A.T.</p>
+            </div>
+            <span class="status-badge"><span class="dot-live"></span>Live Stats</span>
+          </div>
+          <img class="panel-screenshot" src="App Screenshots/Dashboard.png" alt="MooDeX Dashboard">
+          <div class="panel-caption">Playtime tracking &middot; Top 3 most-played &middot; G.O.A.T selector &middot;
+            Live status indicator</div>
+        </div>
+
+        <div class="gallery-panel" data-panel="library">
+          <div class="panel-bar">
+            <div class="panel-bar-left">
+              <h4>My Library</h4>
+              <p>Every title you own, with status, ratings, and personal notes.</p>
+            </div>
+            <span class="info-badge">Your Collection</span>
+          </div>
+          <img class="panel-screenshot" src="App Screenshots/My Library.png" alt="MooDeX My Library">
+          <div class="panel-caption">Rate games &middot; Set status (Playing / Completed / Wishlist / Stopped) &middot;
+            Add personal notes</div>
+        </div>
+
+        <div class="gallery-panel" data-panel="pcgames">
+          <div class="panel-bar">
+            <div class="panel-bar-left">
+              <h4>PC Games</h4>
+              <p>Imported .exe files, auto-matched with RAWG artwork and ready to launch.</p>
+            </div>
+            <span class="info-badge">One-Click Launch</span>
+          </div>
+          <img class="panel-screenshot" src="App Screenshots/PC Games.png" alt="MooDeX PC Games">
+          <div class="panel-caption">Import any .exe &middot; Auto playtime tracking &middot; RAWG cover art matching
+            &middot; Session history</div>
+        </div>
+
+        <div class="gallery-panel" data-panel="discover">
+          <div class="panel-bar">
+            <div class="panel-bar-left">
+              <h4>Discover</h4>
+              <p>Browse Trending, Upcoming, and Popular titles live from RAWG.</p>
+            </div>
+            <span class="status-badge"><span class="dot-live"></span>Live from RAWG</span>
+          </div>
+          <img class="panel-screenshot" src="App Screenshots/Discover Games.png" alt="MooDeX Discover Games">
+          <div class="panel-caption">Trending &middot; Upcoming &middot; Popular &mdash; add any title to your library
+            or wishlist instantly</div>
+        </div>
+
+        <div class="gallery-panel" data-panel="covermatch">
+          <div class="panel-bar">
+            <div class="panel-bar-left">
+              <h4>Cover Match &amp; Game Editor</h4>
+              <p>Auto-match artwork or manually pick the right cover. Edit all details in one dialog.</p>
+            </div>
+            <span class="info-badge">RAWG Matched</span>
+          </div>
+          <div class="panel-dual">
+            <img src="App Screenshots/Match Game & Cover.png" alt="MooDeX Match Game Cover">
+            <img src="App Screenshots/Edit Game Details.png" alt="MooDeX Edit Game Details">
+          </div>
+          <div class="panel-caption">Search RAWG for covers &middot; Edit ratings, status &amp; personal notes in one
+            unified dialog</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section class="section-pad" id="tech">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow"><span class="eyebrow-dot"></span>Tech Stack &amp; Architecture</span>
+          <h2>Built native. Built for speed.</h2>
+          <p>Pure C# and MVVM &mdash; no Electron, no browser runtime. Just a fast, native Windows application using the
+            full .NET 10 platform.</p>
+        </div>
+        <div class="tech-row">
+          <div class="tech-chip"><span class="tech-chip-dot"></span>.NET 10</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>WPF (Windows Presentation Foundation)</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>Material Design In XAML</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>RAWG Video Games API</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>GitHub REST API</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>C# / MVVM Pattern</div>
+          <div class="tech-chip"><span class="tech-chip-dot"></span>JSON Local Storage</div>
+        </div>
+        <div class="arch-flow">
+          <div class="arch-node"><b>WPF View</b><span>XAML UI Layer</span></div>
+          <div class="arch-arrow">&#x2192;</div>
+          <div class="arch-node"><b>ViewModel</b><span>MVVM Bindings</span></div>
+          <div class="arch-arrow">&#x2192;</div>
+          <div class="arch-node"><b>Services</b><span>RAWG &middot; GitHub</span></div>
+          <div class="arch-arrow">&#x2192;</div>
+          <div class="arch-node"><b>Local Store</b><span>Library / Stats</span></div>
+          <div class="arch-arrow">&#x2192;</div>
+          <div class="arch-node"><b>Auto-Updater</b><span>GitHub Releases</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section class="section-pad" id="download">
+      <div class="cta-band">
+        <span class="eyebrow"
+          style="color:rgba(255,255,255,.70);justify-content:center;display:flex;margin-bottom:14px;">
+          <span
+            style="width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.70);flex-shrink:0;margin-top:1px;"></span>
+          v1.2 &nbsp;&middot;&nbsp; Latest Release
+        </span>
+        <h2>Ready to organize your game library?</h2>
+        <p>Download the setup and be tracking your first session in under two minutes.</p>
+        <div class="cta-actions">
+          <a class="btn btn-white" style="padding:14px 28px;font-size:15px;"
+            href="https://github.com/InoshMatheesha/MooDeX/releases/download/MooDeX_v1.2/MooDeX_v1.2.Setup.exe"
+            download>
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+              <path d="M7.5 11L1.5 5.5h4V1h4v4.5h4L7.5 11zM1 13h13v1.5H1z" />
+            </svg>
+            Download for Windows (v1.2)
+          </a>
+          <a class="btn btn-outline-white" style="padding:14px 28px;font-size:15px;"
+            href="https://github.com/InoshMatheesha/MooDeX" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 .3C5.37.3 0 5.67 0 12.3c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.48.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.3c0 .32.22.69.83.57C20.57 22.1 24 17.6 24 12.3 24 5.67 18.63.3 12 .3z" />
+            </svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand">
+            <div class="brand-logo" style="height:34px;width:34px;"><img src="Icon Logo/icon.png" alt="MooDeX"></div>
+            <span class="brand-name" style="font-size:17px;">MooDeX</span>
+          </div>
+          <p class="footer-brand-desc">A sleek desktop game library manager for Windows. Built as an SLIIT BSc (Hons)
+            Information Technology project.</p>
+        </div>
+        <div class="footer-col">
+          <h5>Download</h5>
+          <ul>
+            <li><a href="https://github.com/InoshMatheesha/MooDeX/releases/download/MooDeX_v1.2/MooDeX_v1.2.Setup.exe"
+                download>Windows Setup </a></li>
+            <li><a href="#download">Release Notes</a></li>
+            <li><a href="#tech">System Requirements</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Project</h5>
+          <ul>
+            <li><a href="https://github.com/InoshMatheesha/MooDeX" target="_blank" rel="noopener">GitHub Repository</a>
+            </li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#showcase">Showcase</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Info</h5>
+          <ul>
+            <li><a href="#">MIT License</a></li>
+            <li><a href="#">SLIIT Attribution</a></li>
+            <li><a href="https://github.com/InoshMatheesha/MooDeX/issues" target="_blank" rel="noopener">Report an
+                Issue</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 MooDeX &mdash; Made by MoOdY69.</span>
+        <span>Built with C# &middot; WPF &middot; .NET 10 &middot; MVVM</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

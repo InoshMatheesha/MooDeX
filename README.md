@@ -75,12 +75,14 @@ MooDeX follows the **MVVM** (Model-View-ViewModel) pattern:
 - **Windows 10/11**
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (or later)
 
-### Quick Install
-
-> Just want to use the app? Download the installer from either of these links:
+### Download Links
 
 - [GitHub Releases](https://github.com/InoshMatheesha/MooDeX/releases)
 - [SourceForge](https://sourceforge.net/projects/moodex/)
+
+### Quick Install
+
+> Just want to use the app? Download the installer from one of the links above:
 
 ```
 MooDeX_v1.2.Setup.exe

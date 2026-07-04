@@ -192,7 +192,7 @@ Contributions, issues, and feature requests are welcome.
 
 <div align="center">
 
-<img src="Icon%20Logo/icon.png" alt="MooDeX" width="64"/>
+<img src="Icon%20Logo/icon.ico" alt="MooDeX" width="64"/>
 
 **MooDeX** — Your Games. Your Stats. Your Vibe.
 

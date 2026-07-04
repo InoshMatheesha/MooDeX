@@ -5,7 +5,7 @@
 
 ### Your Games. Your Stats. Your Vibe.
 
-**MooDeX** is a sleek, dark-themed desktop game library manager for Windows, built with WPF and Material Design. Organize your collection, discover new titles, track playtime, and launch games — all from one place.
+**MooDeX** is a sleek, dark-themed game library manager for Windows and the Web. Organize your collection, discover new titles, track playtime, and launch games — all from one place.
 
 <br>
 
@@ -13,15 +13,19 @@
 [![WPF](https://img.shields.io/badge/WPF-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/)
 [![Material Design](https://img.shields.io/badge/Material%20Design-BB86FC?style=for-the-badge&logo=materialdesign&logoColor=white)](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
 [![RAWG API](https://img.shields.io/badge/RAWG%20API-1F1F1F?style=for-the-badge&logo=gamepad&logoColor=white)](https://rawg.io/apidocs)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel_Web-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://moodex-web.vercel.app/)
 
 <br>
 
-### ⬇️ Download MooDeX
+### 🔥 DON'T WANT TO INSTALL ANYTHING? TRY MOODEX IN YOUR BROWSER NOW! 🌐
 
-[![Download from SourceForge](https://img.shields.io/badge/Download%20on-SourceForge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/moodex/)
-[![Download from GitHub Releases](https://img.shields.io/badge/Download%20on-GitHub%20Releases-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases)
+[![Launch MooDeX Web Demo](https://img.shields.io/badge/🌐_LAUNCH_LIVE_WEB_DEMO-00E5FF?style=for-the-badge&logo=vercel&logoColor=black)](https://moodex-web.vercel.app/)
+[![Download on SourceForge](https://img.shields.io/badge/Download%20on-SourceForge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/moodex/)
+[![Download on GitHub Releases](https://img.shields.io/badge/Download%20on-GitHub%20Releases-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases)
 
-*Windows 10/11 · .NET 10 Runtime bundled with the installer · No configuration required*
+*⚡ **Instant 1-Click Web Access:** Experience the vibe right now at **[moodex-web.vercel.app](https://moodex-web.vercel.app/)**!*
+<br/>
+*💻 Windows 10/11 Desktop App · .NET 10 Runtime bundled with the installer · No configuration required*
 
 </div>
 
@@ -58,14 +62,20 @@ MooDeX
 
 ## Getting Started
 
-### Prerequisites
+### 🌐 Instant Access (No Installation Required!)
+
+Want to test drive MooDeX right away without downloading anything?
+
+👉 **[🔥 Launch MooDeX Web Live Demo →](https://moodex-web.vercel.app/)**
+
+### Prerequisites (For Desktop App)
 
 - Windows 10 or 11
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (or later) — only required for building from source
 
-### Install the App
+### Install the Desktop App
 
-The fastest way to get started is to download the installer from either mirror below:
+The fastest way to get started on Windows is to download the installer:
 
 - **[SourceForge →](https://sourceforge.net/projects/moodex/)**
 - **[GitHub Releases →](https://github.com/InoshMatheesha/MooDeX/releases)**
@@ -152,7 +162,8 @@ dotnet run
 
 | Layer | Technology |
 |---|---|
-| Framework | WPF (.NET 10) |
+| Desktop Framework | WPF (.NET 10) |
+| Web Platform | Vercel Live Showcase ([moodex-web.vercel.app](https://moodex-web.vercel.app/)) |
 | UI Library | Material Design In XAML Toolkit v5.3 |
 | API | RAWG Video Games Database |
 | Data Storage | Local JSON files |

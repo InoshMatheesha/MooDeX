@@ -77,7 +77,10 @@ MooDeX follows the **MVVM** (Model-View-ViewModel) pattern:
 
 ### Quick Install
 
-> Just want to use the app? Run the installer executable from [Releases](https://github.com/InoshMatheesha/MooDeX/releases):
+> Just want to use the app? Download the installer from either of these links:
+
+- [GitHub Releases](https://github.com/InoshMatheesha/MooDeX/releases)
+- [SourceForge](https://sourceforge.net/projects/moodex/)
 
 ```
 MooDeX_v1.2.Setup.exe

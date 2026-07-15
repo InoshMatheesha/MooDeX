@@ -1,0 +1,26 @@
+# Auto-normalize line endings
+* text=auto
+
+# Force CRLF for Windows-friendly text files
+*.cs text eol=crlf
+*.xaml text eol=crlf
+*.xaml.cs text eol=crlf
+*.csproj text eol=crlf
+*.sln text eol=crlf
+
+# Treat common docs as text (preserve user's style)
+*.md text=auto
+*.json text=auto
+*.xml text=auto
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.bmp binary
+*.dll binary
+*.exe binary
+*.sqlite binary
+*.slx binary

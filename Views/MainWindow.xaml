@@ -79,25 +79,9 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Margin="15,30,15,35" HorizontalAlignment="Center">
-                    <!-- Added a creative drop shadow effect for the logo -->
-                    <Border CornerRadius="8" Background="Transparent">
-                        <Border.Effect>
-                            <DropShadowEffect Color="#30FFFFFF" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
-                        </Border.Effect>
-                        <Image Source="/Icon Logo/logo with name.png" RenderOptions.BitmapScalingMode="HighQuality" Cursor="AppStarting" RenderTransformOrigin="0.52,0.073" IsHitTestVisible="False" Stretch="Fill" OpacityMask="Black">
-                            <Image.Effect>
-                                <DropShadowEffect/>
-                            </Image.Effect>
-                            <Image.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform X="0"/>
-                                </TransformGroup>
-                            </Image.RenderTransform>
-                        </Image>
-                    </Border>
+                    <Image Source="/Icon Logo/logo with name.png"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Stretch="Uniform"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="1">

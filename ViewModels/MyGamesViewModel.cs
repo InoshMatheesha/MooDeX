@@ -524,6 +524,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                 {
                     Id             = newId,
                     Title          = NewGameName,
+                    CoverUrl       = coverUrl,
                     ExecutableName = string.IsNullOrWhiteSpace(NewExePath) ? string.Empty : Path.GetFileName(NewExePath),
                     ExecutablePath = NewExePath,
                     AddedDate      = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),

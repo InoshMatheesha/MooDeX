@@ -6,172 +6,259 @@
              Background="Transparent"
              Foreground="White">
 
-    <!-- Value converters used by the Application Updates section -->
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <helpers:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
+
+        <!-- Row style for each setting item -->
+        <Style x:Key="SettingRowStyle" TargetType="Grid">
+            <Setter Property="Margin" Value="0,0,0,0"/>
+        </Style>
+
+        <!-- Section label style -->
+        <Style x:Key="SectionLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#7C6FCD"/>
+            <Setter Property="Margin" Value="0,28,0,12"/>
+        </Style>
+
+        <!-- Setting title style -->
+        <Style x:Key="SettingTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#E8E8F0"/>
+            <Setter Property="Margin" Value="0,0,0,3"/>
+        </Style>
+
+        <!-- Setting description style -->
+        <Style x:Key="SettingDescStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#6B6B8A"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- Thin separator -->
+        <Style x:Key="RowSeparatorStyle" TargetType="Separator">
+            <Setter Property="Background" Value="#1E1E2E"/>
+            <Setter Property="Margin" Value="0,0,0,0"/>
+            <Setter Property="Height" Value="1"/>
+        </Style>
     </UserControl.Resources>
 
-    <Grid Margin="30">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,30">
-            <materialDesign:PackIcon Kind="CogOutline" Width="32" Height="32" Foreground="White" VerticalAlignment="Center" Margin="0,0,12,0"/>
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="Settings" FontSize="28" FontWeight="Bold" Foreground="White"/>
-                <TextBlock Text="Configure system startup, tray integration, and preferences" FontSize="14" Foreground="#A0A0A0" Margin="0,4,0,0"/>
-            </StackPanel>
-        </StackPanel>
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="40,36,40,20">
+            <StackPanel HorizontalAlignment="Stretch">
 
-        <!-- Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
-                
-                <!-- System Configuration Section -->
-                <materialDesign:Card UniformCornerRadius="16" Background="#1E1E1E" Padding="25" Margin="0,0,0,20">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                            <materialDesign:PackIcon Kind="Monitor" Width="22" Height="22" Foreground="#BB86FC" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="System Integration" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                        </StackPanel>
+                <!-- Page title -->
+                <TextBlock Text="Settings"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           Margin="0,0,0,6"/>
 
-                        <!-- Toggle Startup -->
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
-                                <TextBlock Text="Launch MooDeX on Startup" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
-                                <TextBlock Text="Automatically start MooDeX when you log into Windows." FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1" IsChecked="{Binding LaunchAtStartup, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}" VerticalAlignment="Center" />
-                        </Grid>
+                <!-- ══════════════════════════════
+                     SECTION: BEHAVIOUR
+                ══════════════════════════════ -->
+                <TextBlock Text="BEHAVIOUR" Style="{StaticResource SectionLabelStyle}"/>
 
-                        <Separator Background="#2A2A2A" Margin="0,15"/>
-
-                        <!-- Toggle Minimize to Tray -->
-                        <Grid Margin="0,15,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
-                                <TextBlock Text="Minimize to System Tray" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
-                                <TextBlock Text="Keep the app running in the background when minimized or closed." FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1" IsChecked="{Binding MinimizeToTray, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}" VerticalAlignment="Center" />
-                        </Grid>
-
-                        <Separator Background="#2A2A2A" Margin="0,15"/>
-
-                        <!-- Toggle Start Minimized -->
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
-                                <TextBlock Text="Start Minimized" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
-                                <TextBlock Text="Start the app minimized to the system tray on Windows startup." FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                            </StackPanel>
-                            <ToggleButton Grid.Column="1" IsChecked="{Binding LaunchMinimized, Mode=TwoWay}" Style="{StaticResource MaterialDesignSwitchToggleButton}" VerticalAlignment="Center" />
-                        </Grid>
+                <!-- Minimize to Tray on Close -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,14,20,14">
+                        <TextBlock Text="Minimize to Tray on Close"
+                                   Style="{StaticResource SettingTitleStyle}"/>
+                        <TextBlock Text="When enabled, clicking X hides MooDeX to the system tray instead of quitting."
+                                   Style="{StaticResource SettingDescStyle}"/>
                     </StackPanel>
-                </materialDesign:Card>
+                    <ToggleButton Grid.Column="1"
+                                  IsChecked="{Binding MinimizeToTray, Mode=TwoWay}"
+                                  Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                  VerticalAlignment="Center"/>
+                </Grid>
+                <Separator Style="{StaticResource RowSeparatorStyle}"/>
 
-                <!-- Application Updates Section -->
-                <materialDesign:Card UniformCornerRadius="16" Background="#1E1E1E" Padding="25" Margin="0,0,0,20">
-                    <StackPanel>
-                        <!-- Section Header -->
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                            <materialDesign:PackIcon Kind="Update" Width="22" Height="22" Foreground="#BB86FC" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <TextBlock Text="Application Updates" FontSize="18" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-                        </StackPanel>
+                <!-- Launch at Windows Startup -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,14,20,14">
+                        <TextBlock Text="Launch at Windows Startup"
+                                   Style="{StaticResource SettingTitleStyle}"/>
+                        <TextBlock Text="MooDeX will start minimized in the background when you log in."
+                                   Style="{StaticResource SettingDescStyle}"/>
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1"
+                                  IsChecked="{Binding LaunchAtStartup, Mode=TwoWay}"
+                                  Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                  VerticalAlignment="Center"/>
+                </Grid>
+                <Separator Style="{StaticResource RowSeparatorStyle}"/>
 
-                        <!-- Update Row: Description + Button -->
-                        <Grid Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                <!-- Launch Minimized -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,14,20,14">
+                        <TextBlock Text="Launch Minimized"
+                                   Style="{StaticResource SettingTitleStyle}"/>
+                        <TextBlock Text="When opened, MooDeX will start minimized to the system tray."
+                                   Style="{StaticResource SettingDescStyle}"/>
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1"
+                                  IsChecked="{Binding LaunchMinimized, Mode=TwoWay}"
+                                  Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                  VerticalAlignment="Center"/>
+                </Grid>
 
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,20,0">
-                                <TextBlock Text="Check for Updates" FontSize="15" FontWeight="SemiBold" Foreground="White"/>
-                                <TextBlock Text="Check if a newer version of MooDeX is available for download." FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                            </StackPanel>
+                <!-- ══════════════════════════════
+                     SECTION: UPDATES
+                ══════════════════════════════ -->
+                <TextBlock Text="UPDATES" Style="{StaticResource SectionLabelStyle}"/>
 
-                            <!-- Check for Updates Button with optional loading spinner -->
-                            <Button Grid.Column="1"
-                                    Command="{Binding CheckForUpdatesCommand}"
-                                    VerticalAlignment="Center"
-                                    Padding="18,8"
-                                    FontSize="13">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
-                                        <Setter Property="Background" Value="#BB86FC"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="10"/>
-                                    </Style>
-                                </Button.Style>
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- Spinner: visible only while checking -->
-                                    <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
-                                                 Width="16" Height="16"
-                                                 IsIndeterminate="True"
-                                                 Foreground="White"
-                                                 Margin="0,0,8,0"
-                                                 Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    <materialDesign:PackIcon Kind="CloudDownloadOutline"
-                                                             Width="18" Height="18"
-                                                             VerticalAlignment="Center"
-                                                             Margin="0,0,8,0"
-                                                             Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                                    <TextBlock Text="Check for Updates" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-                        </Grid>
-
-                        <!-- Status Text (e.g., "You are using the latest version." or error messages) -->
+                <!-- Check for Updates -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,14,20,14">
+                        <TextBlock Text="Check for Updates"
+                                   Style="{StaticResource SettingTitleStyle}"/>
+                        <TextBlock Text="Check if a newer version of MooDeX is available."
+                                   Style="{StaticResource SettingDescStyle}"/>
+                        <!-- Status text shown inline -->
                         <TextBlock Text="{Binding UpdateStatusText}"
-                                   FontSize="13"
-                                   Foreground="#8A8A8A"
+                                   FontSize="12"
+                                   Foreground="#7C6FCD"
                                    Margin="0,6,0,0"
                                    TextWrapping="Wrap"
                                    Visibility="{Binding UpdateStatusText, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
                     </StackPanel>
-                </materialDesign:Card>
+                    <Button Grid.Column="1"
+                            Command="{Binding CheckForUpdatesCommand}"
+                            VerticalAlignment="Center"
+                            Padding="16,8"
+                            FontSize="12"
+                            FontWeight="SemiBold">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                <Setter Property="BorderBrush" Value="#2A2A3E"/>
+                                <Setter Property="Foreground" Value="#A0A0C0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#7C6FCD"/>
+                                        <Setter Property="Foreground" Value="#BB86FC"/>
+                                        <Setter Property="Background" Value="#12100E"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                         Width="13" Height="13"
+                                         IsIndeterminate="True"
+                                         Foreground="#7C6FCD"
+                                         Margin="0,0,8,0"
+                                         Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <materialDesign:PackIcon Kind="CloudDownloadOutline"
+                                                     Width="15" Height="15"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,6,0"
+                                                     Visibility="{Binding IsCheckingForUpdates, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="Check for Updates" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+                <Separator Style="{StaticResource RowSeparatorStyle}"/>
+
+                <!-- ══════════════════════════════
+                     SECTION: ABOUT
+                ══════════════════════════════ -->
+                <TextBlock Text="ABOUT" Style="{StaticResource SectionLabelStyle}"/>
+
+                <!-- GitHub row -->
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,14,20,14">
+                        <TextBlock Text="Source Code on GitHub"
+                                   Style="{StaticResource SettingTitleStyle}"/>
+                        <TextBlock Style="{StaticResource SettingDescStyle}">
+                            <Run Text="View, star, or contribute at "/>
+                            <Hyperlink NavigateUri="https://github.com/InoshMatheesha/MooDeX"
+                                       RequestNavigate="Hyperlink_RequestNavigate"
+                                       Foreground="#7C6FCD">
+                                github.com/InoshMatheesha/MooDeX
+                            </Hyperlink>
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Click="GitHubButton_Click"
+                            VerticalAlignment="Center"
+                            Padding="16,8"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                <Setter Property="BorderBrush" Value="#2A2A3E"/>
+                                <Setter Property="Foreground" Value="#A0A0C0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="8"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#7C6FCD"/>
+                                        <Setter Property="Foreground" Value="#BB86FC"/>
+                                        <Setter Property="Background" Value="#12100E"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Github"
+                                                     Width="15" Height="15"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,6,0"/>
+                            <TextBlock Text="Open GitHub" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
 
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Footer (About Section) -->
-        <Border Grid.Row="2" BorderBrush="#2A2A2A" BorderThickness="0,1,0,0" Padding="0,20,0,0" Margin="0,20,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="MooDeX" FontSize="16" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock FontSize="13" Foreground="#8A8A8A" Margin="0,4,0,0">
-                        <Hyperlink NavigateUri="https://github.com/InoshMatheesha/MooDeX"
-                                   RequestNavigate="Hyperlink_RequestNavigate">
-                            https://github.com/InoshMatheesha/MooDeX
-                        </Hyperlink>
-                    </TextBlock>
-                </StackPanel>
-                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <TextBlock Text="Version v1.2" FontSize="13" FontWeight="SemiBold" Foreground="#BB86FC" HorizontalAlignment="Right"/>
-                    <TextBlock Text="Powered by RAWG API database" FontSize="11" Foreground="#666666" Margin="0,4,0,0" HorizontalAlignment="Right"/>
-                </StackPanel>
-            </Grid>
+        <!-- ══════════════════════════════
+             Footer
+        ══════════════════════════════ -->
+        <Border Grid.Row="1"
+                BorderBrush="#16162A"
+                BorderThickness="0,1,0,0"
+                Padding="40,12,40,14">
+            <TextBlock FontSize="12" Foreground="#3A3A55" VerticalAlignment="Center">
+                <Run Text="MooDeX" FontWeight="SemiBold"/>
+                <Run Text=" · v1.3"/>
+            </TextBlock>
         </Border>
     </Grid>
 </UserControl>

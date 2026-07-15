@@ -1,5 +1,6 @@
 <div align="center">
 
+
 <br>
 <img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="300"/>
 
@@ -19,7 +20,7 @@
 
 ### 🔥 DON'T WANT TO INSTALL ANYTHING? TRY MOODEX IN YOUR BROWSER NOW! 🌐
 
-[![Launch MooDeX Web Demo](https://img.shields.io/badge/🌐_LAUNCH_LIVE_WEB_DEMO-00E5FF?style=for-the-badge&logo=vercel&logoColor=black)](https://moodex-web.vercel.app/)
+[![MooDeX Web](https://img.shields.io/badge/🌐_LAUNCH_LIVE_WEB_DEMO-4c29a6?style=for-the-badge&logo=vercel&logoColor=black)](https://moodex-web.vercel.app/)
 [![Download on SourceForge](https://img.shields.io/badge/Download%20on-SourceForge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/moodex/)
 [![Download on GitHub Releases](https://img.shields.io/badge/Download%20on-GitHub%20Releases-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases)
 

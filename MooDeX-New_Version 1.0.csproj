@@ -12,6 +12,7 @@
     <Version>1.3</Version>
     <AssemblyVersion>1.3.0.0</AssemblyVersion>
     <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyName>MooDeX v1.3</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

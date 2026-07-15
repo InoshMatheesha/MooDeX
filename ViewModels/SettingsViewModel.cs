@@ -240,7 +240,7 @@ namespace MooDeX_New_Version_1._0.ViewModels
                         if (enable)
                         {
                             string appPath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName 
-                                ?? Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "MooDeX-New_Version 1.0.exe");
+                                ?? Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "MooDeX v1.3.exe");
                             string args = LaunchMinimized ? " --minimized" : "";
                             key.SetValue(RegistryValueName, $"\"{appPath}\"{args}");
                         }

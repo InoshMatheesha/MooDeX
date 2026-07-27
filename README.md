@@ -5,7 +5,7 @@
 <img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="300"/>
 
 ### Your Games. Your Stats. Your Vibe. 
-
+ 
 **MooDeX** is a sleek, dark-themed game library manager for Windows and the Web. Organize your collection, discover new titles, track playtime, and launch games — all from one place.
 
 <br>

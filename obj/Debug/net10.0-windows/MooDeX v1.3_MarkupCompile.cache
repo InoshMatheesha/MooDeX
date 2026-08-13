@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_O
 D:\SLIIT\GitHub\MooDeX\App.xaml
 7944798810
 22-91328922
-28-409761836
+301783436017
 217-1643796707
 Views\DashboardView.xaml;Views\DiscoverView.xaml;Views\LibraryView.xaml;Views\MainWindow.xaml;Views\MyGamesView.xaml;Views\SettingsView.xaml;Views\UpdateDialog.xaml;
 
-False
+True
 

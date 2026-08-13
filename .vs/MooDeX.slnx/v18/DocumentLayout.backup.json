@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "D:\\SLIIT\\GitHub\\MooDeX\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\SettingsViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ViewModels\\SettingsViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\ViewModelBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ViewModels\\ViewModelBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MooDeX-New_Version 1.0.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
@@ -17,14 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\Views\\DiscoverView.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Views\\DiscoverView.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\SettingsViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ViewModels\\SettingsViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\ViewModelBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ViewModels\\ViewModelBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,11 +34,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\Views\\MainWindow.xaml",
               "RelativeDocumentMoniker": "Views\\MainWindow.xaml",
@@ -46,12 +46,11 @@
               "RelativeToolTip": "Views\\MainWindow.xaml",
               "ViewState": "AgIAAE8AAAAAAAAAAAAUwFgAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-15T04:42:41.544Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:41.544Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "DiscoverView.xaml",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\Views\\DiscoverView.xaml",
               "RelativeDocumentMoniker": "Views\\DiscoverView.xaml",
@@ -59,12 +58,11 @@
               "RelativeToolTip": "Views\\DiscoverView.xaml",
               "ViewState": "AgIAAEUAAAAAAAAAAAAUwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-15T04:42:28.385Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:28.385Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "DiscoverView.xaml.cs",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\Views\\DiscoverView.xaml.cs",
               "RelativeDocumentMoniker": "Views\\DiscoverView.xaml.cs",
@@ -72,25 +70,24 @@
               "RelativeToolTip": "Views\\DiscoverView.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T04:42:26.845Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:26.845Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 0,
               "Title": "SettingsViewModel.cs",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\SettingsViewModel.cs",
               "RelativeDocumentMoniker": "ViewModels\\SettingsViewModel.cs",
               "ToolTip": "D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\SettingsViewModel.cs",
               "RelativeToolTip": "ViewModels\\SettingsViewModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAANQAAAAAAAAAAAAUwOEAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-15T04:41:54.346Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 1,
               "Title": "ViewModelBase.cs",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\ViewModelBase.cs",
               "RelativeDocumentMoniker": "ViewModels\\ViewModelBase.cs",
@@ -98,21 +95,19 @@
               "RelativeToolTip": "ViewModels\\ViewModelBase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T04:41:49.556Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:41:49.556Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "MooDeX-New_Version 1.0.csproj",
               "DocumentMoniker": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
               "RelativeDocumentMoniker": "MooDeX-New_Version 1.0.csproj",
               "ToolTip": "D:\\SLIIT\\GitHub\\MooDeX\\MooDeX-New_Version 1.0.csproj",
               "RelativeToolTip": "MooDeX-New_Version 1.0.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-07-15T04:12:28.819Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:12:28.819Z"
             }
           ]
         }

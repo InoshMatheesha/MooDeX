@@ -1,13 +1,27 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using MooDeX_New_Version_1._0.Services;
 
 namespace MooDeX_New_Version_1._0
 {
     public partial class App : System.Windows.Application
     {
+        private static void LogCrash(string source, Exception? ex)
+        {
+            try
+            {
+                var appFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MooDeX");
+                Directory.CreateDirectory(appFolder);
+                var logPath = Path.Combine(appFolder, "crash_log.txt");
+                File.AppendAllText(logPath, $"[{DateTime.Now:O}] {source}\n{ex}\n\n");
+            }
+            catch { }
+        }
         private static Mutex? _mutex;
         private ProcessMonitor? _processMonitor;
 
@@ -23,6 +37,13 @@ namespace MooDeX_New_Version_1._0
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.UnhandledException += (s, args) =>
+                LogCrash("AppDomain.UnhandledException", args.ExceptionObject as Exception);
+            DispatcherUnhandledException += (s, args) =>
+                LogCrash("DispatcherUnhandledException", args.Exception);
+            TaskScheduler.UnobservedTaskException += (s, args) =>
+                LogCrash("TaskScheduler.UnobservedTaskException", args.Exception);
+
             const string mutexName = "MooDeX_SingleInstance_Mutex_9981A";
             _mutex = new Mutex(true, mutexName, out bool createdNew);
 

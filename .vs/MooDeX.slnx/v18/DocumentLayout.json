@@ -46,8 +46,7 @@
               "RelativeToolTip": "Views\\MainWindow.xaml",
               "ViewState": "AgIAAE8AAAAAAAAAAAAUwFgAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-15T04:42:41.544Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:41.544Z"
             },
             {
               "$type": "Document",
@@ -59,8 +58,7 @@
               "RelativeToolTip": "Views\\DiscoverView.xaml",
               "ViewState": "AgIAAEUAAAAAAAAAAAAUwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-07-15T04:42:28.385Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:28.385Z"
             },
             {
               "$type": "Document",
@@ -72,8 +70,7 @@
               "RelativeToolTip": "Views\\DiscoverView.xaml.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T04:42:26.845Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:42:26.845Z"
             },
             {
               "$type": "Document",
@@ -83,7 +80,7 @@
               "RelativeDocumentMoniker": "ViewModels\\SettingsViewModel.cs",
               "ToolTip": "D:\\SLIIT\\GitHub\\MooDeX\\ViewModels\\SettingsViewModel.cs",
               "RelativeToolTip": "ViewModels\\SettingsViewModel.cs",
-              "ViewState": "AgIAAM8AAAAAAAAAAAAAAOEAAAAzAAAAAAAAAA==",
+              "ViewState": "AgIAANQAAAAAAAAAAAAUwOEAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-07-15T04:41:54.346Z",
               "EditorCaption": ""
@@ -98,8 +95,7 @@
               "RelativeToolTip": "ViewModels\\ViewModelBase.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-15T04:41:49.556Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:41:49.556Z"
             },
             {
               "$type": "Document",
@@ -111,8 +107,7 @@
               "RelativeToolTip": "MooDeX-New_Version 1.0.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-07-15T04:12:28.819Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-15T04:12:28.819Z"
             }
           ]
         }

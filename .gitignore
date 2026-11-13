@@ -1,0 +1,25 @@
+# Build output and tooling state (spec 13.1)
+target/
+dist/
+node_modules/
+*.pdb
+*.msi
+*.exe
+.vs/
+.vscode/
+.vercel/
+.env*
+*.log
+app/src-tauri/gen/
+
+# Source artwork (processed copies live in assets/ and app icons)
+temp Icon Logo/
+# Local release copies
+release/
+*.debug
+
+# Local secrets - never commit (spec 1.5)
+api.txt
+*.key
+*.pem
+secrets*

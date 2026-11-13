@@ -1,0 +1,5 @@
+# .gitattributes - LF in the repo for every text file; binaries untouched.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.webp binary

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MooDeX",
+  "mainBinaryName": "MooDeX",
+  "version": "2.0.3",
+  "identifier": "io.moodex.app",
+  "build": {
+    "frontendDist": "../ui/dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "MooDeX",
+        "width": 1340,
+        "height": 820,
+        "minWidth": 960,
+        "minHeight": 620,
+        "visible": false,
+        "center": true,
+        "theme": "Dark",
+        "backgroundColor": "#08080A",
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "img-src": "'self' data: http://moodex-img.localhost moodex-img:",
+        "style-src": "'self' 'unsafe-inline'",
+        "font-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost",
+        "script-src": "'self'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "publisher": "Inosh Matheesha",
+    "copyright": "Copyright (C) 2026 Inosh Matheesha",
+    "shortDescription": "Game library manager",
+    "longDescription": "MooDeX keeps every PC game you own in one place, tracks real playtime and pulls in artwork.",
+    "category": "Utility",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "installerHooks": "./installer-hooks.nsh"
+      }
+    }
+  }
+}

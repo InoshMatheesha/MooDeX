@@ -1,0 +1,63 @@
+# ci.yml - fmt -> clippy -> test -> llvm-cov -> deny -> audit -> repo-hygiene -> build (spec Appendix A).
+name: ci
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 4 * * 1" # weekly, to catch advisories filed after merge
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: windows-latest
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain (pinned by rust-toolchain.toml)
+        run: rustup show active-toolchain
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Frontend deps and build
+        working-directory: app
+        run: |
+          npm ci
+          npm run build
+
+      - name: fmt
+        run: cargo fmt --all -- --check
+
+      - name: clippy (unwrap/expect/panic denied)
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: test
+        run: cargo test --workspace --locked
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,cargo-deny,cargo-audit,cargo-cyclonedx
+
+      - name: coverage (moodex-core >= 80%)
+        run: cargo llvm-cov -p moodex-core --locked --fail-under-lines 80
+
+      - name: deny
+        run: cargo deny check licenses advisories bans sources
+
+      - name: audit
+        run: cargo audit
+
+      - name: repo hygiene
+        shell: pwsh
+        run: ./scripts/repo-hygiene.ps1
+
+      - name: build
+        run: cargo build --release --locked -p moodex-app

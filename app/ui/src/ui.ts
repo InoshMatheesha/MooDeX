@@ -4,16 +4,36 @@ import type { ApiError } from "./api";
 
 let region: HTMLElement | null = null;
 
+const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Play an exit animation (CSS class), then run `done`; instant when motion is reduced.
+function leave(el: HTMLElement, cls: string, done: () => void, ms = 220): void {
+  if (reduced() || el.classList.contains(cls)) {
+    if (!el.classList.contains(cls)) done();
+    return;
+  }
+  el.classList.add(cls);
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    done();
+  };
+  el.addEventListener("animationend", finish, { once: true });
+  window.setTimeout(finish, ms + 80);
+}
+
 // Inline, dismissible, non-blocking messages replace v1's MessageBox.
 export function toast(message: string, kind: "info" | "ok" | "error" = "info", ms = 4500): void {
   if (!region) {
     region = h("div", { class: "toasts", role: "status", "aria-live": "polite" });
     document.body.append(region);
   }
-  const close = h("button", { "aria-label": "Dismiss", onclick: () => t.remove() }, "×");
+  const dismiss = () => leave(t, "leaving", () => t.remove());
+  const close = h("button", { "aria-label": "Dismiss", onclick: dismiss }, "×");
   const t = h("div", { class: `toast ${kind}` }, h("p", {}, message), close);
   region.append(t);
-  if (ms > 0) window.setTimeout(() => t.remove(), kind === "error" ? ms * 2 : ms);
+  if (ms > 0) window.setTimeout(dismiss, kind === "error" ? ms * 2 : ms);
 }
 
 export function toastError(e: ApiError | unknown, prefix = ""): void {
@@ -42,10 +62,16 @@ export function modal(title: string, opts: { size?: "wide" | "narrow"; hero?: HT
   let result: unknown;
   let resolve: (v: unknown) => void = () => {};
   const closed = new Promise<unknown>((r) => (resolve = r));
+  // Animate out first, so dialogs leave as smoothly as they arrive.
   const close = (v?: unknown) => {
     result = v;
-    if (el.open) el.close();
+    if (el.open) leave(el, "closing", () => el.open && el.close(), 180);
   };
+  // Esc goes through the same exit animation.
+  el.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    close();
+  });
   closeBtn.addEventListener("click", () => close());
   el.addEventListener("close", () => {
     resolve(result);

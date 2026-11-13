@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.7
+
+### Added
+- **Smooth navigation.** The sidebar highlight now glides to the page you pick. Each page slides in from the direction you moved in the sidebar: pages further down rise from below, pages further up drop from above.
+- **Dashboard intro.** On the first visit, the dashboard's sections settle in one after another, the counters tick up to their values, and the status and playtime bars grow into place.
+- **Livelier library.** The first screen of game cards fades in with a short stagger, cards lift slightly on hover, and pressing Play sends a ring out from the button.
+- **Polished details.** Buttons and filter chips respond to presses, toggles spring, game dialogs open and close smoothly, and toasts slide in and out instead of popping.
+
+### Notes
+- Animations use only transform and opacity, so they stay smooth on any PC. If Windows has "Animation effects" turned off, MooDeX turns them off too.
+
 ## 2.0.6
 
 ### Changed

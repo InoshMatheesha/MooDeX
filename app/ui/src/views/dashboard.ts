@@ -163,7 +163,23 @@ function recentRow(list: GameView[]): HTMLElement {
   return row;
 }
 
+// Count every number in `el` up from zero ("2126h 44m" counts both parts) with an ease-out.
+function countUp(el: HTMLElement, ms = 900): void {
+  const final = el.textContent ?? "";
+  if (!/\d/.test(final)) return;
+  const start = performance.now();
+  const step = (now: number) => {
+    const t = Math.min(1, (now - start) / ms);
+    const k = 1 - Math.pow(1 - t, 3);
+    el.textContent = t >= 1 ? final : final.replace(/\d+/g, (n) => String(Math.round(Number(n) * k)));
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 export function dashboardView(): { el: HTMLElement; dispose: () => void } {
+  // The entrance plays once per visit, never on the live refreshes that follow.
+  let intro = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const body = h("div", { class: "dash" });
   const el = h("section", { class: "view", "aria-label": "Dashboard" }, h("div", { class: "scroll" }, body));
 
@@ -203,6 +219,12 @@ export function dashboardView(): { el: HTMLElement; dispose: () => void } {
       parts.push(h("div", { class: "empty" }, h("h2", {}, "Welcome to MooDeX"), h("p", {}, "Add games from Discover, or link a PC game to start tracking real playtime.")));
     }
     body.replaceChildren(...parts.filter((x): x is HTMLElement => x !== null));
+    if (intro) {
+      intro = false;
+      body.classList.add("intro");
+      body.querySelectorAll<HTMLElement>(".status-card b, .stat-card .big").forEach((el) => countUp(el));
+      window.setTimeout(() => body.classList.remove("intro"), 1400);
+    }
     tick();
   }
 

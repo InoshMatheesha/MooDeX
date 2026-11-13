@@ -26,6 +26,9 @@ export class VirtualGrid {
   private ro: ResizeObserver;
   private io: IntersectionObserver;
   private pendingFocus: number | null = null;
+  // First screen of cards fades in with a short stagger; scrolling never animates.
+  private introUntil = 0;
+  private introCount = 0;
 
   constructor(private opts: GridOptions) {
     this.space = h("div", { class: "grid-space", role: "list", "aria-label": opts.label });
@@ -70,6 +73,10 @@ export class VirtualGrid {
   }
 
   setKeys(keys: string[]): void {
+    if (this.keys.length === 0 && keys.length > 0 && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      this.introUntil = performance.now() + 600;
+      this.introCount = 0;
+    }
     this.keys = keys;
     const keep = new Set(keys);
     for (const [k, el] of this.mounted) {
@@ -134,6 +141,11 @@ export class VirtualGrid {
         if (!el) {
           el = this.opts.render(key);
           el.dataset.key = key;
+          if (performance.now() < this.introUntil) {
+            el.classList.add("card-in");
+            el.style.setProperty("--i", String(Math.min(this.introCount++, 16)));
+            el.addEventListener("animationend", () => el?.classList.remove("card-in"), { once: true });
+          }
           el.setAttribute("role", "listitem");
           this.mounted.set(key, el);
         }

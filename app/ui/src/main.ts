@@ -46,7 +46,23 @@ function boot(): void {
     nav.append(b);
   }
 
-  function mount(route: Route): void {
+  // Sliding highlight behind the active sidebar item.
+  const indicator = h("span", { class: "nav-ind", "aria-hidden": "true" });
+  nav.prepend(indicator);
+  function moveIndicator(route: Route, instant = false): void {
+    const b = buttons.get(route);
+    if (!b) return;
+    indicator.classList.toggle("instant", instant);
+    indicator.style.transform = `translateY(${b.offsetTop}px)`;
+    indicator.style.height = `${b.offsetHeight}px`;
+    indicator.classList.add("ready");
+  }
+
+  const order: Route[] = NAV.map(([r]) => r);
+  let currentRoute: Route | null = null;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function swap(route: Route): void {
     current?.dispose();
     const v =
       route === "dashboard" ? dashboardView() :
@@ -56,13 +72,36 @@ function boot(): void {
       settingsView();
     current = v;
     main.replaceChildren(v.el);
+  }
+
+  // Page changes travel in the direction of the sidebar: down the list rises, up the list falls.
+  function mount(route: Route): void {
+    if (route === currentRoute) return;
+    const from = currentRoute === null ? -1 : order.indexOf(currentRoute);
+    const to = order.indexOf(route);
+    const first = currentRoute === null;
+    currentRoute = route;
     buttons.forEach((b, r) => b.setAttribute("aria-current", r === route ? "page" : "false"));
+    moveIndicator(route, first);
+    document.documentElement.dataset.navDir = to >= from ? "down" : "up";
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    if (!first && !reduceMotion.matches && typeof doc.startViewTransition === "function") {
+      doc.startViewTransition(() => swap(route));
+    } else {
+      swap(route);
+      if (!first && !reduceMotion.matches) {
+        main.classList.remove("page-enter");
+        void main.offsetWidth;
+        main.classList.add("page-enter");
+      }
+    }
     try {
       sessionStorage.setItem("moodex.route", route);
     } catch {
       // Route memory is a convenience only.
     }
   }
+  window.addEventListener("resize", () => currentRoute && moveIndicator(currentRoute, true));
   setMount(mount);
 
   // Live timer ticks client-side from SessionStarted; totals are reconciled by PlaytimeTick.

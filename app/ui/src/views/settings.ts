@@ -38,6 +38,8 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     }
   }
 
+  // Sections settle in on the first render only, not on every toggle.
+  let firstRender = true;
   function render(v: SettingsView): void {
     const s = v.settings;
     const general = h(
@@ -183,6 +185,11 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     }).catch(() => {});
 
     body.replaceChildren(updatesSection(s), general, folders, tracking, discover, data, v1, about);
+    if (firstRender) {
+      firstRender = false;
+      body.classList.add("intro");
+      window.setTimeout(() => body.classList.remove("intro"), 900);
+    }
 
   }
 

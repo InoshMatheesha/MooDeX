@@ -1,0 +1,72 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/moodex-core",
+    "crates/moodex-store",
+    "crates/moodex-rawg",
+    "crates/moodex-images",
+    "crates/moodex-winproc",
+    "crates/moodex-library",
+    "app/src-tauri",
+]
+
+[workspace.package]
+version = "2.0.3"
+edition = "2021"
+rust-version = "1.83"
+authors = ["Inosh Matheesha"]
+license = "MIT"
+publish = false
+
+[workspace.dependencies]
+moodex-core = { path = "crates/moodex-core" }
+moodex-store = { path = "crates/moodex-store" }
+moodex-rawg = { path = "crates/moodex-rawg" }
+moodex-images = { path = "crates/moodex-images" }
+moodex-winproc = { path = "crates/moodex-winproc" }
+moodex-library = { path = "crates/moodex-library" }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v7", "serde"] }
+time = { version = "0.3", features = ["serde", "serde-human-readable", "formatting", "parsing", "macros"] }
+thiserror = "2"
+anyhow = "1"
+camino = { version = "1", features = ["serde1"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "fs"] }
+tracing = "0.1"
+tempfile = "3"
+sha2 = "0.10"
+hex = "0.4"
+rusqlite = { version = "0.37", features = ["bundled", "backup"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "gzip"] }
+moka = { version = "0.12", features = ["sync"] }
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp"] }
+webp = { version = "0.3", default-features = false, features = ["img"] }
+proptest = "1"
+wiremock = "0.6"
+
+# Workspace lint policy (spec 4.2)
+[workspace.lints.clippy]
+unwrap_used        = "deny"
+expect_used        = "deny"
+panic              = "deny"
+todo               = "deny"
+dbg_macro          = "deny"
+float_cmp          = "deny"
+await_holding_lock = "deny"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+# Release profile (spec 13.2)
+[profile.release]
+opt-level     = 3
+lto           = "fat"
+codegen-units = 1
+panic         = "abort"
+strip         = false
+debug         = 1
+
+[profile.release.package."*"]
+opt-level = 3

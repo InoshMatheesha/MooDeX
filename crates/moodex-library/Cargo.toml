@@ -1,0 +1,32 @@
+[package]
+name = "moodex-library"
+description = "MooDeX library actor - the single owner of state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+moodex-core.workspace = true
+moodex-store.workspace = true
+moodex-rawg.workspace = true
+moodex-images.workspace = true
+moodex-winproc.workspace = true
+camino.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+notify = "8"
+
+[dev-dependencies]
+tempfile.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[lints]
+workspace = true

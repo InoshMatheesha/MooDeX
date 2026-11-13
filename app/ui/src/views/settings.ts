@@ -1,0 +1,246 @@
+// settings.ts - Preferences, RAWG source, data tools and the Diagnostics pane (spec 11, Appendix A).
+import { open, save } from "@tauri-apps/plugin-dialog";
+import { api, type Settings, type SettingsView } from "../api";
+import { h, icon, I } from "../dom";
+import { toast, toastError } from "../ui";
+import { openImportV1 } from "../dialogs/importv1";
+
+function toggleRow(title: string, help: string, checked: boolean, onChange: (v: boolean) => void, disabled = false): HTMLElement {
+  const input = h("input", { type: "checkbox", role: "switch", "aria-label": title, checked, disabled });
+  input.addEventListener("change", () => onChange(input.checked));
+  return h("label", { class: "switch" }, h("div", {}, h("b", {}, title), h("small", {}, help)), h("span", { class: "toggle" }, input, h("i", {})));
+}
+
+function numberField(label: string, value: number, min: number, max: number, onCommit: (v: number) => void): HTMLElement {
+  const input = h("input", { class: "input", type: "number", min, max, value: String(value), "aria-label": label });
+  input.addEventListener("change", () => {
+    const v = Number(input.value);
+    if (Number.isInteger(v) && v >= min && v <= max) onCommit(v);
+    else {
+      toast(`${label} must be between ${min} and ${max}`, "error");
+      input.value = String(value);
+    }
+  });
+  return h("label", { class: "field" }, h("span", {}, label), input);
+}
+
+export function settingsView(): { el: HTMLElement; dispose: () => void } {
+  const body = h("div", { class: "settings" });
+  const el = h("section", { class: "view", "aria-label": "Settings" }, h("header", { class: "view-head" }, h("h1", {}, "Settings")), h("div", { class: "scroll" }, h("div", { class: "pad" }, body)));
+
+  async function set(key: keyof Settings, value: unknown): Promise<void> {
+    try {
+      render(await api.setSetting(key, value));
+    } catch (e) {
+      toastError(e);
+      void load();
+    }
+  }
+
+  function render(v: SettingsView): void {
+    const s = v.settings;
+    const general = h(
+      "section",
+      {},
+      h("h2", {}, "General"),
+      toggleRow("Minimize to tray", "Closing the window keeps MooDeX running in the tray so playtime is still recorded.", s.minimize_to_tray, (x) => void set("minimize_to_tray", x)),
+      toggleRow("Launch at startup", "Start MooDeX when you sign in to Windows.", s.launch_at_startup, (x) => void set("launch_at_startup", x)),
+      toggleRow("Start minimized", "When launched at startup, stay in the tray.", s.start_minimized, (x) => void set("start_minimized", x), !s.launch_at_startup),
+    );
+
+    const tracking = h(
+      "section",
+      {},
+      h("h2", {}, "Play tracking"),
+      h(
+        "div",
+        { class: "line" },
+        numberField("Ignore sessions shorter than (seconds)", s.min_session_seconds, 0, 3600, (x) => void set("min_session_seconds", x)),
+        numberField("Launcher stub threshold (seconds)", s.stub_threshold_seconds, 1, 600, (x) => void set("stub_threshold_seconds", x)),
+      ),
+      h("p", { class: "note", style: "padding-bottom:8px" }, "If a launched game exits faster than the stub threshold and has a separate detection executable, MooDeX keeps the session open and watches for the real game (Steam, Epic, Ubisoft)."),
+    );
+
+    // RAWG source: proxy (default), personal key in Credential Manager, or none (spec 9.1).
+    const source = h("select", { class: "select", "aria-label": "RAWG source" });
+    for (const [val, label] of [["proxy", "MooDeX proxy (no key needed)"], ["user", "My own RAWG API key"], ["none", "Off - local library only"]] as const) {
+      source.append(h("option", { value: val, selected: s.rawg_key_source === val }, label));
+    }
+    source.addEventListener("change", () => void set("rawg_key_source", source.value));
+    const proxy = h("input", { class: "input", type: "url", placeholder: "https://your-proxy.vercel.app/api/rawg", value: s.rawg_proxy_url, "aria-label": "Proxy URL" });
+    const saveProxy = h("button", { class: "btn", onclick: () => void set("rawg_proxy_url", proxy.value.trim()) }, "Save");
+    const key = h("input", { class: "input", type: "password", autocomplete: "off", placeholder: v.rawg_key_set ? "Key stored in Windows Credential Manager" : "Paste your RAWG API key", "aria-label": "RAWG API key" });
+    const saveKey = h("button", { class: "btn", onclick: async () => {
+      try {
+        render(await api.setRawgKey(key.value.trim() || null));
+        toast("Key saved to Windows Credential Manager", "ok");
+      } catch (e) {
+        toastError(e);
+      }
+    } }, "Save key");
+    const clearKey = h("button", { class: "btn ghost", disabled: !v.rawg_key_set, onclick: async () => {
+      try {
+        render(await api.setRawgKey(null));
+        toast("Key removed", "ok");
+      } catch (e) {
+        toastError(e);
+      }
+    } }, "Remove");
+    const test = h("button", { class: "btn", onclick: async () => {
+      test.setAttribute("disabled", "");
+      try {
+        const n = await api.testRawg();
+        toast(`RAWG is reachable (${n} results)`, "ok");
+      } catch (e) {
+        toastError(e, "RAWG test failed");
+      } finally {
+        test.removeAttribute("disabled");
+      }
+    } }, "Test connection");
+    const discover = h(
+      "section",
+      {},
+      h("h2", {}, "Discover (RAWG)"),
+      h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Source"), source), test),
+      s.rawg_key_source === "proxy" ? h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Proxy URL"), proxy), saveProxy) : null,
+      s.rawg_key_source === "user" ? h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Personal API key"), key), saveKey, clearKey) : null,
+      h("p", { class: "note", style: "padding-bottom:8px" }, `Active route: ${v.rawg_active}. No key is ever stored in the app or its database; a personal key lives only in Windows Credential Manager.`),
+    );
+
+    const data = h(
+      "section",
+      {},
+      h("h2", {}, "Your data"),
+      h(
+        "div",
+        { class: "line" },
+        h("button", { class: "btn", onclick: () => void doExport() }, icon(I.download), "Export library"),
+        h("button", { class: "btn", onclick: () => void doImport() }, icon(I.upload), "Import export file"),
+        h("button", { class: "btn ghost", onclick: () => void api.openFolder("backups").catch(toastError) }, icon(I.folder), "Backups"),
+      ),
+      h("div", { class: "line" }, numberField("Cover cache budget (MB)", s.image_cache_budget_mb, 50, 20000, (x) => void set("image_cache_budget_mb", x)), numberField("Daily backups kept", s.backup_retention_days, 1, 90, (x) => void set("backup_retention_days", x))),
+      h("p", { class: "note", style: "padding-bottom:8px" }, "The library is a crash-safe SQLite database with a daily rolling backup. Cache budget changes apply on next start."),
+    );
+
+    const diag = h("section", {}, h("h2", {}, "Diagnostics"), h("p", { class: "note" }, "Loading..."));
+    // Auto-detect: folders scanned now and watched for new installs.
+    const folderList = h("div", { class: "list", style: "margin:6px 0 10px" });
+    if (s.scan_folders.length === 0) {
+      folderList.append(h("p", { class: "note", style: "padding:10px 12px" }, "No folders yet. Add the folder your games install into (for example D:\\Games or a SteamLibrary)."));
+    }
+    for (const f of s.scan_folders) {
+      const rm = h("button", { class: "btn sm ghost danger", "aria-label": `Stop watching ${f}` }, "Remove");
+      rm.addEventListener("click", () => void set("scan_folders", s.scan_folders.filter((x) => x !== f)));
+      folderList.append(h("div", { class: "sess", style: "grid-template-columns:auto 1fr auto;align-items:center" }, icon(I.folder), h("span", { class: "path selectable" }, f), rm));
+    }
+    const addFolder = h("button", { class: "btn primary", onclick: async () => {
+      const dir = await open({ title: "Choose a folder that contains your games", directory: true, multiple: false });
+      if (typeof dir !== "string") return;
+      if (s.scan_folders.some((x) => x.toLowerCase() === dir.toLowerCase())) return;
+      toast("Scanning for games...", "info", 2500);
+      await set("scan_folders", [...s.scan_folders, dir]);
+    } }, icon(I.plus), "Add folder");
+    const scanBtn = h("button", { class: "btn", disabled: s.scan_folders.length === 0 }, icon(I.refresh), "Scan now");
+    scanBtn.addEventListener("click", async () => {
+      scanBtn.setAttribute("disabled", "");
+      try {
+        const r = await api.scanNow();
+        // Found games are announced by the global scan listener (main.ts).
+        if (r.added.length + r.linked.length === 0) toast(`No new games in ${r.scanned} folder${r.scanned === 1 ? "" : "s"}`, "info");
+      } catch (e) {
+        toastError(e, "Scan failed");
+      } finally {
+        scanBtn.removeAttribute("disabled");
+      }
+    });
+    const resetIgnored = s.scan_ignored.length
+      ? h("button", { class: "btn sm ghost", onclick: () => void set("scan_ignored", []) }, `Allow ${s.scan_ignored.length} removed game${s.scan_ignored.length === 1 ? "" : "s"} again`)
+      : null;
+    const folders = h(
+      "section",
+      {},
+      h("h2", {}, "Auto-detect games"),
+      h("p", { class: "note", style: "padding-top:6px" }, "Pick the folders your games are installed in. MooDeX finds each game's executable, adds it with a matching cover, and watches the folders - new installs appear automatically."),
+      folderList,
+      h("div", { class: "line", style: "padding-top:0" }, addFolder, scanBtn, resetIgnored),
+      h("p", { class: "note", style: "padding-bottom:8px" }, "Games you delete from MooDeX are remembered and not re-added. Steam libraries are detected via steamapps\\common."),
+    );
+
+    // One-time import of the old library; you review it before anything is written.
+    const v1 = h("section", {}, h("h2", {}, "Import from MooDeX v1"), h("p", { class: "note", style: "padding:6px 0 10px" }, "Checking for a v1 library..."));
+    void api.v1Status().then((st) => {
+      const text = st.already_imported
+        ? "Your v1 library has been imported. You can run it again - games already present are skipped."
+        : st.path
+          ? `Found a v1 library at ${st.path}. Import your games and playtime; you'll review everything first.`
+          : "No v1 library found in the default location. You can choose the file manually.";
+      v1.replaceChildren(
+        h("h2", {}, "Import from MooDeX v1"),
+        h("p", { class: "note", style: "padding:6px 0 4px" }, text),
+        h("div", { class: "line" }, h("button", { class: `btn ${st.path && !st.already_imported ? "primary" : ""}`, onclick: () => void openImportV1() }, icon(I.upload), st.already_imported ? "Import again" : "Review import")),
+      );
+    }).catch(() => {});
+
+    body.replaceChildren(general, folders, tracking, discover, data, v1, diag);
+    void renderDiagnostics(diag);
+  }
+
+  async function renderDiagnostics(sec: HTMLElement): Promise<void> {
+    try {
+      const d = await api.diagnostics();
+      const kv = h(
+        "dl",
+        { class: "kv selectable" },
+        h("dt", {}, "Version"), h("dd", {}, `MooDeX ${d.version}`),
+        h("dt", {}, "Build"), h("dd", {}, d.build_hash),
+        h("dt", {}, "WebView2"), h("dd", {}, d.webview),
+        h("dt", {}, "Library"), h("dd", {}, `${d.games} games, ${d.installed} installed, schema v${d.schema_version}`),
+        h("dt", {}, "Tracking"), h("dd", {}, `${d.detect_registry} executables watched, ${d.open_sessions} live session(s)`),
+        h("dt", {}, "Data folder"), h("dd", { class: "path" }, d.data_dir),
+      );
+      const problems = d.recent_problems.length ? h("div", { class: "code selectable" }, d.recent_problems.join("\n")) : h("p", { class: "note" }, "No recent warnings or errors.");
+      sec.replaceChildren(
+        h("h2", {}, "Diagnostics"),
+        kv,
+        h("div", { class: "line" }, h("button", { class: "btn", onclick: () => void api.openFolder("logs").catch(toastError) }, icon(I.folder), "Open log folder"), h("button", { class: "btn", onclick: () => void api.openFolder("data").catch(toastError) }, icon(I.folder), "Open data folder")),
+        h("h3", { style: "font-size:13px;margin:6px 0 8px" }, "Last 10 warnings and errors"),
+        problems,
+        h("p", { class: "note", style: "padding:10px 0 4px" }, "MooDeX sends no telemetry. Nothing leaves this PC except RAWG lookups and cover downloads."),
+      );
+    } catch (e) {
+      sec.replaceChildren(h("h2", {}, "Diagnostics"), h("p", { class: "err" }, String((e as Error).message ?? e)));
+    }
+  }
+
+  async function doExport(): Promise<void> {
+    try {
+      const path = await save({ title: "Export MooDeX library", defaultPath: `moodex-library-${new Date().toISOString().slice(0, 10)}.json`, filters: [{ name: "MooDeX export", extensions: ["json"] }] });
+      if (!path) return;
+      const n = await api.exportLibrary(path);
+      toast(`Exported ${n} games`, "ok");
+    } catch (e) {
+      toastError(e, "Export failed");
+    }
+  }
+
+  async function doImport(): Promise<void> {
+    try {
+      const path = await open({ title: "Import MooDeX export", multiple: false, directory: false, filters: [{ name: "MooDeX export", extensions: ["json"] }] });
+      if (!path || Array.isArray(path)) return;
+      const r = await api.importLibrary(path);
+      toast(`Imported ${r.imported} games (${r.skipped} already present)`, "ok");
+    } catch (e) {
+      toastError(e, "Import failed");
+    }
+  }
+
+  async function load(): Promise<void> {
+    try {
+      render(await api.getSettings());
+    } catch (e) {
+      toastError(e, "Could not load settings");
+    }
+  }
+  void load();
+  return { el, dispose: () => {} };
+}

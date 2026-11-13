@@ -1,213 +1,101 @@
-<div align="center"> 
+<p align="center"><img src="assets/logo-wordmark.png" alt="MooDeX" width="420"></p>
 
+# MooDeX 2.0
 
-<br>
-<img src="Icon%20Logo/logo%20with%20name.png" alt="MooDeX Logo" width="300"/> 
+MooDeX keeps every PC game you own in one place. It records how long you really play, adds artwork from the RAWG catalogue, and lets you rate games and keep notes. Everything stays on your PC.
 
-### Your Games. Your Stats. Your Vibe. 
- 
-**MooDeX** is a sleek, dark-themed game library manager for Windows and the Web. Organize your collection, discover new titles, track playtime, and launch games — all from one place.
+This is the Rust rewrite of MooDeX, built with Tauri 2. The design contract it follows is [MOODEX_RUST_MVP.md](MOODEX_RUST_MVP.md).
 
-<br>
+## Requirements
 
-[![.NET](https://img.shields.io/badge/.NET%2010-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
-[![WPF](https://img.shields.io/badge/WPF-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/)
-[![Material Design](https://img.shields.io/badge/Material%20Design-BB86FC?style=for-the-badge&logo=materialdesign&logoColor=white)](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
-[![RAWG API](https://img.shields.io/badge/RAWG%20API-1F1F1F?style=for-the-badge&logo=gamepad&logoColor=white)](https://rawg.io/apidocs)
-[![Vercel Deployment](https://img.shields.io/badge/Vercel_Web-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://moodex-web.vercel.app/)
+- Windows 10 or 11, 64-bit.
+- **Microsoft Edge WebView2 Runtime.** It ships with Windows 11 and is already on most Windows 10 PCs. The installer downloads it if it is missing, so the first install on such a PC needs an internet connection. **The runtime is not bundled.**
 
-<br>
+## How playtime tracking works
 
-### 🔥 DON'T WANT TO INSTALL ANYTHING? TRY MOODEX IN YOUR BROWSER NOW! 🌐
-
-[![MooDeX Web](https://img.shields.io/badge/🌐_LAUNCH_LIVE_WEB_DEMO-4c29a6?style=for-the-badge&logo=vercel&logoColor=black)](https://moodex-web.vercel.app/)
-[![Download on SourceForge](https://img.shields.io/badge/Download%20on-SourceForge-FF6600?style=for-the-badge&logo=sourceforge&logoColor=white)](https://sourceforge.net/projects/moodex/)
-[![Download on GitHub Releases](https://img.shields.io/badge/Download%20on-GitHub%20Releases-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases)
-
-*⚡ **Instant 1-Click Web Access:** Experience the vibe right now at **[moodex-web.vercel.app](https://moodex-web.vercel.app/)**!*
-<br/>
-*💻 Windows 10/11 Desktop App · .NET 10 Runtime bundled with the installer · No configuration required*
-
-</div>
-
----
-
-## Overview
-
-MooDeX is a personal game library manager for Windows that brings together the games on your PC and the titles you discover online into a single, organized hub — a mini dashboard designed entirely around your own collection and play habits.
-
-## Features
-
-| Feature | Description |
+| How the game starts | How MooDeX tracks it |
 |---|---|
-| **Dashboard** | View total games, playtime statistics, your top three most-played titles, and mark your all-time favorite game (G.O.A.T.) |
-| **My Library** | A curated list of games added via search, with editable details, custom ratings, status tracking, and personal notes |
-| **My PC Games** | Import local `.exe` files, auto-match them against the RAWG database, and launch them directly from the app |
-| **Discover** | Browse Trending, Upcoming, and Popular titles powered by the RAWG API, and add any of them to your library instantly |
-| **Playtime Tracking** | A background process monitor records how long you play each game, updated in real time |
-| **Settings** | Minimize to tray, launch at startup, and start minimized, with full control over app behavior |
+| **Play** on a linked `.exe` | MooDeX starts the game inside a Windows *job object*. The session ends when the game and every process it started have exited. |
+| **Play** on a Steam/Epic/Ubisoft URI or shortcut, with a **detection exe** set | The launcher exits right away. MooDeX then waits for the real game's executable to appear and tracks that instead. |
+| The game was started outside MooDeX | MooDeX notices a linked executable starting, using WMI process events. |
 
-## Architecture
+- **Exact matching.** A process counts as a game only if its full, resolved path matches the linked path. A partial name is never enough.
+- **Sessions are kept separately.** Every session is saved as its own record, and playtime is the sum of them.
+- **Sleep and crashes.** A 30-second heartbeat lets MooDeX detect when the PC slept, so that time is not counted. If MooDeX crashes, the next start closes the open session at the last heartbeat.
+- **Short sessions are dropped.** Sessions under 60 seconds are discarded. You can change this in Settings.
+- **When WMI is busy.** WMI shares a limit across the whole machine. If other software has used it up, MooDeX checks the list of linked executables every 2 seconds instead, and keeps retrying WMI.
 
-MooDeX follows the MVVM (Model-View-ViewModel) pattern:
+## Discover (RAWG)
 
-```
-MooDeX
-├── Models/            # Game, AppSettings — data classes
-├── Views/             # XAML pages (Dashboard, Library, MyGames, Discover, Settings)
-├── ViewModels/        # Logic layer — binds data to UI
-├── Services/          # RAWG API client, storage (JSON), process monitor
-├── Helpers/           # Image caching, RelayCommand, ObservableCollection extensions
-└── Icon Logo/         # App icon and branding assets
-```
+The app contains no API key. You can choose one of three options in **Settings > Discover**:
 
-## Getting Started
+1. **Proxy.** Deploy [`proxy/`](proxy/README.md) to Vercel with your key, then paste its URL into Settings.
+2. **Your own key.** Paste a personal RAWG key. It is stored in **Windows Credential Manager**, never in a file or the database.
+3. **Off.** The local library still works fully.
 
-### 🌐 Instant Access (No Installation Required!)
+## Your data
 
-Want to test drive MooDeX right away without downloading anything?
+Everything lives in `%LOCALAPPDATA%\MooDeX\v2\`:
 
-👉 **[🔥 Launch MooDeX Web Live Demo →](https://moodex-web.vercel.app/)**
-
-### Prerequisites (For Desktop App)
-
-- Windows 10 or 11
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) (or later) — only required for building from source
-
-### Install the Desktop App
-
-The fastest way to get started on Windows is to download the installer:
-
-- **[SourceForge →](https://sourceforge.net/projects/moodex/)**
-- **[GitHub Releases →](https://github.com/InoshMatheesha/MooDeX/releases)**
-
-Run the installer and MooDeX will be ready to use — no additional setup required.
-
-### Build from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/InoshMatheesha/MooDeX.git
-cd MooDeX
-
-# Restore and build
-dotnet restore
-dotnet build
-
-# Run
-dotnet run
-```
-
-## How It Works
-
-```
-┌───────────────┐     ┌───────────────┐     ┌──────────────┐
-│   Discover    │────▶│   My Library   │────▶│  Dashboard   │
-│  (RAWG API)   │     │  (Rate / Edit) │     │   (Stats)    │
-└───────────────┘     └───────────────┘     └──────────────┘
-                              │
-                       ┌──────┴───────┐
-                       │ My PC Games  │
-                       │(Launch/Track)│
-                       └──────────────┘
-```
-
-1. **Discover** games from the RAWG database and add them to your library
-2. **Import** PC games by browsing for `.exe` files, with cover art auto-matched via RAWG
-3. **Launch** games directly from MooDeX, which tracks playtime in the background
-4. **Review** your stats on the Dashboard — top games, total playtime, and status breakdown
-
-## UI Highlights
-
-- Dark theme with deep purple accents (`#BB86FC`)
-- Card-based layout with hover animations and elevation effects
-- Debounced search for fast, responsive results without excess API calls
-- Live status indicator showing "Playing Now" or "Last Played" in the sidebar
-- Five-tier rating system, from *Awful* to *Masterpiece*
-- Ultra-thin, modern scrollbars throughout
-
-## Screenshots
-
-**Dashboard** — your gaming command center at a glance
-
-![Dashboard](App%20Screenshots/Dashboard.png)
-
-**My Library** — every game you own, beautifully organized
-
-![My Library](App%20Screenshots/My%20Library.png)
-
-**Discover** — browse trending, upcoming, and popular titles powered by RAWG
-
-![Discover Games](App%20Screenshots/Discover%20Games.png)
-
-**My PC Games** — import local executables and track playtime automatically
-
-![PC Games](App%20Screenshots/PC%20Games.png)
-
-<table>
-  <tr>
-    <td align="center" width="50%">
-      <strong>Edit Game Details</strong><br/><br/>
-      <img src="App%20Screenshots/Edit%20Game%20Details.png" alt="Edit Game Details" width="340"/>
-      <br/><em>Set status, rate the game, and add personal notes</em>
-    </td>
-    <td align="center" width="50%">
-      <strong>Match Game &amp; Cover</strong><br/><br/>
-      <img src="App%20Screenshots/Match%20Game%20%26%20Cover.png" alt="Match Game and Cover" width="340"/>
-      <br/><em>Auto-match your local .exe to the RAWG database for cover art</em>
-    </td>
-  </tr>
-</table>
-
-## Tech Stack
-
-| Layer | Technology |
+| Path | What it holds |
 |---|---|
-| Desktop Framework | WPF (.NET 10) |
-| Web Platform | Vercel Live Showcase ([moodex-web.vercel.app](https://moodex-web.vercel.app/)) |
-| UI Library | Material Design In XAML Toolkit v5.3 |
-| API | RAWG Video Games Database |
-| Data Storage | Local JSON files |
-| Architecture | MVVM |
-| Language | C# |
+| `moodex.db` | Your library (SQLite in WAL mode, safe across crashes) |
+| `backups\moodex-YYYY-MM-DD.db` | Daily backups. The last 7 are kept. |
+| `covers\` | Cached cover images (WebP). Old ones are removed once the cache reaches 500 MB. |
+| `logs\moodex.YYYY-MM-DD.log` | Log files. The last 7 days are kept. Panics also go to `crash.log`. |
 
-## Configuration Options
+The v1 file `%LOCALAPPDATA%\MooDeX\games_data.json` is read, never modified. On the first import it is copied to `games_data.v1.backup.json`.
 
-| Setting | Default | Description |
-|---|---|---|
-| Minimize to Tray | Off | Close button sends the app to the system tray instead of exiting |
-| Launch at Startup | Off | Automatically starts MooDeX with Windows via the registry |
-| Launch Minimized | Off | Starts the app hidden in the tray (requires startup enabled) |
+When you uninstall, your library is kept. If you tick **"Delete the application data"**, the uninstaller first copies `moodex.db` to `Documents\MooDeX backup\`, then removes only the `v2` folder.
 
-## Game Statuses
+No telemetry is sent. The only network traffic is RAWG lookups and cover downloads.
 
-Every game in your library can be tagged with one of the following:
+## Building
 
-| Status | Meaning |
-|---|---|
-| Playing | Currently in progress |
-| Completed | Finished |
-| Like to Play | On your wishlist |
-| Stopped | Dropped or paused |
+**Prerequisites:**
+- Rust, pinned in [rust-toolchain.toml](rust-toolchain.toml).
+- Node 20 or later.
+- A C compiler for the bundled SQLite, ring and libwebp sources:
+  - MSVC Build Tools, or
+  - on the GNU toolchain, MSYS2 MinGW-w64 (`C:\msys64\mingw64\bin`).
 
-## Contributing
+```powershell
+# Full release build: MooDeX.exe plus the NSIS and MSI installers
+powershell -ExecutionPolicy Bypass -File scripts\build.ps1
 
-Contributions, issues, and feature requests are welcome.
+# Checks (the same gates CI runs)
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+```
 
-1. Fork the project
-2. Create your feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'Add your feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a Pull Request
+Build outputs:
+- `target/release/MooDeX.exe`
+- `target/release/bundle/nsis/MooDeX_2.0.0_x64-setup.exe`
+- `target/release/bundle/msi/MooDeX_2.0.0_x64_en-US.msi`
 
----
+> **GNU toolchain note:** on the `x86_64-pc-windows-gnu` target, WebView2's loader is a separate `WebView2Loader.dll`. The installers include it. If you copy the `.exe` by hand, copy the DLL with it. MSVC builds link the loader statically.
 
-<div align="center">
+## Signing and SmartScreen
 
-<img src="Icon%20Logo/icon.ico" alt="MooDeX" width="64"/>
+A local build is **not signed**. Do not hand it out, not even to a friend for testing (spec §13.8). Every build that is meant for other people goes through [`.github/workflows/release.yml`](.github/workflows/release.yml), which:
+1. Signs the exe and both installers with Authenticode and an RFC-3161 timestamp.
+2. Signs the update files with minisign.
+3. Produces an SBOM and SHA-256 checksums.
+4. Fails if any program file is left unsigned.
 
-**MooDeX** — Your Games. Your Stats. Your Vibe.
+Even once releases are signed, Windows SmartScreen may warn about the first few versions until enough people have installed them. This is normal for a new publisher and does not mean the app is malware.
 
-Built with WPF · Powered by RAWG · Designed for gamers
+## Layout
 
-</div>
+```
+crates/moodex-core      domain types and pure logic (no I/O)
+crates/moodex-store     SQLite, migrations, crash-safe writes, backups
+crates/moodex-rawg      RAWG client, HTTP cache, rate limiting
+crates/moodex-images    cover cache (memory + disk), WebP variants
+crates/moodex-winproc   job objects, WMI, launching (the only crate with `unsafe`)
+crates/moodex-library   the single owner of library state, the play tracker, v1 import
+app/src-tauri           the window, tray, IPC commands, logging, cover protocol
+app/ui                  TypeScript frontend (no framework), virtualized grid
+proxy/                  Vercel edge function that holds the RAWG key
+```

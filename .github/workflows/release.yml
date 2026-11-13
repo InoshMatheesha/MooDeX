@@ -1,0 +1,96 @@
+# release.yml - verify -> build -> Authenticode sign + timestamp -> bundle -> minisign -> SBOM -> verify -> publish (spec 13).
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    environment: release
+    env:
+      CARGO_TERM_COLOR: always
+      # Updater signing (minisign); never committed (spec 13.7).
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      # Azure Trusted Signing (or an OV certificate); never committed (spec 13.5).
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      SIGNING_ENDPOINT: ${{ vars.SIGNING_ENDPOINT }}
+      SIGNING_ACCOUNT: ${{ vars.SIGNING_ACCOUNT }}
+      SIGNING_PROFILE: ${{ vars.SIGNING_PROFILE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny,cargo-audit,cargo-cyclonedx
+
+      - name: Verify (all CI gates)
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --workspace --locked
+          cargo deny check
+          cargo audit
+
+      - name: Version matches tag
+        shell: pwsh
+        run: |
+          $v = (Get-Content app/src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          if ("v$v" -ne "${{ github.ref_name }}") { throw "tauri.conf.json version $v does not match tag ${{ github.ref_name }}" }
+
+      - name: Install signing tool
+        run: dotnet tool install --global --prerelease sign
+
+      # signCommand signs the exe and both installers with an RFC-3161 timestamp.
+      - name: Build, sign and bundle
+        working-directory: app
+        shell: pwsh
+        run: |
+          npm ci
+          $sign = 'sign code trusted-signing "%1" --trusted-signing-endpoint $env:SIGNING_ENDPOINT --trusted-signing-account $env:SIGNING_ACCOUNT --trusted-signing-certificate-profile $env:SIGNING_PROFILE --timestamp-url http://timestamp.acs.microsoft.com'
+          $conf = @{ bundle = @{ createUpdaterArtifacts = $true; windows = @{ signCommand = $sign } } } | ConvertTo-Json -Depth 5 -Compress
+          npx tauri build --config $conf
+
+      - name: SBOM
+        run: cargo cyclonedx --format json --override-filename moodex-sbom
+
+      - name: Verify every PE is signed and timestamped
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" | Select-Object -Last 1
+          $pes = @("target/release/MooDeX.exe") + (Get-ChildItem target/release/bundle -Recurse -Include *.exe,*.msi).FullName
+          foreach ($p in $pes) { & $signtool.FullName verify /pa /v $p; if ($LASTEXITCODE -ne 0) { throw "unsigned: $p" } }
+
+      - name: Checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem target/release/bundle -Recurse -Include *.exe,*.msi,*.sig |
+            ForEach-Object { "{0}  {1}" -f (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower(), $_.Name } |
+            Set-Content SHA256SUMS.txt
+
+      - name: Publish GitHub release (installers, .sig, SBOM, PDB, checksums)
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            target/release/bundle/nsis/*.exe
+            target/release/bundle/nsis/*.sig
+            target/release/bundle/msi/*.msi
+            target/release/bundle/msi/*.sig
+            target/release/MooDeX.pdb
+            moodex-sbom.json
+            SHA256SUMS.txt

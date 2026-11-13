@@ -1,0 +1,44 @@
+[package]
+name = "moodex-app"
+description = "MooDeX - game library manager"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "MooDeX"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+moodex-core.workspace = true
+moodex-store.workspace = true
+moodex-rawg.workspace = true
+moodex-images.workspace = true
+moodex-winproc.workspace = true
+moodex-library.workspace = true
+anyhow.workspace = true
+camino.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+time.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+tracing-appender = "0.2"
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-window-state = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+keyring = { version = "3", features = ["windows-native"] }
+
+[lints]
+workspace = true

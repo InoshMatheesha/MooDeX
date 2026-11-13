@@ -1,0 +1,24 @@
+[package]
+name = "moodex-store"
+description = "MooDeX SQLite persistence - migrations and crash-safe writes"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+moodex-core.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+time.workspace = true
+thiserror.workspace = true
+camino.workspace = true
+tempfile.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true

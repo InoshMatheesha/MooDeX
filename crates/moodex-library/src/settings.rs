@@ -83,7 +83,11 @@ impl Settings {
     // Overlay stored values; unknown or invalid entries are logged and ignored.
     pub fn from_stored(stored: &HashMap<String, Value>) -> Self {
         let mut s = Settings::default();
-        for (k, v) in stored {
+        // Fixed order: keys others depend on (launch_at_startup before start_minimized) come first.
+        let mut keys: Vec<&String> = stored.keys().collect();
+        keys.sort_by_key(|k| (k.as_str() != "launch_at_startup", k.as_str().to_string()));
+        for k in keys {
+            let Some(v) = stored.get(k) else { continue };
             if let Err(e) = s.apply(k, v) {
                 tracing::warn!(key = %k, error = %e, "ignoring stored setting");
             }
@@ -180,6 +184,19 @@ mod tests {
         assert_eq!(f, json!(["D:/Games", "E:/SteamLibrary"]));
         assert!(s.apply("scan_folders", &json!(["relative/path"])).is_err());
         assert!(s.apply("scan_folders", &json!("D:/Games")).is_err());
+    }
+
+    // Regression: HashMap order once applied start_minimized before launch_at_startup and dropped it.
+    #[test]
+    fn dependent_settings_load_in_order() {
+        for _ in 0..20 {
+            let mut m = HashMap::new();
+            m.insert("start_minimized".to_string(), json!(true));
+            m.insert("launch_at_startup".to_string(), json!(true));
+            m.insert("minimize_to_tray".to_string(), json!(true));
+            let s = Settings::from_stored(&m);
+            assert!(s.launch_at_startup && s.start_minimized);
+        }
     }
 
     #[test]

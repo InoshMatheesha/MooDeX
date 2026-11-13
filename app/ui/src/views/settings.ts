@@ -1,8 +1,8 @@
-// settings.ts - Preferences, RAWG source, data tools and the Diagnostics pane (spec 11, Appendix A).
+// settings.ts - Preferences, folders, RAWG source, data tools, updates and About (spec 11, Appendix A).
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { listen } from "@tauri-apps/api/event";
 import { api, type Settings, type SettingsView, type UpdateInfo, type UpdateProgress } from "../api";
-import { h, icon, I } from "../dom";
+import { githubMark, h, icon, I } from "../dom";
 import { toast, toastError } from "../ui";
 import { openImportV1 } from "../dialogs/importv1";
 
@@ -123,7 +123,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
       h("p", { class: "note", style: "padding-bottom:8px" }, "The library is a crash-safe SQLite database with a daily rolling backup. Cache budget changes apply on next start."),
     );
 
-    const diag = h("section", {}, h("h2", {}, "Diagnostics"), h("p", { class: "note" }, "Loading..."));
+    const about = aboutSection();
     // Auto-detect: folders scanned now and watched for new installs.
     const folderList = h("div", { class: "list", style: "margin:6px 0 10px" });
     if (s.scan_folders.length === 0) {
@@ -182,8 +182,8 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
       );
     }).catch(() => {});
 
-    body.replaceChildren(updatesSection(s), general, folders, tracking, discover, data, v1, diag);
-    void renderDiagnostics(diag);
+    body.replaceChildren(updatesSection(s), general, folders, tracking, discover, data, v1, about);
+
   }
 
   // Updates: check GitHub Releases, then download + verify + install in one click.
@@ -259,31 +259,59 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     );
   }
 
-  async function renderDiagnostics(sec: HTMLElement): Promise<void> {
-    try {
-      const d = await api.diagnostics();
-      const kv = h(
-        "dl",
-        { class: "kv selectable" },
-        h("dt", {}, "Version"), h("dd", {}, `MooDeX ${d.version}`),
-        h("dt", {}, "Build"), h("dd", {}, d.build_hash),
-        h("dt", {}, "WebView2"), h("dd", {}, d.webview),
-        h("dt", {}, "Library"), h("dd", {}, `${d.games} games, ${d.installed} installed, schema v${d.schema_version}`),
-        h("dt", {}, "Tracking"), h("dd", {}, `${d.detect_registry} executables watched, ${d.open_sessions} live session(s)`),
-        h("dt", {}, "Data folder"), h("dd", { class: "path" }, d.data_dir),
+  // About: identity, maker and project links in one card.
+  function aboutSection(): HTMLElement {
+    const ver = h("span", { class: "about-chip mono" }, "v-");
+    const build = h("span", {}, "");
+    void api.diagnostics().then((d) => {
+      ver.textContent = `v${d.version}`;
+      build.textContent = `build ${d.build_hash}`;
+    }).catch(() => {});
+    const link = (which: string, ico: SVGElement, title: string, sub: string): HTMLElement => {
+      const b = h("button", { class: "about-link", "aria-label": `${title}: ${sub}` },
+        h("span", { class: "about-link-ico" }, ico),
+        h("span", { class: "about-link-text" }, h("b", {}, title), h("small", {}, sub)),
+        h("span", { class: "about-link-go", "aria-hidden": "true" }, icon(I.arrowUpRight)),
       );
-      const problems = d.recent_problems.length ? h("div", { class: "code selectable" }, d.recent_problems.join("\n")) : h("p", { class: "note" }, "No recent warnings or errors.");
-      sec.replaceChildren(
-        h("h2", {}, "Diagnostics"),
-        kv,
-        h("div", { class: "line" }, h("button", { class: "btn", onclick: () => void api.openFolder("logs").catch(toastError) }, icon(I.folder), "Open log folder"), h("button", { class: "btn", onclick: () => void api.openFolder("data").catch(toastError) }, icon(I.folder), "Open data folder")),
-        h("h3", { style: "font-size:13px;margin:6px 0 8px" }, "Last 10 warnings and errors"),
-        problems,
-        h("p", { class: "note", style: "padding:10px 0 4px" }, "MooDeX sends no telemetry. Nothing leaves this PC except RAWG lookups, cover downloads and update checks."),
-      );
-    } catch (e) {
-      sec.replaceChildren(h("h2", {}, "Diagnostics"), h("p", { class: "err" }, String((e as Error).message ?? e)));
-    }
+      b.addEventListener("click", () => void api.openLink(which).catch(toastError));
+      return b;
+    };
+    const sign = h("button", { class: "about-sign-name", title: "MoOdY69 on GitHub" }, "MoOdY69");
+    sign.addEventListener("click", () => void api.openLink("profile").catch(toastError));
+    const logs = h("button", { class: "about-logs" }, "Open logs");
+    logs.addEventListener("click", () => void api.openFolder("logs").catch(toastError));
+    return h(
+      "section",
+      { class: "about" },
+      h("div", { class: "about-mark", "aria-hidden": "true" }),
+      h(
+        "div",
+        { class: "about-head" },
+        h("img", { class: "about-icon", src: "/icon.png", alt: "" }),
+        h(
+          "div",
+          { class: "about-id" },
+          h("img", { class: "about-wordmark", src: "/logo-wordmark.png", alt: "MooDeX" }),
+          h("p", { class: "about-tag" }, "Every game you own. Every hour you actually played."),
+          h("div", { class: "about-meta mono" }, ver, build, h("span", {}, "Rust · Tauri 2")),
+        ),
+        h("div", { class: "about-sign" }, h("span", { class: "about-sign-label mono" }, "Crafted by"), sign),
+      ),
+      h(
+        "div",
+        { class: "about-links" },
+        link("repo", githubMark(), "Source code", "github.com/InoshMatheesha/MooDeX"),
+        link("releases", icon(I.tag), "Release notes", "What changed in each version"),
+        link("site", icon(I.globe), "Website", "moodex-web.vercel.app"),
+        link("issues", icon(I.flag), "Report a problem", "Opens a new GitHub issue"),
+      ),
+      h(
+        "div",
+        { class: "about-foot" },
+        h("span", {}, "Free and open source · No telemetry · Your library never leaves this PC"),
+        logs,
+      ),
+    );
   }
 
   async function doExport(): Promise<void> {

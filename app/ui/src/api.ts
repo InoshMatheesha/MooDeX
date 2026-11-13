@@ -314,6 +314,7 @@ export const api = {
   testRawg: () => call<number>("test_rawg"),
   diagnostics: () => call<Diagnostics>("diagnostics"),
   openFolder: (which: "logs" | "data" | "backups") => call<void>("open_folder", { which }),
+  openLink: (which: string) => call<void>("open_link", { which }),
   v1Status: () => call<V1Status>("v1_status"),
   v1Plan: (path: string | null) => call<ImportPlan>("v1_plan", { path }),
   v1Apply: (plan: ImportPlan, accepted: [string, string][]) => call<ImportReport>("v1_apply", { plan, accepted }),

@@ -118,6 +118,7 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
             commands::settings::test_rawg,
             commands::diagnostics::diagnostics,
             commands::diagnostics::open_folder,
+            commands::diagnostics::open_link,
             commands::data::v1_status,
             commands::data::v1_plan,
             commands::data::v1_apply,

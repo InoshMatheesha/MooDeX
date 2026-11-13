@@ -2579,7 +2579,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-app"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "anyhow",
  "camino",
@@ -2610,7 +2610,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-core"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "camino",
  "proptest",
@@ -2623,7 +2623,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-images"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "camino",
  "hex",
@@ -2643,7 +2643,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-library"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "camino",
  "moodex-core",
@@ -2664,7 +2664,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-rawg"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "moodex-core",
  "reqwest 0.12.28",
@@ -2679,7 +2679,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-store"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "camino",
  "moodex-core",
@@ -2695,7 +2695,7 @@ dependencies = [
 
 [[package]]
 name = "moodex-winproc"
-version = "2.0.5"
+version = "2.0.6"
 dependencies = [
  "camino",
  "moodex-core",

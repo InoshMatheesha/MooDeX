@@ -1,9 +1,14 @@
 # Changelog
 
-## 2.0.5 - unreleased
+## 2.0.6
+
+### Changed
+- **About card.** Settings ends with an About card instead of Diagnostics: the app's identity and version, "Crafted by MoOdY69", and links to the source code, release notes, website and issue tracker. "Open logs" is still there for troubleshooting.
 
 ### Fixed
-- A stray icon (the hidden duplicates button) showed beside the search box in My PC Games. Elements marked hidden now always stay hidden.
+- **Update button.** "Download & install" now only appears when an update is actually available.
+- **"Start minimized" kept.** Your "Start minimized" choice was sometimes dropped at startup, depending on the order settings were loaded in.
+- **No stray icon.** A stray icon (the hidden duplicates button) no longer shows beside the search box in My PC Games.
 
 ## 2.0.4
 

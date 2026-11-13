@@ -50,6 +50,19 @@ export function icon(d: string, label?: string): SVGSVGElement {
   return svg;
 }
 
+// GitHub's mark, filled (not a stroke icon).
+export function githubMark(): SVGSVGElement {
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const p = document.createElementNS(ns, "path");
+  p.setAttribute("fill", "currentColor");
+  p.setAttribute("d", "M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z");
+  svg.append(p);
+  return svg;
+}
+
 export const I = {
   dash: "M4 13h6V4H4z|M14 20h6v-9h-6z|M14 4h6v4h-6z|M4 20h6v-3H4z",
   lib: "M4 5h4v15H4z|M10 5h4v15h-4z|M16.5 5.5l3.8 1-3.8 14.4-3.8-1z",
@@ -76,6 +89,10 @@ export const I = {
   gamepad: "M7 8h10a4 4 0 0 1 4 4v1a3 3 0 0 1-5.4 1.8L14.5 14h-5l-1.1 1.8A3 3 0 0 1 3 13v-1a4 4 0 0 1 4-4z|M8 10.5v3|M6.5 12h3|M15.5 11.5h.01|M17.5 12.5h.01",
   clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z|M12 7.5V12l3 2",
   pencil: "M4 20h4L19 9l-4-4L4 16z|M13.5 6.5l4 4",
+  arrowUpRight: "M7 17L17 7|M8 7h9v9",
+  tag: "M3 12V4h8l10 10-8 8z|M7.5 7.5h.01",
+  globe: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z|M3 12h18|M12 3c2.5 2.7 3.6 5.8 3.6 9s-1.1 6.3-3.6 9c-2.5-2.7-3.6-5.8-3.6-9S9.5 5.7 12 3z",
+  flag: "M5 21V4|M5 4h11l-2 4 2 4H5",
   starCircle: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z|M12 7.5l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z",
 };
 

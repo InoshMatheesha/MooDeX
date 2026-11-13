@@ -18,17 +18,78 @@
   );
   setTheme(root.dataset.theme || "dark");
 
-  // Latest installer from GitHub Releases; static fallbacks stay if this fails.
-  fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } })
+  // One request keeps the whole page current: version, size, download link, pill and changelog.
+  // Publishing a GitHub release is enough; the static HTML is only the offline fallback.
+  const setup = (rel) => (rel.assets || []).find((a) => /-setup\.exe$/i.test(a.name));
+  const isStable = (rel) => !rel.draft && !rel.prerelease && /^v\d+\.\d+\.\d+$/.test(rel.tag_name || "") && setup(rel);
+
+  // First bullet of the notes: "- **Title.** Rest of the sentence" -> { title, text }.
+  // Sections like "Download" or "Updating" describe files and steps, not what changed.
+  const SKIP_SECTION = /download|updating|update steps|good to know|install|checksum/i;
+  const summarize = (body) => {
+    const lines = String(body || "").split(/\r?\n/);
+    let skipping = false;
+    for (const line of lines) {
+      const head = line.match(/^\s*#{1,6}\s+(.*)$/);
+      if (head) {
+        skipping = SKIP_SECTION.test(head[1]);
+        continue;
+      }
+      if (skipping) continue;
+      const m = line.match(/^\s*[-*]\s+\*\*(.+?)\*\*\s*(.*)$/);
+      if (m && !/`|\.exe|\.msi/i.test(m[1])) {
+        return { title: m[1].replace(/[.:]\s*$/, ""), text: m[2].replace(/^[:\s]+/, "").replace(/[*_`]/g, "").trim() };
+      }
+    }
+    const plain = lines.map((l) => l.trim()).find((l) => l && !l.startsWith("#") && !l.startsWith("<"));
+    return { title: "Improvements and fixes", text: (plain || "").replace(/^[-*]\s+/, "").replace(/[*_`]/g, "") };
+  };
+  const clip = (s, n) => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s);
+  const shortDate = (iso) => new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+
+  fetch(`https://api.github.com/repos/${REPO}/releases?per_page=12`, { headers: { Accept: "application/vnd.github+json" } })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-    .then((rel) => {
-      const asset = (rel.assets || []).find((a) => /-setup\.exe$/i.test(a.name));
-      if (!asset) return;
-      const v = String(rel.tag_name || "").replace(/^v/i, "");
+    .then((list) => {
+      const releases = (Array.isArray(list) ? list : []).filter(isStable);
+      const latest = releases[0];
+      if (!latest) return;
+      const asset = setup(latest);
+      const v = latest.tag_name.replace(/^v/i, "");
       document.querySelectorAll("[data-download]").forEach((a) => (a.href = asset.browser_download_url));
       document.querySelectorAll("[data-version-text]").forEach((el) => (el.textContent = `v${v}`));
       document.querySelectorAll("[data-version-plain]").forEach((el) => (el.textContent = v));
       document.querySelectorAll("[data-size]").forEach((el) => (el.textContent = `${(asset.size / 1048576).toFixed(1)} MB`));
+
+      // Hero pill names what the newest release brought.
+      const pill = document.querySelector("[data-pill]");
+      if (pill) pill.textContent = `v${v}: ${clip(summarize(latest.body).title, 44)}`;
+
+      // Changelog cards, built with textContent only (release text is never parsed as HTML).
+      const log = document.querySelector("[data-log]");
+      if (log) {
+        const cards = releases.slice(0, 4).map((rel) => {
+          const s = summarize(rel.body);
+          const a = document.createElement("a");
+          a.className = "log-card";
+          a.href = rel.html_url;
+          const top = document.createElement("div");
+          top.className = "log-top";
+          const ver = document.createElement("span");
+          ver.className = "mono ver";
+          ver.textContent = rel.tag_name;
+          const date = document.createElement("span");
+          date.className = "log-date";
+          date.textContent = shortDate(rel.published_at || rel.created_at);
+          top.append(ver, date);
+          const h = document.createElement("h3");
+          h.textContent = clip(s.title, 48);
+          const p = document.createElement("p");
+          p.textContent = clip(s.text, 120);
+          a.append(top, h, p);
+          return a;
+        });
+        if (cards.length) log.replaceChildren(...cards);
+      }
     })
     .catch(() => {});
 

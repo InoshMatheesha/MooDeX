@@ -381,3 +381,12 @@ h3 { font-size: 18px; font-weight: 650; letter-spacing: -0.02em; }
   .scan li { opacity: 1; transform: none; }
   .upd-bar i { width: 72%; }
 }
+
+/* --- Live changelog cards (from GitHub Releases) --- */
+.log-card { display: block; padding: 22px; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--surface); transition: border-color 0.2s var(--ease), transform 0.2s var(--ease); }
+.log-card:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.log-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.log-top .ver { margin-bottom: 0; }
+.log-date { font-size: 12px; color: var(--text-3); }
+.log-card h3 { font-size: 16.5px; margin-bottom: 6px; }
+.log-card p { font-size: 14.5px; color: var(--text-2); }

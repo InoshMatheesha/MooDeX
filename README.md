@@ -1,119 +1,242 @@
-<p align="center"><img src="assets/logo-wordmark.png" alt="MooDeX" width="420"></p>
+<div align="center">
 
-# MooDeX 2.0
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-wordmark.png">
+  <img src="assets/logo-wordmark-light.png" alt="MooDeX" width="380">
+</picture>
 
-MooDeX keeps every PC game you own in one place. It records how long you really play, adds artwork from the RAWG catalogue, and lets you rate games and keep notes. Everything stays on your PC.
+### Every game you own. Every hour you actually played.
 
-This is the Rust rewrite of MooDeX, built with Tauri 2. The design contract it follows is [MOODEX_RUST_MVP.md](MOODEX_RUST_MVP.md).
+A fast, private game library for Windows. Keep every PC game in one list, track playtime that is measured instead of guessed, and let new installs show up on their own.
 
-## Requirements
+[![Latest release](https://img.shields.io/github/v/release/InoshMatheesha/MooDeX?style=flat-square&label=release&color=6d5dfc)](https://github.com/InoshMatheesha/MooDeX/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/InoshMatheesha/MooDeX/total?style=flat-square&color=3b82f6)](https://github.com/InoshMatheesha/MooDeX/releases)
+[![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-18181b?style=flat-square&logo=windows&logoColor=white)](#install)
+[![Built with Rust and Tauri](https://img.shields.io/badge/Rust-Tauri%202-18181b?style=flat-square&logo=rust&logoColor=white)](#build-from-source)
 
-- Windows 10 or 11, 64-bit.
-- **Microsoft Edge WebView2 Runtime.** It ships with Windows 11 and is already on most Windows 10 PCs. The installer downloads it if it is missing, so the first install on such a PC needs an internet connection. **The runtime is not bundled.**
+<br>
 
-## How playtime tracking works
+[![Download for Windows](https://img.shields.io/badge/Download%20for%20Windows-0b0b0f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases/latest)
+&nbsp;
+[![Website](https://img.shields.io/badge/Website-moodex--web.vercel.app-3b82f6?style=for-the-badge)](https://moodex-web.vercel.app)
 
-| How the game starts | How MooDeX tracks it |
+<br>
+
+<img src="site/img/dashboard.webp" alt="MooDeX dashboard showing library status, total playtime, the G.O.A.T. game and the most played games" width="900">
+
+</div>
+
+<br>
+
+## Highlights
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <h3>Real playtime</h3>
+      Steam and Epic launchers quit seconds after starting a game. MooDeX follows the hand-off to the real game and keeps counting until it closes, so a four-hour evening counts as four hours.
+    </td>
+    <td width="33%" valign="top">
+      <h3>Finds your games</h3>
+      Point it at the folders your games install into, Steam libraries included. It picks each game's real executable, matches the cover, and adds new installs automatically.
+    </td>
+    <td width="33%" valign="top">
+      <h3>Stays on your PC</h3>
+      No account, no telemetry. Your library is one crash-safe database on your PC with daily backups. Updates install in one click and are signature-checked first.
+    </td>
+  </tr>
+</table>
+
+## Features
+
+| | |
 |---|---|
-| **Play** on a linked `.exe` | MooDeX starts the game inside a Windows *job object*. The session ends when the game and every process it started have exited. |
-| **Play** on a Steam/Epic/Ubisoft URI or shortcut, with a **detection exe** set | The launcher exits right away. MooDeX then waits for the real game's executable to appear and tracks that instead. |
-| The game was started outside MooDeX | MooDeX notices a linked executable starting, using WMI process events. |
+| **Library** | All your games in one list with covers, a status (Playing, Completed, Want to Play, Stopped), 1-5 star ratings and notes. Search, filter and sort instantly, even with hundreds of games. |
+| **Playtime** | Every session is saved separately and the total is added up from them. Matching uses exact executable paths, so an overlay or a similarly named program is never counted as your game. Time the PC spent asleep isn't counted, and a crash doesn't lose your time. |
+| **PC Games** | Installed games get a Play button right on the card. Launch from MooDeX or anywhere else; the session is recorded either way. |
+| **Auto-detect** | Watch your game folders. Installers, redistributables and crash reporters are skipped. Games you remove are not re-added. |
+| **Dashboard** | Status counts, total hours, your G.O.A.T. game, a most-played podium and a live "Playing now" panel. |
+| **Discover** | Browse Trending, Upcoming and Popular games, or search 800k+ games from the RAWG catalogue. Results are cached, so Discover still works offline. |
+| **Updates** | Check for updates in Settings. Each download is signature-verified before it installs. |
+| **Moving from v1** | Import your MooDeX 1 library with its playtime. You review everything first, and nothing is merged silently. |
 
-- **Exact matching.** A process counts as a game only if its full, resolved path matches the linked path. A partial name is never enough.
-- **Sessions are kept separately.** Every session is saved as its own record, and playtime is the sum of them.
-- **Sleep and crashes.** A 30-second heartbeat lets MooDeX detect when the PC slept, so that time is not counted. If MooDeX crashes, the next start closes the open session at the last heartbeat.
-- **Short sessions are dropped.** Sessions under 60 seconds are discarded. You can change this in Settings.
-- **When WMI is busy.** WMI shares a limit across the whole machine. If other software has used it up, MooDeX checks the list of linked executables every 2 seconds instead, and keeps retrying WMI.
+## How playtime is measured
 
-## Discover (RAWG)
+```mermaid
+gantt
+    title One evening of play, as each tracker sees it
+    dateFormat HH:mm
+    axisFormat %H:%M
+    section What runs
+    Steam launcher, exits after seconds :done, a1, 20:00, 1m
+    The game itself                     :active, a2, 20:01, 251m
+    section What gets recorded
+    MooDeX session                      :b1, 20:00, 252m
+    A typical tracker                   :crit, b2, 20:00, 1m
+```
 
-The app contains no API key. You can choose one of three options in **Settings > Discover**:
+1. When you press **Play**, MooDeX starts the game inside a Windows *job object*. The OS reports when every process in that tree has exited.
+2. If the launched program is a launcher stub that exits quickly, MooDeX keeps the session open. It switches to watching the game's real executable, matched by its full path.
+3. Games started outside MooDeX (from Steam, a shortcut or anywhere else) are detected the same way, by exact path.
+4. A heartbeat every 30 seconds records that the game is still running. If the PC sleeps, the session is split so the time asleep isn't counted. If MooDeX itself is killed, the session ends at the last heartbeat on the next start.
 
-1. **Proxy.** Deploy [`proxy/`](proxy/README.md) to Vercel with your key, then paste its URL into Settings.
-2. **Your own key.** Paste a personal RAWG key. It is stored in **Windows Credential Manager**, never in a file or the database.
-3. **Off.** The local library still works fully.
+## Screenshots
+
+<table>
+  <tr>
+    <td><img src="site/img/library.webp" alt="My Library"></td>
+    <td><img src="site/img/pc-games.webp" alt="My PC Games with play buttons"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Library:</b> every game, one list</sub></td>
+    <td align="center"><sub><b>PC Games:</b> play straight from the card</sub></td>
+  </tr>
+  <tr>
+    <td><img src="site/img/game-detail.webp" alt="Game details"></td>
+    <td><img src="site/img/dashboard.webp" alt="Dashboard"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Game details:</b> sessions, rating, notes, launch settings</sub></td>
+    <td align="center"><sub><b>Dashboard:</b> your library at a glance</sub></td>
+  </tr>
+</table>
+
+## Install
+
+1. Download **`MooDeX_<version>_x64-setup.exe`** from the [latest release](https://github.com/InoshMatheesha/MooDeX/releases/latest).
+2. Run it. It installs for your user account only, so there is no admin prompt.
+3. Optional: in **Settings > Auto-detect games**, add the folders your games install into.
+
+**Requirements:**
+- Windows 10 or 11, 64-bit.
+- The Microsoft Edge WebView2 Runtime. It ships with Windows 11 and is on most Windows 10 PCs; if it's missing, the installer downloads it.
+
+> [!NOTE]
+> **About the "Windows protected your PC" warning:** the installer is not yet signed with a paid code-signing certificate, so SmartScreen doesn't recognise it. Choose **More info**, then **Run anyway**. Every release publishes its SHA-256 checksums.
+
+## Updates
+
+MooDeX updates itself from GitHub Releases:
+
+1. Open **Settings > Updates** and click **Check for updates**.
+2. If a newer version is out, click **Download & install**. The package's signature is verified against a key built into the app, then it installs and restarts.
+
+MooDeX can also check quietly at startup; you can turn that off in the same section.
 
 ## Your data
 
-Everything lives in `%LOCALAPPDATA%\MooDeX\v2\`:
-
-| Path | What it holds |
+| | |
 |---|---|
-| `moodex.db` | Your library (SQLite in WAL mode, safe across crashes) |
-| `backups\moodex-YYYY-MM-DD.db` | Daily backups. The last 7 are kept. |
-| `covers\` | Cached cover images (WebP). Old ones are removed once the cache reaches 500 MB. |
-| `logs\moodex.YYYY-MM-DD.log` | Log files. The last 7 days are kept. Panics also go to `crash.log`. |
+| Library | `%LOCALAPPDATA%\MooDeX\v2\moodex.db` (SQLite, crash-safe) |
+| Backups | `%LOCALAPPDATA%\MooDeX\v2\backups`, one per day, the last 7 kept |
+| Covers | `%LOCALAPPDATA%\MooDeX\v2\covers`, cached WebP images |
+| Logs | `%LOCALAPPDATA%\MooDeX\v2\logs`, kept for 7 days |
+| Network | Cover downloads, catalogue lookups and update checks only |
+| Telemetry | None |
 
-The v1 file `%LOCALAPPDATA%\MooDeX\games_data.json` is read, never modified. On the first import it is copied to `games_data.v1.backup.json`.
+Uninstalling keeps your library. If you tick **Delete the application data**, your database is copied to `Documents\MooDeX backup` first.
 
-When you uninstall, your library is kept. If you tick **"Delete the application data"**, the uninstaller first copies `moodex.db` to `Documents\MooDeX backup\`, then removes only the `v2` folder.
+<details>
+<summary><b>Discover and the RAWG API key</b></summary>
+<br>
 
-No telemetry is sent. The only network traffic is RAWG lookups and cover downloads.
+Covers and game details come from the [RAWG](https://rawg.io) catalogue. No key is built into the app. Choose one of these in **Settings > Discover**:
 
-## Building
+- **Personal key:** paste a free key from [rawg.io/apidocs](https://rawg.io/apidocs). It is stored in Windows Credential Manager, never in a file.
+- **Proxy:** deploy [`proxy/`](proxy/README.md) to Vercel with your key, then paste its URL into Settings.
+
+Your library works fully without a key; only Discover needs one.
+</details>
+
+## FAQ
+
+<details>
+<summary><b>Does it track games I start from Steam or Epic directly?</b></summary>
+<br>
+Yes. Linked games are recognised by their exact executable path however they are started, and MooDeX records the session.
+</details>
+
+<details>
+<summary><b>I used MooDeX 1. Do I keep my playtime?</b></summary>
+<br>
+Yes. Go to <b>Settings > Import from MooDeX v1</b>. You see the plan before anything is written, your old file is backed up first, and the playtime is imported as an estimated session.
+</details>
+
+<details>
+<summary><b>Will it slow down my games?</b></summary>
+<br>
+No. It doesn't inject anything into games, has no overlay, and sits idle in the tray. Detection uses Windows process events, with a lightweight fallback if those are unavailable.
+</details>
+
+<details>
+<summary><b>Can I move my library to another PC?</b></summary>
+<br>
+Yes. Use <b>Settings > Your data > Export library</b> and import the file on the other PC.
+</details>
+
+## Build from source
 
 **Prerequisites:**
-- Rust, pinned in [rust-toolchain.toml](rust-toolchain.toml).
+- Rust, pinned in [`rust-toolchain.toml`](rust-toolchain.toml).
 - Node 20 or later.
-- A C compiler for the bundled SQLite, ring and libwebp sources:
-  - MSVC Build Tools, or
-  - on the GNU toolchain, MSYS2 MinGW-w64 (`C:\msys64\mingw64\bin`).
+- A C compiler: MSVC Build Tools, or MSYS2 MinGW-w64 on the GNU toolchain.
 
 ```powershell
-# Full release build: MooDeX.exe plus the NSIS and MSI installers
+git clone https://github.com/InoshMatheesha/MooDeX.git
+cd MooDeX
+
+# Release build: MooDeX.exe plus the NSIS and MSI installers
 powershell -ExecutionPolicy Bypass -File scripts\build.ps1
 
-# Checks (the same gates CI runs)
+# The same quality gates CI runs
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-Build outputs:
-- `target/release/MooDeX.exe`
-- `target/release/bundle/nsis/MooDeX_2.0.0_x64-setup.exe`
-- `target/release/bundle/msi/MooDeX_2.0.0_x64_en-US.msi`
+### Architecture
 
-> **GNU toolchain note:** on the `x86_64-pc-windows-gnu` target, WebView2's loader is a separate `WebView2Loader.dll`. The installers include it. If you copy the `.exe` by hand, copy the DLL with it. MSVC builds link the loader statically.
+```mermaid
+flowchart LR
+    UI["WebView2 UI<br/><sub>TypeScript, virtualized grid</sub>"] -- commands --> CMD["Tauri command layer"]
+    CMD -- messages --> ACTOR["Library actor<br/><sub>the only owner of state</sub>"]
+    ACTOR -- events --> UI
+    ACTOR --> DB[("SQLite<br/><sub>WAL + daily backups</sub>")]
+    ACTOR --> RAWG["RAWG client<br/><sub>cache + rate limit</sub>"]
+    ACTOR --> IMG["Cover cache<br/><sub>memory + WebP on disk</sub>"]
+    WIN["Process tracking<br/><sub>job objects + WMI</sub>"] -- play events --> ACTOR
+```
 
-## Updates
+| Crate | Responsibility |
+|---|---|
+| `moodex-core` | Domain types and pure logic, with no I/O. Fully unit-tested. |
+| `moodex-store` | SQLite, migrations, crash-safe writes, backups. |
+| `moodex-library` | The library actor, play tracker, folder scanner and v1 import. |
+| `moodex-winproc` | Job objects, WMI process events and launching. The only crate that uses `unsafe`. |
+| `moodex-rawg` | RAWG client with stale-while-revalidate caching. |
+| `moodex-images` | Two-tier cover cache and WebP thumbnails. |
+| `app/` | Tauri shell, IPC commands and the TypeScript UI. |
+| `site/` | The website at [moodex-web.vercel.app](https://moodex-web.vercel.app). |
 
-MooDeX updates itself from [GitHub Releases](https://github.com/InoshMatheesha/MooDeX/releases). Open **Settings > Updates** and click **Check for updates**. If a newer version is out, click **Download & install**. MooDeX also checks quietly at startup; you can turn that off in the same place.
-
-Every update is signed. The app checks the signature against a public key built into it, and refuses any update that doesn't match. This works with the private key at `%USERPROFILE%\.tauri\moodex.key`, which only the maintainer has.
-
-**To publish an update (maintainer):**
+<details>
+<summary><b>Publishing a release (maintainers)</b></summary>
+<br>
 
 1. Bump `version` in `app/src-tauri/tauri.conf.json`, `Cargo.toml` and `app/package.json`, and add a `## <version>` section to `CHANGELOG.md`.
-2. Run `scripts\build.ps1`. It writes `target\release\bundle\latest.json` next to the signed installer.
-3. Create the release `v<version>` and attach:
-   - the `-setup.exe`
-   - its `.sig`
-   - the `.msi`
-   - `latest.json`
+2. Run `scripts\build.ps1`. It signs the update packages with `%USERPROFILE%\.tauri\moodex.key` and writes `target\release\bundle\latest.json`.
+3. Create the release `v<version>`. Attach the `-setup.exe`, the `.msi`, both `.sig` files and `latest.json`.
 
-Installed copies pick up the new version at their next check.
+The website and installed apps both pick up the new version from the release automatically.
 
-## Signing and SmartScreen
+Release notes written as `- **Headline.** Details` become the changelog cards on the website.
+</details>
 
-A local build is **not signed**. Do not hand it out, not even to a friend for testing (spec §13.8). Every build that is meant for other people goes through [`.github/workflows/release.yml`](.github/workflows/release.yml), which:
-1. Signs the exe and both installers with Authenticode and an RFC-3161 timestamp.
-2. Signs the update files with minisign.
-3. Produces an SBOM and SHA-256 checksums.
-4. Fails if any program file is left unsigned.
+<br>
 
-Even once releases are signed, Windows SmartScreen may warn about the first few versions until enough people have installed them. This is normal for a new publisher and does not mean the app is malware.
+<div align="center">
 
-## Layout
+Crafted by **[MoOdY69](https://github.com/InoshMatheesha)**
 
-```
-crates/moodex-core      domain types and pure logic (no I/O)
-crates/moodex-store     SQLite, migrations, crash-safe writes, backups
-crates/moodex-rawg      RAWG client, HTTP cache, rate limiting
-crates/moodex-images    cover cache (memory + disk), WebP variants
-crates/moodex-winproc   job objects, WMI, launching (the only crate with `unsafe`)
-crates/moodex-library   the single owner of library state, the play tracker, v1 import
-app/src-tauri           the window, tray, IPC commands, logging, cover protocol
-app/ui                  TypeScript frontend (no framework), virtualized grid
-proxy/                  Vercel edge function that holds the RAWG key
-```
+<sub>Game artwork in screenshots comes from the RAWG catalogue. Windows is a trademark of Microsoft.</sub>
+
+</div>

@@ -68,7 +68,7 @@ gantt
     dateFormat HH:mm
     axisFormat %H:%M
     section What runs
-    Steam launcher, exits after seconds :done, a1, 20:00, 1m
+    Steam launcher exits in seconds     :done, a1, 20:00, 1m
     The game itself                     :active, a2, 20:01, 251m
     section What gets recorded
     MooDeX session                      :b1, 20:00, 252m

@@ -1,12 +1,14 @@
 <!doctype html>
-<!-- index.html - MooDeX download site: one page, no framework, real screenshots. -->
-<html lang="en">
+<!-- index.html - MooDeX website: product page with dark and light themes. -->
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MooDeX - your PC game library, with real playtime</title>
-  <meta name="description" content="MooDeX keeps every PC game you own in one place and records real playtime, including Steam and Epic games. Free, open source, and it stays on your PC.">
-  <meta name="theme-color" content="#F1EEE7">
+  <title>MooDeX - every game you own, every hour you played</title>
+  <meta name="description" content="MooDeX is a fast, private game library for Windows. One list for every PC game, real playtime tracking (Steam and Epic included) and auto-detection of installed games. Free and open source.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
   <meta property="og:title" content="MooDeX - your PC game library, with real playtime">
   <meta property="og:description" content="Every game you own. Every hour you actually played. Free for Windows.">
   <meta property="og:type" content="website">
@@ -14,331 +16,337 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" href="/img/favicon.png">
   <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <!-- Apply the saved or system theme before first paint (no flash). -->
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("moodex-theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <header class="top" id="top">
-    <div class="wrap top-row">
-      <a class="brand" href="/" aria-label="MooDeX home">
-        <img src="/img/mark.png" alt="" width="28" height="28">
+  <!-- Floating navigation -->
+  <header class="nav-wrap" id="nav">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="/" aria-label="MooDeX home">
+        <img src="/img/mark.png" alt="" width="26" height="26">
         <span>MooDeX</span>
       </a>
-      <nav class="top-nav" aria-label="Sections">
-        <a href="#library">Library</a>
-        <a href="#playtime">Playtime</a>
-        <a href="#specs">Specs</a>
-        <a href="#changes">Changes</a>
-        <a href="https://github.com/InoshMatheesha/MooDeX/tree/v2-rust">Source</a>
-      </nav>
-      <a class="btn btn-ink btn-sm" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
-        Download <span class="mono" data-version>2.0.4</span>
-      </a>
-    </div>
+      <div class="nav-links">
+        <a href="#tour">Tour</a>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="nav-end">
+        <a class="icon-btn" href="https://github.com/InoshMatheesha/MooDeX" aria-label="MooDeX on GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.16.08 1.770 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.770 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        </a>
+        <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">
+          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="btn btn-primary btn-sm" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Download</a>
+      </div>
+    </nav>
   </header>
 
   <main id="main">
     <!-- Hero -->
     <section class="hero">
-      <div class="wrap">
-        <p class="eyebrow mono">Game library manager for Windows</p>
-        <h1>Every game you own.<br><span class="soft">Every hour you actually played.</span></h1>
-        <div class="hero-row">
-          <p class="lede">MooDeX keeps your whole PC library in one list, records real playtime (Steam and Epic games included) and keeps all of it on your computer. No account, no launcher lock-in, no tracking.</p>
-          <div class="hero-cta">
-            <a class="btn btn-ink btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
-              Download for Windows
-            </a>
-            <p class="cta-meta mono"><span data-version>v2.0.4</span> &middot; <span data-size>5.1 MB</span> &middot; Windows 10 / 11, 64-bit</p>
-          </div>
+      <div class="hero-bg" aria-hidden="true"><div class="grid-fade"></div><div class="spot"></div></div>
+      <div class="container hero-copy">
+        <a class="pill" href="#changes">
+          <span class="pill-tag">New</span>
+          <span>In-app updates in <span data-version-text>v2.0.6</span></span>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <h1>Every game you own.<br><span class="muted">Every hour you actually played.</span></h1>
+        <p class="lede">A fast, private game library for Windows. One list for every PC game, playtime that is measured instead of guessed (Steam and Epic included), and new installs found on their own.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.5 10.5 3.4v8.1H3zm0 15 7.5 1.1v-8H3zm8.6 1.3L21 22v-9.5h-9.4zm0-17.6v8.3H21V2z"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn btn-ghost btn-lg" href="https://github.com/InoshMatheesha/MooDeX">View source</a>
         </div>
+        <p class="meta mono"><span data-version-text>v2.0.6</span> <i></i> <span data-size>5.1 MB</span> <i></i> Windows 10 and 11 <i></i> Free and open source</p>
       </div>
 
-      <!-- Annotated product shot -->
-      <div class="wrap">
-        <figure class="shot shot-hero">
-          <div class="frame">
-            <div class="frame-bar" aria-hidden="true"><img src="/img/mark.png" alt="" width="14" height="14"><span>MooDeX</span><i></i><i></i><i></i></div>
-            <div class="pins">
-              <img src="/img/dashboard.webp" srcset="/img/dashboard-sm.webp 900w, /img/dashboard.webp 1600w" sizes="(max-width: 900px) 100vw, 1200px" width="1600" height="799" alt="MooDeX dashboard: status counts, a library mix bar, total games and playtime, the G.O.A.T. game card and the most played games." fetchpriority="high">
-              <span class="pin" style="left:38%;top:22%">01</span>
-              <span class="pin" style="left:56%;top:58%">02</span>
-              <span class="pin" style="left:84%;top:52%">03</span>
-              <span class="pin" style="left:9%;top:86%">04</span>
+      <!-- Product with live overlays -->
+      <div class="container stage-wrap">
+        <div class="stage">
+          <div class="window">
+            <div class="window-bar" aria-hidden="true">
+              <span class="wb-title"><img src="/img/mark.png" alt="" width="14" height="14">MooDeX</span>
+              <span class="wb-ctrl"><i></i><i></i><i></i></span>
+            </div>
+            <img class="window-shot" src="/img/dashboard.webp" srcset="/img/dashboard-sm.webp 900w, /img/dashboard.webp 1600w" sizes="(max-width: 1000px) 100vw, 1100px" width="1600" height="799" alt="The MooDeX dashboard: library status cards, total playtime, the G.O.A.T. game and the most played games." fetchpriority="high">
+          </div>
+
+          <div class="float float-now" aria-hidden="true">
+            <img src="/img/cover-onimusha.webp" alt="" width="96" height="54">
+            <div>
+              <small><span class="dot"></span>Playing now</small>
+              <b>Onimusha: Way of the Sword</b>
+              <span class="mono timer" data-timer>0:42:13</span>
             </div>
           </div>
-          <figcaption>
-            <ol class="legend">
-              <li><b class="mono">01</b> Where your library stands, by status. Click a card to see the games.</li>
-              <li><b class="mono">02</b> Playtime added up from recorded sessions, not guessed.</li>
-              <li><b class="mono">03</b> One game above the rest: your G.O.A.T.</li>
-              <li><b class="mono">04</b> What you are playing right now, or what you played last.</li>
-            </ol>
-          </figcaption>
-        </figure>
-      </div>
-    </section>
 
-    <!-- Facts strip -->
-    <section class="facts" aria-label="At a glance">
-      <div class="wrap facts-row">
-        <div><span class="mono">Installer</span><b data-size>5.1 MB</b></div>
-        <div><span class="mono">Engine</span><b>Native Rust</b></div>
-        <div><span class="mono">Account</span><b>Not needed</b></div>
-        <div><span class="mono">Telemetry</span><b>None</b></div>
-        <div><span class="mono">Price</span><b>Free, open source</b></div>
-      </div>
-    </section>
-
-    <!-- 01 Library -->
-    <section class="chapter" id="library">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">01</span>
-          <h2>One list for every game you own.</h2>
-        </header>
-        <div class="split">
-          <div class="copy">
-            <p>Games you bought on Steam, Epic, Ubisoft or GOG, old installs from a disc, things you want to play next. They all go in one library with real cover art, a status, a rating and your notes.</p>
-            <ul class="ticks">
-              <li>Playing, Completed, Want to Play, Stopped</li>
-              <li>Search, sort by playtime, rating or last played</li>
-              <li>Duplicates are suggested, never merged behind your back</li>
-              <li>Smooth with hundreds of games: only what is on screen is drawn</li>
-            </ul>
+          <div class="float float-toast" aria-hidden="true">
+            <span class="check">
+              <svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div><b>Session recorded</b><small>Crimson Desert <span class="mono">+2h 05m</span></small></div>
           </div>
-          <figure class="shot">
-            <div class="frame"><img src="/img/library.webp" srcset="/img/library-sm.webp 900w, /img/library.webp 1600w" sizes="(max-width: 900px) 100vw, 760px" width="1600" height="799" alt="My Library: game cards with cover art, status badges, playtime and star ratings." loading="lazy"></div>
+
+          <div class="float float-scan" aria-hidden="true">
+            <small class="mono">D:\SteamLibrary</small>
+            <b>3 new games detected</b>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Works with -->
+    <section class="works container" aria-label="Works with games from">
+      <p>Tracks games from every store you use</p>
+      <ul>
+        <li>Steam</li><li>Epic Games</li><li>Ubisoft Connect</li><li>GOG</li><li>EA app</li><li>Standalone .exe</li>
+      </ul>
+    </section>
+
+    <!-- Tour -->
+    <section class="section" id="tour">
+      <div class="container">
+        <header class="head">
+          <p class="kicker mono">Product tour</p>
+          <h2>Built for people with more games than free evenings.</h2>
+        </header>
+        <div class="tour">
+          <div class="tabs" role="tablist" aria-label="Screens">
+            <button role="tab" aria-selected="true" aria-controls="tour-panel" data-shot="dashboard" data-caption="Your whole library at a glance: what you are playing, what you finished, total hours and your all-time favourite.">Dashboard</button>
+            <button role="tab" aria-selected="false" aria-controls="tour-panel" data-shot="library" data-caption="Every game in one list with real cover art, status, rating and notes. Filter, search and sort in an instant.">Library</button>
+            <button role="tab" aria-selected="false" aria-controls="tour-panel" data-shot="pc-games" data-caption="Installed games with a play button right on the card. Launch from MooDeX and every minute is counted.">PC Games</button>
+            <button role="tab" aria-selected="false" aria-controls="tour-panel" data-shot="game-detail" data-caption="Everything about one game on one screen: sessions, playtime, status, rating, notes and how it launches.">Game details</button>
+          </div>
+          <figure class="tour-panel" id="tour-panel" role="tabpanel">
+            <div class="window window-flat">
+              <img id="tour-img" src="/img/dashboard.webp" srcset="/img/dashboard-sm.webp 900w, /img/dashboard.webp 1600w" sizes="(max-width: 1000px) 100vw, 1100px" width="1600" height="799" alt="MooDeX screen" loading="lazy">
+            </div>
+            <figcaption id="tour-caption">Your whole library at a glance: what you are playing, what you finished, total hours and your all-time favourite.</figcaption>
           </figure>
         </div>
       </div>
     </section>
 
-    <!-- 02 Playtime -->
-    <section class="chapter chapter-alt" id="playtime">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">02</span>
-          <h2>Counted from the game, not the launcher.</h2>
+    <!-- Features -->
+    <section class="section" id="features">
+      <div class="container">
+        <header class="head">
+          <p class="kicker mono">Features</p>
+          <h2>Small app. Serious about the details.</h2>
         </header>
-        <div class="split split-rev">
-          <div class="copy">
-            <p>Most trackers watch the program they started. With Steam or Epic that is a launcher stub that quits after a few seconds, so a four-hour evening gets logged as six seconds.</p>
-            <p>MooDeX starts the game in a Windows job object and follows every process it spawns. When a launcher hands off, MooDeX switches to watching the real game executable and keeps the session open until that game exits.</p>
-            <ul class="ticks">
-              <li>Exact path matching. A game is never confused with an overlay or a similar name.</li>
-              <li>Sleep and crashes do not inflate or lose time.</li>
-              <li>Every session is kept; totals are added up from them.</li>
-            </ul>
-          </div>
-          <figure class="diagram" aria-label="Timeline: a Steam launcher exits after a few seconds while the game runs for hours; MooDeX keeps the session open for the whole game.">
-            <svg viewBox="0 0 640 300" role="img" aria-hidden="true">
-              <g class="axis">
-                <line x1="150" y1="262" x2="620" y2="262"/>
-                <text x="150" y="286">launch</text>
-                <text x="620" y="286" text-anchor="end">4 h later</text>
-              </g>
-              <g class="lane">
-                <text x="0" y="46">steam://run</text>
-                <rect x="150" y="30" width="22" height="22" class="bar-mute"/>
-                <text x="182" y="46" class="note">launcher hands off and exits after ~6 s</text>
-              </g>
-              <g class="lane">
-                <text x="0" y="106">game.exe</text>
-                <rect x="166" y="90" width="430" height="22" class="bar-ink"/>
-              </g>
-              <g class="lane">
-                <text x="0" y="166">MooDeX</text>
-                <rect x="150" y="150" width="446" height="22" class="bar-accent"/>
-                <text x="596" y="192" class="note" text-anchor="end">session closes when the game exits</text>
-              </g>
-              <g class="lane">
-                <text x="0" y="226">Typical tracker</text>
-                <rect x="150" y="210" width="22" height="22" class="bar-bad"/>
-                <text x="182" y="226" class="note">records 6 s</text>
-              </g>
-              <line x1="172" y1="22" x2="172" y2="250" class="guide"/>
-              <line x1="596" y1="82" x2="596" y2="250" class="guide"/>
-            </svg>
-          </figure>
-        </div>
-      </div>
-    </section>
 
-    <!-- 03 Auto-detect -->
-    <section class="chapter" id="detect">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">03</span>
-          <h2>Point it at a folder. That is the setup.</h2>
-        </header>
-        <div class="split">
-          <div class="copy">
-            <p>Add the folders your games install into, a Steam library included. MooDeX finds each game's real executable (not the uninstaller, crash reporter or redistributable), matches the cover, and keeps watching. Install something new and it shows up on its own.</p>
-            <ul class="ticks">
-              <li>Play straight from the card</li>
-              <li>Remove a game once and it stays removed</li>
-              <li>Watching is event-based: no constant disk scanning</li>
-            </ul>
-          </div>
-          <figure class="shot">
-            <div class="frame"><img src="/img/pc-games.webp" srcset="/img/pc-games-sm.webp 900w, /img/pc-games.webp 1600w" sizes="(max-width: 900px) 100vw, 760px" width="1600" height="799" alt="My PC Games: installed games with a play button on each card." loading="lazy"></div>
-          </figure>
-        </div>
-      </div>
-    </section>
+        <div class="bento">
+          <!-- Playtime -->
+          <article class="cell cell-wide">
+            <div class="cell-copy">
+              <h3>Playtime that is actually right</h3>
+              <p>Launchers like Steam quit seconds after starting a game, so most trackers log a whole evening as six seconds. MooDeX follows the hand-off to the real game and keeps counting until it closes.</p>
+            </div>
+            <div class="viz timeline" aria-hidden="true">
+              <div class="lane"><span class="mono">launcher</span><div class="track"><i class="bar bar-stub"></i></div></div>
+              <div class="lane"><span class="mono">game.exe</span><div class="track"><i class="bar bar-game"></i></div></div>
+              <div class="lane"><span class="mono">MooDeX</span><div class="track"><i class="bar bar-moodex"></i><em class="mono">4h 12m</em></div></div>
+              <div class="lane lane-bad"><span class="mono">others</span><div class="track"><i class="bar bar-bad"></i><em class="mono">6s</em></div></div>
+            </div>
+          </article>
 
-    <!-- 04 Details -->
-    <section class="chapter chapter-alt" id="details">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">04</span>
-          <h2>Everything about a game, on one screen.</h2>
-        </header>
-        <div class="split split-rev">
-          <div class="copy">
-            <p>Open a game to play it, rate it, change its status, write where you left off, or link a different executable. Every play session is listed with its date and length, so the total is never a mystery.</p>
-            <p>Moving from MooDeX 1? Your old library imports with its playtime. You review the plan first and nothing is merged without asking.</p>
-          </div>
-          <figure class="shot">
-            <div class="frame"><img src="/img/game-detail.webp" srcset="/img/game-detail-sm.webp 900w, /img/game-detail.webp 1600w" sizes="(max-width: 900px) 100vw, 760px" width="1600" height="799" alt="Game details for Red Dead Redemption 2: play button, status, rating, notes, playtime and install settings." loading="lazy"></div>
-          </figure>
+          <!-- Auto-detect -->
+          <article class="cell">
+            <div class="viz scan" aria-hidden="true">
+              <div class="scan-path mono">D:\SteamLibrary\steamapps\common</div>
+              <ul>
+                <li><span class="tick"></span>Crimson Desert<small class="mono">bin64\CrimsonDesert.exe</small></li>
+                <li><span class="tick"></span>Onimusha: Way of the Sword<small class="mono">OnimushaWotS.exe</small></li>
+                <li class="skip-row"><span class="x"></span>_CommonRedist<small class="mono">skipped</small></li>
+              </ul>
+            </div>
+            <div class="cell-copy">
+              <h3>Point at a folder. Done.</h3>
+              <p>Pick where your games install. MooDeX finds each real executable, matches the cover and watches for new installs.</p>
+            </div>
+          </article>
+
+          <!-- Play from card -->
+          <article class="cell">
+            <div class="viz play" aria-hidden="true">
+              <div class="mini-card">
+                <img src="/img/cover-crimson.webp" alt="" width="240" height="135">
+                <span class="mini-play"><svg viewBox="0 0 16 16"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg></span>
+                <div class="mini-info"><b>Crimson Desert</b><small class="mono">216h</small></div>
+              </div>
+            </div>
+            <div class="cell-copy">
+              <h3>Play straight from the card</h3>
+              <p>No menus in the way. Launch from MooDeX, or from anywhere else, and the session is recorded either way.</p>
+            </div>
+          </article>
+
+          <!-- Updates -->
+          <article class="cell">
+            <div class="viz update" aria-hidden="true">
+              <div class="upd">
+                <div class="upd-row"><b>MooDeX <span data-version-plain>2.0.6</span></b><span class="badge">Available</span></div>
+                <div class="upd-bar"><i></i></div>
+                <small class="mono">Signature verified</small>
+              </div>
+            </div>
+            <div class="cell-copy">
+              <h3>One-click updates</h3>
+              <p>New versions install from Settings in a click. Every package is signature-checked before it runs.</p>
+            </div>
+          </article>
+
+          <!-- Private -->
+          <article class="cell">
+            <div class="viz private" aria-hidden="true">
+              <div class="stat"><b>0</b><small>accounts</small></div>
+              <div class="stat"><b>0</b><small>telemetry</small></div>
+              <div class="stat"><b>1</b><small>local file</small></div>
+            </div>
+            <div class="cell-copy">
+              <h3>Private by design</h3>
+              <p>Your library is one database on your PC with daily backups. Nothing is uploaded, nothing is tracked.</p>
+            </div>
+          </article>
+
+          <!-- Native -->
+          <article class="cell cell-band">
+            <div class="viz native" aria-hidden="true">
+              <div class="chip-row"><span>Rust</span><span>Tauri 2</span><span>SQLite</span></div>
+              <div class="size"><b data-size>5.1 MB</b><small>installer</small></div>
+            </div>
+            <div class="cell-copy">
+              <h3>Light, native, quick</h3>
+              <p>Written in Rust. Starts fast, stays out of the way in the tray, and never slows down your games.</p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
 
     <!-- Steps -->
-    <section class="steps" aria-label="Get started">
-      <div class="wrap steps-row">
-        <div><span class="num">1</span><h3>Install</h3><p>Run the installer. It installs for your user only, so no admin prompt.</p></div>
-        <div><span class="num">2</span><h3>Add your games</h3><p>Pick your game folders, import MooDeX 1, or search the catalogue.</p></div>
-        <div><span class="num">3</span><h3>Just play</h3><p>Launch from MooDeX or anywhere else. Playtime is recorded either way.</p></div>
+    <section class="section section-tight">
+      <div class="container">
+        <ol class="steps">
+          <li><span class="step-n mono">01</span><h3>Install</h3><p>Per-user install. No admin prompt, no account.</p></li>
+          <li><span class="step-n mono">02</span><h3>Add your games</h3><p>Pick your game folders, search the catalogue, or import MooDeX 1.</p></li>
+          <li><span class="step-n mono">03</span><h3>Play</h3><p>Launch from anywhere. MooDeX quietly records every session.</p></li>
+        </ol>
       </div>
     </section>
 
-    <!-- Specs -->
-    <section class="chapter" id="specs">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">05</span>
-          <h2>Specifications</h2>
-        </header>
-        <dl class="spec">
-          <div><dt>Platform</dt><dd>Windows 10 and 11, 64-bit</dd></div>
-          <div><dt>Built with</dt><dd>Rust, Tauri 2, Microsoft WebView2</dd></div>
-          <div><dt>Installer</dt><dd><span data-size>5.1 MB</span>, per-user, no admin rights</dd></div>
-          <div><dt>Your data</dt><dd>One SQLite database in %LOCALAPPDATA%\MooDeX, crash-safe, daily backups</dd></div>
-          <div><dt>Playtime</dt><dd>Windows job objects and process events, exact path matching</dd></div>
-          <div><dt>Covers and info</dt><dd>RAWG catalogue, cached on disk for offline use</dd></div>
-          <div><dt>Updates</dt><dd>Built in, signature-verified before install</dd></div>
-          <div><dt>Network</dt><dd>Only cover downloads, catalogue lookups and update checks</dd></div>
-          <div><dt>Telemetry</dt><dd>None</dd></div>
-          <div><dt>Source</dt><dd>Open source on GitHub</dd></div>
-        </dl>
+    <!-- Download -->
+    <section class="section" id="download">
+      <div class="container">
+        <div class="dl">
+          <div class="dl-glow" aria-hidden="true"></div>
+          <img class="dl-icon" src="/img/apple-touch-icon.png" alt="" width="88" height="88">
+          <h2>Get MooDeX for Windows</h2>
+          <p class="dl-sub">Free, open source, and yours to keep.</p>
+          <a class="btn btn-primary btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download <span data-version-text>v2.0.6</span>
+          </a>
+          <dl class="dl-specs">
+            <div><dt>Size</dt><dd data-size>5.1 MB</dd></div>
+            <div><dt>Requires</dt><dd>Windows 10 or 11, 64-bit</dd></div>
+            <div><dt>Runtime</dt><dd>WebView2 (installed for you if missing)</dd></div>
+          </dl>
+          <p class="dl-links"><a href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Release notes and checksums</a><span></span><a href="https://github.com/InoshMatheesha/MooDeX/releases">All versions</a></p>
+        </div>
       </div>
     </section>
 
     <!-- Changes -->
-    <section class="chapter chapter-alt" id="changes">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">06</span>
-          <h2>Recent changes</h2>
+    <section class="section section-tight" id="changes">
+      <div class="container">
+        <header class="head head-row">
+          <div><p class="kicker mono">Changelog</p><h2>Recently shipped</h2></div>
+          <a class="link-arrow" href="https://github.com/InoshMatheesha/MooDeX/releases">All releases</a>
         </header>
         <div class="log">
-          <article>
-            <p class="mono when">v2.0.4</p>
-            <h3>In-app updates</h3>
-            <p>Settings now has an Updates section. MooDeX downloads new versions from GitHub, verifies the signature and installs them in one click.</p>
-          </article>
-          <article>
-            <p class="mono when">v2.0.3</p>
-            <h3>New identity, nothing cropped</h3>
-            <p>New logo and icon. The sidebar shows your last played game. Artwork in game details is shown whole, never cut off.</p>
-          </article>
-          <article>
-            <p class="mono when">v2.0.2</p>
-            <h3>Folders that fill themselves</h3>
-            <p>Auto-detect games in watched folders, play buttons on cards, smaller and faster cover thumbnails.</p>
-          </article>
-          <article>
-            <p class="mono when">v2.0.0</p>
-            <h3>Rewritten from scratch</h3>
-            <p>MooDeX 2 replaces the old WPF app with Rust and Tauri: a smaller install, lower memory use and playtime that is finally correct.</p>
-          </article>
+          <article><span class="mono ver">v2.0.6</span><h3>About, refined</h3><p>An About card with project links. The update button only shows when an update exists.</p></article>
+          <article><span class="mono ver">v2.0.4</span><h3>In-app updates</h3><p>Check, download and install new versions from Settings, signature-verified.</p></article>
+          <article><span class="mono ver">v2.0.2</span><h3>Auto-detect</h3><p>Watched game folders, play buttons on cards, faster covers.</p></article>
+          <article><span class="mono ver">v2.0.0</span><h3>Rewritten in Rust</h3><p>A smaller, faster app with playtime that is finally correct.</p></article>
         </div>
-        <p class="more"><a href="https://github.com/InoshMatheesha/MooDeX/releases">All releases on GitHub &rarr;</a></p>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="chapter" id="faq">
-      <div class="wrap">
-        <header class="chapter-head">
-          <span class="mono idx">07</span>
-          <h2>Questions</h2>
+    <section class="section" id="faq">
+      <div class="container faq-grid">
+        <header class="head">
+          <p class="kicker mono">FAQ</p>
+          <h2>Questions, answered.</h2>
+          <p class="head-sub">Something else? <a href="https://github.com/InoshMatheesha/MooDeX/issues">Open an issue</a> on GitHub.</p>
         </header>
         <div class="faq">
           <details>
             <summary>Windows says "Windows protected your PC". Is it safe?</summary>
-            <p>The installer is not signed with a paid code-signing certificate yet, so SmartScreen does not recognise it. Click <b>More info</b>, then <b>Run anyway</b>. The full source is on GitHub, and the SHA-256 checksum of every download is published with each release.</p>
+            <p>The installer is not signed with a paid code-signing certificate yet, so SmartScreen does not recognise it. Choose <b>More info</b>, then <b>Run anyway</b>. The source is public and every release lists SHA-256 checksums.</p>
           </details>
           <details>
-            <summary>Does it need anything else installed?</summary>
-            <p>Only the Microsoft Edge WebView2 Runtime, which ships with Windows 11 and is already on most Windows 10 PCs. If it is missing, the installer downloads it for you.</p>
+            <summary>Does it work with Steam, Epic and Ubisoft games?</summary>
+            <p>Yes. Launch them through their store or through MooDeX: MooDeX recognises the real game executable by its exact path and records the whole session.</p>
           </details>
           <details>
-            <summary>Where is my data, and what leaves my PC?</summary>
-            <p>Everything is stored in <span class="mono">%LOCALAPPDATA%\MooDeX\v2</span>. The only network traffic is cover downloads, catalogue lookups when you search, and the update check. There is no account and no telemetry.</p>
+            <summary>Where is my data stored?</summary>
+            <p>In one database under <span class="mono">%LOCALAPPDATA%\MooDeX\v2</span>, with a rolling daily backup. You can export it to JSON at any time.</p>
+          </details>
+          <details>
+            <summary>What is sent over the internet?</summary>
+            <p>Only cover downloads, game lookups when you search, and the update check. No account, no analytics, no telemetry.</p>
           </details>
           <details>
             <summary>Why does Discover ask for a RAWG key?</summary>
-            <p>Covers and game info come from the RAWG catalogue. Paste a free personal key in Settings and it is stored in Windows Credential Manager, never in a file. Your library works fully without it.</p>
+            <p>Covers and game details come from the RAWG catalogue. Add a free personal key in Settings; it is kept in Windows Credential Manager. Your library works fine without it.</p>
           </details>
           <details>
-            <summary>I used MooDeX 1. Do I lose my playtime?</summary>
-            <p>No. Settings has an import for your old library. You see the plan before anything is written, and your old file is backed up first.</p>
+            <summary>I used MooDeX 1. Do I keep my playtime?</summary>
+            <p>Yes. Settings includes an importer for your old library. You review everything before it is applied, and your old file is backed up first.</p>
           </details>
-          <details>
-            <summary>How do updates work?</summary>
-            <p>MooDeX checks GitHub Releases at startup (you can turn that off). Installing an update is one click, and the package is signature-checked before it runs.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- Final call -->
-    <section class="closing">
-      <div class="wrap closing-row">
-        <div>
-          <h2>Bring your library home.</h2>
-          <p>Free for Windows 10 and 11. Five megabytes. Yours to keep.</p>
-        </div>
-        <div class="closing-cta">
-          <a class="btn btn-paper btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0l-4-4m4 4l4-4M4 17h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"/></svg>
-            Download MooDeX <span data-version>2.0.4</span>
-          </a>
-          <a class="link-light" href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Checksums and release notes</a>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="foot">
-    <div class="wrap foot-row">
-      <div class="brand brand-foot"><img src="/img/mark.png" alt="" width="22" height="22"><span>MooDeX</span></div>
-      <p>Made by Inosh Matheesha. Game data and images from <a href="https://rawg.io">RAWG</a>.</p>
-      <nav aria-label="Project">
-        <a href="https://github.com/InoshMatheesha/MooDeX/tree/v2-rust">Source</a>
+  <footer class="footer">
+    <div class="container footer-row">
+      <div class="footer-brand">
+        <a class="logo" href="/"><img src="/img/mark.png" alt="" width="24" height="24"><span>MooDeX</span></a>
+        <p>Crafted by <a class="sig" href="https://github.com/InoshMatheesha">MoOdY69</a></p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="https://github.com/InoshMatheesha/MooDeX">GitHub</a>
         <a href="https://github.com/InoshMatheesha/MooDeX/releases">Releases</a>
         <a href="https://github.com/InoshMatheesha/MooDeX/issues">Report a problem</a>
+        <button class="footer-theme" type="button" data-theme-toggle>Switch theme</button>
       </nav>
+    </div>
+    <div class="container footer-fine">
+      <p>Game artwork shown in screenshots is from the RAWG catalogue. Windows is a trademark of Microsoft.</p>
     </div>
   </footer>
 

@@ -1,6 +1,16 @@
 # Changelog
 
-## 2.0.3 - unreleased
+## 2.0.5 - unreleased
+
+### Fixed
+- A stray icon (the hidden duplicates button) showed beside the search box in My PC Games. Elements marked hidden now always stay hidden.
+
+## 2.0.4
+
+### Added
+- **In-app updates.** Go to Settings > Updates and click **Check for updates**. If a newer version is out, click **Download & install**: MooDeX downloads it from GitHub Releases, checks its signature, closes any running play sessions cleanly, installs it and restarts. MooDeX also checks quietly at startup; you can turn that off.
+
+## 2.0.3
 
 ### Changed
 - **New logo.** New MooDeX logo for the app icon (corners are now transparent) and the sidebar wordmark.

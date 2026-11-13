@@ -57,6 +57,8 @@ img { display: block; max-width: 100%; }
 /* Visible focus ring everywhere (spec 12.4) */
 :focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; border-radius: 6px; }
 
+/* The hidden attribute always wins over component display rules */
+[hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* --- Shell --- */
@@ -491,3 +493,9 @@ dialog.modal[open] { animation: pop 0.16s var(--ease); }
 /* Discover detail has no title on the banner: centre the artwork. */
 .game-dlg .g-hero:not(:has(.g-hero-title)) .g-art { right: auto; left: 50%; transform: translateX(-50%); }
 .game-dlg .g-hero:not(:has(.g-hero-title))::after { background: linear-gradient(180deg, transparent 60%, rgba(18, 18, 21, 0.6) 100%); }
+
+/* --- Updates --- */
+.upd-bar { height: 6px; border-radius: 999px; background: var(--surface-3); overflow: hidden; margin: 4px 0 10px; }
+.upd-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-hi)); transition: width 0.2s linear; }
+.upd-new { color: var(--ok); font-weight: 650; }
+.nav button.has-update::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); margin-left: auto; box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18); }

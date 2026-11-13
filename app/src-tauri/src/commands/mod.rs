@@ -5,3 +5,4 @@ pub mod diagnostics;
 pub mod discover;
 pub mod library;
 pub mod settings;
+pub mod update;

@@ -174,6 +174,20 @@ export interface Settings {
   v1_import_done: boolean;
   scan_folders: string[];
   scan_ignored: string[];
+  auto_update_check: boolean;
+}
+
+export interface UpdateInfo {
+  current: string;
+  available: boolean;
+  version: string | null;
+  notes: string | null;
+  date: string | null;
+}
+
+export interface UpdateProgress {
+  downloaded: number;
+  total: number | null;
 }
 
 export interface ScanReport {
@@ -286,6 +300,8 @@ export const api = {
   running: () => call<GameId[]>("running"),
   play: (id: GameId) => call<PlayOutcome>("play_game", { id }),
   scanNow: () => call<ScanReport>("scan_now"),
+  checkUpdate: () => call<UpdateInfo>("check_update"),
+  installUpdate: () => call<void>("install_update"),
   feed: (feed: "trending" | "upcoming" | "popular", page: number) => call<DiscoverPage>("discover_feed", { feed, page }),
   search: (query: string, page: number) => call<DiscoverPage>("discover_search", { query, page }),
   rawgDetails: (id: number) => call<RawgGameDetail>("rawg_details", { id }),

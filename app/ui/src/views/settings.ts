@@ -1,6 +1,7 @@
 // settings.ts - Preferences, RAWG source, data tools and the Diagnostics pane (spec 11, Appendix A).
 import { open, save } from "@tauri-apps/plugin-dialog";
-import { api, type Settings, type SettingsView } from "../api";
+import { listen } from "@tauri-apps/api/event";
+import { api, type Settings, type SettingsView, type UpdateInfo, type UpdateProgress } from "../api";
 import { h, icon, I } from "../dom";
 import { toast, toastError } from "../ui";
 import { openImportV1 } from "../dialogs/importv1";
@@ -181,8 +182,81 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
       );
     }).catch(() => {});
 
-    body.replaceChildren(general, folders, tracking, discover, data, v1, diag);
+    body.replaceChildren(updatesSection(s), general, folders, tracking, discover, data, v1, diag);
     void renderDiagnostics(diag);
+  }
+
+  // Updates: check GitHub Releases, then download + verify + install in one click.
+  function updatesSection(s: Settings): HTMLElement {
+    const status = h("p", { class: "note", style: "padding:6px 0 0" }, "");
+    const notes = h("div", { class: "code selectable", hidden: true });
+    const bar = h("div", { class: "upd-bar", hidden: true }, h("i", {}));
+    const checkBtn = h("button", { class: "btn" }, icon(I.refresh), "Check for updates");
+    const installBtn = h("button", { class: "btn primary", hidden: true }, icon(I.download), "Download & install");
+    const ver = h("b", {}, "");
+    void api.diagnostics().then((d) => (ver.textContent = d.version)).catch(() => {});
+
+    function show(info: UpdateInfo): void {
+      if (info.available) {
+        status.replaceChildren(h("span", { class: "upd-new" }, `MooDeX ${info.version} is available`), ` - you have ${info.current}.`);
+        notes.textContent = info.notes?.trim() || "No release notes.";
+        notes.hidden = false;
+        installBtn.hidden = false;
+      } else {
+        status.textContent = `You're up to date (MooDeX ${info.current}).`;
+        notes.hidden = true;
+        installBtn.hidden = true;
+      }
+    }
+    checkBtn.addEventListener("click", async () => {
+      checkBtn.setAttribute("disabled", "");
+      status.textContent = "Checking GitHub for a new release...";
+      try {
+        show(await api.checkUpdate());
+      } catch (e) {
+        status.textContent = (e as { message: string }).message;
+      } finally {
+        checkBtn.removeAttribute("disabled");
+      }
+    });
+    installBtn.addEventListener("click", async () => {
+      installBtn.setAttribute("disabled", "");
+      checkBtn.setAttribute("disabled", "");
+      bar.hidden = false;
+      status.textContent = "Downloading the update...";
+      const fill = bar.firstElementChild as HTMLElement;
+      const off = await listen<UpdateProgress>("update-progress", (e) => {
+        const { downloaded, total } = e.payload;
+        const mb = (n: number) => (n / 1048576).toFixed(1);
+        if (total) {
+          fill.style.width = `${Math.min(100, (downloaded / total) * 100)}%`;
+          status.textContent = `Downloading ${mb(downloaded)} of ${mb(total)} MB...`;
+        } else status.textContent = `Downloading ${mb(downloaded)} MB...`;
+      });
+      try {
+        await api.installUpdate();
+        status.textContent = "Installing - MooDeX will restart.";
+      } catch (e) {
+        status.textContent = (e as { message: string }).message;
+        installBtn.removeAttribute("disabled");
+        checkBtn.removeAttribute("disabled");
+        bar.hidden = true;
+      } finally {
+        off();
+      }
+    });
+    // A startup check may already have found something.
+    const pending = (window as unknown as { __moodexUpdate?: UpdateInfo }).__moodexUpdate;
+    if (pending?.available) show(pending);
+    return h(
+      "section",
+      {},
+      h("h2", {}, "Updates"),
+      h("div", { class: "line" }, h("div", { style: "flex:1;min-width:200px" }, h("p", {}, "Installed version ", ver), status), checkBtn, installBtn),
+      bar,
+      notes,
+      toggleRow("Check for updates at startup", "MooDeX asks GitHub Releases for a newer version when it starts. Updates are signature-checked before installing.", s.auto_update_check, (x) => void set("auto_update_check", x)),
+    );
   }
 
   async function renderDiagnostics(sec: HTMLElement): Promise<void> {
@@ -205,7 +279,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
         h("div", { class: "line" }, h("button", { class: "btn", onclick: () => void api.openFolder("logs").catch(toastError) }, icon(I.folder), "Open log folder"), h("button", { class: "btn", onclick: () => void api.openFolder("data").catch(toastError) }, icon(I.folder), "Open data folder")),
         h("h3", { style: "font-size:13px;margin:6px 0 8px" }, "Last 10 warnings and errors"),
         problems,
-        h("p", { class: "note", style: "padding:10px 0 4px" }, "MooDeX sends no telemetry. Nothing leaves this PC except RAWG lookups and cover downloads."),
+        h("p", { class: "note", style: "padding:10px 0 4px" }, "MooDeX sends no telemetry. Nothing leaves this PC except RAWG lookups, cover downloads and update checks."),
       );
     } catch (e) {
       sec.replaceChildren(h("h2", {}, "Diagnostics"), h("p", { class: "err" }, String((e as Error).message ?? e)));

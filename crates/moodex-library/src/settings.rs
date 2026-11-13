@@ -21,6 +21,8 @@ pub struct Settings {
     pub scan_folders: Vec<String>,
     // Game folders the user removed; never auto-added again.
     pub scan_ignored: Vec<String>,
+    // Look for a new release on GitHub at startup.
+    pub auto_update_check: bool,
 }
 
 impl Default for Settings {
@@ -38,6 +40,7 @@ impl Default for Settings {
             v1_import_done: false,
             scan_folders: Vec::new(),
             scan_ignored: Vec::new(),
+            auto_update_check: true,
         }
     }
 }
@@ -111,6 +114,7 @@ impl Settings {
             "image_cache_budget_mb" => self.image_cache_budget_mb = as_range(key, v, 50, 20_000)?,
             "backup_retention_days" => self.backup_retention_days = as_range(key, v, 1, 90)? as u32,
             "v1_import_done" => self.v1_import_done = as_bool(key, v)?,
+            "auto_update_check" => self.auto_update_check = as_bool(key, v)?,
             "scan_folders" => self.scan_folders = as_paths(key, v, 32)?,
             "scan_ignored" => self.scan_ignored = as_paths(key, v, 5000)?,
             "rawg_key_source" => {

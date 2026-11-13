@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "MooDeX",
   "mainBinaryName": "MooDeX",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "identifier": "io.moodex.app",
   "build": {
     "frontendDist": "../ui/dist",
@@ -40,7 +40,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
     "publisher": "Inosh Matheesha",
     "copyright": "Copyright (C) 2026 Inosh Matheesha",
     "shortDescription": "Game library manager",
@@ -53,11 +56,25 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
       "nsis": {
         "installMode": "currentUser",
         "displayLanguageSelector": false,
         "installerHooks": "./installer-hooks.nsh"
+      }
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQwRDk5NjhBRDVDMTkwNkQKUldSdGtNSFZpcGJaUUkzS0U2UmxxMWxsRzlpcUZQVC9maVRpVTZFcHRoeHpNZDYweXovRVFLLzkK",
+      "endpoints": [
+        "https://github.com/InoshMatheesha/MooDeX/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }

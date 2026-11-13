@@ -1,6 +1,6 @@
 {
   "name": "moodex",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "private": true,
   "type": "module",
   "description": "MooDeX - game library manager (Tauri 2 + Vite)",

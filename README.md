@@ -76,6 +76,24 @@ Build outputs:
 
 > **GNU toolchain note:** on the `x86_64-pc-windows-gnu` target, WebView2's loader is a separate `WebView2Loader.dll`. The installers include it. If you copy the `.exe` by hand, copy the DLL with it. MSVC builds link the loader statically.
 
+## Updates
+
+MooDeX updates itself from [GitHub Releases](https://github.com/InoshMatheesha/MooDeX/releases). Open **Settings > Updates** and click **Check for updates**. If a newer version is out, click **Download & install**. MooDeX also checks quietly at startup; you can turn that off in the same place.
+
+Every update is signed. The app checks the signature against a public key built into it, and refuses any update that doesn't match. This works with the private key at `%USERPROFILE%\.tauri\moodex.key`, which only the maintainer has.
+
+**To publish an update (maintainer):**
+
+1. Bump `version` in `app/src-tauri/tauri.conf.json`, `Cargo.toml` and `app/package.json`, and add a `## <version>` section to `CHANGELOG.md`.
+2. Run `scripts\build.ps1`. It writes `target\release\bundle\latest.json` next to the signed installer.
+3. Create the release `v<version>` and attach:
+   - the `-setup.exe`
+   - its `.sig`
+   - the `.msi`
+   - `latest.json`
+
+Installed copies pick up the new version at their next check.
+
 ## Signing and SmartScreen
 
 A local build is **not signed**. Do not hand it out, not even to a friend for testing (spec §13.8). Every build that is meant for other people goes through [`.github/workflows/release.yml`](.github/workflows/release.yml), which:

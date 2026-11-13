@@ -54,6 +54,7 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
         )
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .register_asynchronous_uri_scheme_protocol("moodex-img", |ctx, request, responder| {
             let Some(state) = ctx.app_handle().try_state::<AppState>() else {
                 responder.respond(tauri::http::Response::builder().status(503).body(Vec::new()).unwrap_or_default());
@@ -74,6 +75,7 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
             if !hide {
                 tray::show_main(app.handle());
             }
+            commands::update::spawn_startup_check(app.handle().clone());
             tracing::info!(minimized = hide, "MooDeX ready");
             Ok(())
         })
@@ -121,6 +123,8 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
             commands::data::v1_apply,
             commands::data::export_library,
             commands::data::import_library,
+            commands::update::check_update,
+            commands::update::install_update,
         ])
         .build(tauri::generate_context!())?;
 

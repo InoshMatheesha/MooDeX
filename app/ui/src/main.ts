@@ -2,7 +2,7 @@
 import "./styles.css";
 import { getVersion } from "@tauri-apps/api/app";
 import { listen } from "@tauri-apps/api/event";
-import { api, imgUrl, type ScanEvent } from "./api";
+import { api, imgUrl, type ScanEvent, type UpdateInfo } from "./api";
 import { clock, h, icon, I, relativeLabel } from "./dom";
 import { setMount, type Route } from "./router";
 import { games, startStore } from "./store";
@@ -131,6 +131,13 @@ function boot(): void {
 document.addEventListener("contextmenu", (e) => {
   const t = e.target as HTMLElement;
   if (!t.closest("input, textarea, .selectable")) e.preventDefault();
+});
+
+// Startup update check found a release: badge the Settings tab and say so once.
+void listen<UpdateInfo>("update-available", (e) => {
+  (window as unknown as { __moodexUpdate?: UpdateInfo }).__moodexUpdate = e.payload;
+  document.querySelector(".nav button:last-child")?.classList.add("has-update");
+  toast(`MooDeX ${e.payload.version} is available - open Settings > Updates to install it.`, "info", 10000);
 });
 
 // New installs found in watched folders (or by Scan now).

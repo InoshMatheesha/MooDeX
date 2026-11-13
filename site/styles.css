@@ -135,7 +135,7 @@ b { font-weight: 600; }
 .pill:hover { border-color: var(--text-3); color: var(--text); }
 .pill svg { width: 14px; height: 14px; }
 .pill-tag { height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; background: linear-gradient(90deg, var(--brand-a), var(--brand-b)); }
-h1 { margin-top: 26px; font-size: clamp(40px, 6.6vw, 78px); line-height: 1.03; font-weight: 700; letter-spacing: -0.045em; max-width: 19ch; }
+h1 { margin-top: 26px; font-size: clamp(36px, 5.5vw, 70px); line-height: 1.05; font-weight: 700; letter-spacing: -0.045em; max-width: 24ch; text-wrap: balance; }
 h1 .muted { color: var(--text-3); }
 .lede { margin-top: 22px; max-width: 56ch; font-size: clamp(16.5px, 1.6vw, 19px); color: var(--text-2); }
 .cta-row { display: flex; gap: 12px; margin-top: 34px; flex-wrap: wrap; justify-content: center; }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.5 - unreleased
+
+### Fixed
+- A stray icon (the hidden duplicates button) showed beside the search box in My PC Games. Elements marked hidden now always stay hidden.
+
 ## 2.0.4
 
 ### Added

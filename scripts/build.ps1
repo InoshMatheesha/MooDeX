@@ -11,7 +11,7 @@ $gnu = (rustup show active-toolchain) -match "gnu"
 if ($gnu -and (Test-Path $mingw)) { $env:Path = "$mingw;$env:Path" }
 
 $rel = Join-Path $root "target\release"
-# A MooDeX running from targetelease locks MooDeX.exe and breaks linking/bundling.
+# A MooDeX running from the build output folder locks MooDeX.exe and breaks linking/bundling.
 $locked = Get-Process -Name MooDeX -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.Path.StartsWith($rel, [StringComparison]::OrdinalIgnoreCase) }
 if ($locked) {
     throw "MooDeX is running - quit it from the tray icon (Quit MooDeX), then build again."

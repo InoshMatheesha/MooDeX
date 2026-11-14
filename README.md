@@ -123,16 +123,26 @@ MooDeX updates itself from GitHub Releases:
 
 MooDeX can also check quietly at startup; you can turn that off in the same section.
 
-## Your data
+## Privacy & Network Requests
 
-| | |
+MooDeX is built offline-first with zero telemetry and no accounts.
+
+| Component | Storage & Behavior |
 |---|---|
-| Library | `%LOCALAPPDATA%\MooDeX\v2\moodex.db` (SQLite, crash-safe) |
-| Backups | `%LOCALAPPDATA%\MooDeX\v2\backups`, one per day, the last 7 kept |
-| Covers | `%LOCALAPPDATA%\MooDeX\v2\covers`, cached WebP images |
-| Logs | `%LOCALAPPDATA%\MooDeX\v2\logs`, kept for 7 days |
-| Network | Cover downloads, catalogue lookups and update checks only |
-| Telemetry | None |
+| **Game Library** | `%LOCALAPPDATA%\MooDeX\v2\moodex.db` (SQLite, crash-safe). **Stored locally; never uploaded.** |
+| **Playtime Data** | Recorded and stored locally on your machine. **Never uploaded or shared.** |
+| **Backups** | `%LOCALAPPDATA%\MooDeX\v2\backups`, one per day, the last 7 kept locally. |
+| **Covers Cache** | `%LOCALAPPDATA%\MooDeX\v2\covers`, cached WebP images on disk. |
+| **Logs** | `%LOCALAPPDATA%\MooDeX\v2\logs`, kept locally for 7 days. |
+| **Telemetry** | None. Zero analytics, no user tracking. |
+
+### Outbound Network Connections
+The app connects to the internet strictly for these user-initiated features:
+1. **Game Catalogue Lookups:** When searching for games or browsing Discover, metadata queries are sent to the [RAWG Video Games Database API](https://rawg.io) (`api.rawg.io` or your custom proxy). Only search keywords are transmitted.
+2. **Cover Art Downloads:** Artwork images for games in your library are fetched from RAWG CDN servers and cached locally as WebP files.
+3. **Software Updates:** Checks GitHub Releases API (`api.github.com/repos/InoshMatheesha/MooDeX/releases/latest`) to notify you when new releases are available.
+
+> For complete details, see our full [Privacy Policy](PRIVACY.md).
 
 Uninstalling keeps your library. If you tick **Delete the application data**, your database is copied to `Documents\MooDeX backup` first.
 
@@ -230,6 +240,21 @@ The website and installed apps both pick up the new version from the release aut
 
 Release notes written as `- **Headline.** Details` become the changelog cards on the website.
 </details>
+
+## Code Signing Policy
+
+Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org) *(planned / subject to approval)*.
+
+- **Authors & Committers:** Inosh Matheesha ([@InoshMatheesha](https://github.com/InoshMatheesha))
+- **Reviewers:** Inosh Matheesha ([@InoshMatheesha](https://github.com/InoshMatheesha)) & community contributors
+- **Approvers for Signing Requests:** Inosh Matheesha ([@InoshMatheesha](https://github.com/InoshMatheesha))
+- **Privacy Declaration:** The local game library and playtime data remain strictly on your machine and are not uploaded by the app. See [Privacy Policy](PRIVACY.md).
+
+For the complete policy governing binary builds, verification, and signing controls, see [CODE_SIGNING.md](CODE_SIGNING.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
 
 <br>
 

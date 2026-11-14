@@ -390,3 +390,39 @@ h3 { font-size: 18px; font-weight: 650; letter-spacing: -0.02em; }
 .log-date { font-size: 12px; color: var(--text-3); }
 .log-card h3 { font-size: 16.5px; margin-bottom: 6px; }
 .log-card p { font-size: 14.5px; color: var(--text-2); }
+
+/* --- Code signing & trust banner --- */
+.dl-trust {
+  margin-top: 26px;
+  padding: 16px 22px;
+  border-radius: var(--r);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--text-2);
+  max-width: 620px;
+  text-align: center;
+}
+.dl-trust .trust-attribution {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.dl-trust .trust-attribution svg {
+  flex-shrink: 0;
+  color: var(--brand);
+}
+.dl-trust .trust-details {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+.dl-trust a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

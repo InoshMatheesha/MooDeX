@@ -274,6 +274,19 @@
             <div><dt>Runtime</dt><dd>WebView2 (installed for you if missing)</dd></div>
           </dl>
           <p class="dl-links"><a href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Release notes and checksums</a><span></span><a href="https://github.com/InoshMatheesha/MooDeX/releases">All versions</a></p>
+          <div class="dl-trust">
+            <p class="trust-attribution">
+              <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Free code signing provided by <a href="https://signpath.io" target="_blank" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" target="_blank" rel="noopener">SignPath Foundation</a> <em>(planned / subject to approval)</em>.
+            </p>
+            <p class="trust-details">
+              <strong>Authors & Committers:</strong> Inosh Matheesha (<a href="https://github.com/InoshMatheesha" target="_blank" rel="noopener">@InoshMatheesha</a>) &bull;
+              <strong>Reviewers:</strong> Inosh Matheesha &bull;
+              <strong>Approvers:</strong> Inosh Matheesha &bull;
+              <a href="#privacy">Privacy Declaration</a> &bull;
+              <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/CODE_SIGNING.md" target="_blank" rel="noopener">Code Signing Policy</a>
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -316,9 +329,25 @@
             <summary>Where is my data stored?</summary>
             <p>In one database under <span class="mono">%LOCALAPPDATA%\MooDeX\v2</span>, with a rolling daily backup. You can export it to JSON at any time.</p>
           </details>
-          <details>
-            <summary>What is sent over the internet?</summary>
-            <p>Only cover downloads, game lookups when you search, and the update check. No account, no analytics, no telemetry.</p>
+          <details id="privacy">
+            <summary>What is sent over the internet and what stays on my PC?</summary>
+            <p><strong>Strictly Local:</strong> Your game library, playtime tracking data, session logs, notes, ratings, and game directories are stored only on your PC in a local SQLite database (<code>%LOCALAPPDATA%\MooDeX\v2\moodex.db</code>). <strong>They are never uploaded by the app to any server or cloud service.</strong> There are no user accounts, no analytics, and zero telemetry.</p>
+            <p><strong>Outbound Network Connections:</strong> MooDeX connects to the internet only for:</p>
+            <ul>
+              <li><strong>Catalogue & Metadata Lookups:</strong> When searching for games or using Discover, search queries are sent to the RAWG Video Games Database API (<code>api.rawg.io</code>). No personal data or library details are transmitted.</li>
+              <li><strong>Cover Art Downloads:</strong> Cover images are downloaded from RAWG CDN servers and cached locally as WebP files on your machine.</li>
+              <li><strong>Update Checks:</strong> Checks GitHub Releases for new releases.</li>
+            </ul>
+            <p>For full details, read our <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+          </details>
+          <details id="code-signing">
+            <summary>Code Signing Policy & Verification</summary>
+            <p>Free code signing provided by <a href="https://signpath.io" target="_blank" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" target="_blank" rel="noopener">SignPath Foundation</a> <em>(planned / subject to approval)</em>.</p>
+            <p><strong>Authors & Committers:</strong> Inosh Matheesha (<a href="https://github.com/InoshMatheesha" target="_blank" rel="noopener">@InoshMatheesha</a>)<br>
+            <strong>Reviewers:</strong> Inosh Matheesha & community contributors via GitHub Pull Requests<br>
+            <strong>Approvers for Signing Requests:</strong> Inosh Matheesha<br>
+            <strong>Privacy Declaration:</strong> Local library and playtime data are never uploaded by the app.</p>
+            <p>Read our full <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/CODE_SIGNING.md" target="_blank" rel="noopener">Code Signing Policy</a>.</p>
           </details>
           <details>
             <summary>Why does Discover ask for a RAWG key?</summary>
@@ -342,11 +371,15 @@
       <nav class="footer-links" aria-label="Footer">
         <a href="https://github.com/InoshMatheesha/MooDeX">GitHub</a>
         <a href="https://github.com/InoshMatheesha/MooDeX/releases">Releases</a>
+        <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/CODE_SIGNING.md" target="_blank" rel="noopener">Code Signing</a>
+        <a href="https://github.com/InoshMatheesha/MooDeX/blob/main/LICENSE" target="_blank" rel="noopener">License (MIT)</a>
         <a href="https://github.com/InoshMatheesha/MooDeX/issues">Report a problem</a>
         <button class="footer-theme" type="button" data-theme-toggle>Switch theme</button>
       </nav>
     </div>
     <div class="container footer-fine">
+      <p>Free code signing provided by <a href="https://signpath.io" target="_blank" rel="noopener">SignPath.io</a>, certificate by <a href="https://signpath.org" target="_blank" rel="noopener">SignPath Foundation</a> (planned / subject to approval).</p>
       <p>Game artwork shown in screenshots is from the RAWG catalogue. Windows is a trademark of Microsoft.</p>
     </div>
   </footer>

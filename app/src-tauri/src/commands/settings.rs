@@ -37,16 +37,30 @@ pub async fn get_settings(app: AppHandle, state: State<'_, AppState>) -> ApiResu
 
 // Keep OS registration in line with the stored preference.
 pub fn sync_autostart(app: &AppHandle, want: bool) {
-    let al = app.autolaunch();
-    let have = al.is_enabled().unwrap_or(false);
-    let res = match (want, have) {
-        (true, false) => al.enable(),
-        (false, true) => al.disable(),
-        _ => Ok(()),
-    };
-    if let Err(e) = res {
-        tracing::warn!(error = %e, want, "could not update autostart registration");
+    if want {
+        // Rewritten on every start, so the entry follows the exe when the install folder moves.
+        if let Err(e) = register_autostart(app) {
+            tracing::warn!(error = %e, "could not register autostart");
+        }
+        return;
     }
+    let al = app.autolaunch();
+    if al.is_enabled().unwrap_or(false) {
+        if let Err(e) = al.disable() {
+            tracing::warn!(error = %e, "could not remove autostart registration");
+        }
+    }
+}
+
+// HKCU Run entry with the exe path quoted; the plugin writes it unquoted, which breaks on
+// "C:\Program Files". Same value name as the plugin, so its is_enabled/disable still apply.
+fn register_autostart(app: &AppHandle) -> anyhow::Result<()> {
+    let exe = std::env::current_exe()?;
+    let value = format!("\"{}\" --minimized", exe.display());
+    windows_registry::CURRENT_USER
+        .create(r"Software\Microsoft\Windows\CurrentVersion\Run")?
+        .set_string(&app.package_info().name, value)?;
+    Ok(())
 }
 
 // Match the native title bar and window background to the UI theme.

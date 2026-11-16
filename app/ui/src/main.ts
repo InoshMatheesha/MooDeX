@@ -188,6 +188,9 @@ void listen<UpdateInfo>("update-available", (e) => {
   toast(`MooDeX ${e.payload.version} is available - open Settings > Updates to install it.`, "info", 10000);
 });
 
+// A game launched from the tray menu failed to start.
+void listen<string>("tray-play-error", (e) => toast(`Could not start the game: ${e.payload}`, "error", 8000));
+
 // New installs found in watched folders (or by Scan now).
 void listen<ScanEvent>("scan-event", (e) => {
   if (e.payload.type !== "finished") return;

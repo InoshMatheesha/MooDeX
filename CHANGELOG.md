@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.0.10
+
+### Added
+- **Game icons in the tray menu.** Every game in the tray's right-click menu now shows its icon: the game's own icon taken from its .exe (the same logo Windows shows for it), or a small rounded tile of its cover art, or a colourful letter tile when neither is available. A game that is running gets a green "playing" dot. "Show MooDeX" carries the MooDeX icon.
+
+### Changed
+- **Left-click the tray icon to open or close MooDeX.** One click opens the window; clicking again while it is open in front hides it to the tray. If the window is open but behind other windows, a click brings it to the front instead of hiding it.
+
+## 2.0.9
+
+### Added
+- **Play from the tray.** Right-click the MooDeX tray icon to launch a game directly, like Steam: your most recently played installed games are at the top, and every installed game is in the "Installed games" submenu. Games launched this way are tracked exactly like the Play button. A game that is already running is marked "(playing)".
+
+### Changed
+- **Installs to Program Files.** MooDeX now installs for the whole PC into `C:\Program Files\MooDeX`, like other desktop software, so installing and updating asks for administrator permission. Updating from an older version moves MooDeX there automatically: the old copy and its shortcuts are removed, and your library, settings and "Launch at startup" carry over unchanged.
+
+### Fixed
+- **Taskbar icon.** Because MooDeX now runs from a new location, Windows shows the new app icon on the taskbar instead of a cached old one.
+
 ## 2.0.8
 
 ### Added

@@ -24,6 +24,7 @@ moodex-winproc.workspace = true
 moodex-library.workspace = true
 anyhow.workspace = true
 camino.workspace = true
+image.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -40,6 +41,8 @@ tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
 tauri-plugin-updater = "2"
 keyring = { version = "3", features = ["windows-native"] }
+# Writes the quoted "Launch at startup" entry (paths under Program Files contain spaces).
+windows-registry = "0.6"
 
 [lints]
 workspace = true

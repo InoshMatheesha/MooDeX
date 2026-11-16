@@ -10,6 +10,7 @@ mod paths;
 mod protocol;
 mod state;
 mod tray;
+mod tray_icons;
 
 use crate::paths::AppDirs;
 use crate::state::AppState;
@@ -81,6 +82,10 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
             Ok(())
         })
         .on_window_event(|window, event| {
+            // Lets a tray click tell "window was in front" apart from "window was behind".
+            if matches!(event, WindowEvent::Focused(false)) && window.label() == "main" {
+                tray::note_focus_lost();
+            }
             if let WindowEvent::CloseRequested { api, .. } = event {
                 let to_tray = window.app_handle().try_state::<AppState>().is_some_and(|s| s.tray_enabled());
                 if to_tray {

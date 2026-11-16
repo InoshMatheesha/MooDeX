@@ -109,6 +109,69 @@
     });
   }
 
+  // Download counts: every release's program files of the repository, rolled in on the buttons.
+  var counts = document.querySelectorAll("[data-dl-count][data-repo]");
+  var byRepo = {};
+  counts.forEach(function (el) { (byRepo[el.getAttribute("data-repo")] = byRepo[el.getAttribute("data-repo")] || []).push(el); });
+  function render(el, total) {
+    var odo = el.querySelector(".odo");
+    var sr = el.querySelector(".sr-only");
+    var text = total >= 100000 ? (total / 1000).toFixed(0) + "K" : total.toLocaleString("en-US");
+    odo.textContent = "";
+    text.split("").forEach(function (ch) {
+      if (/\d/.test(ch)) {
+        var digit = document.createElement("span");
+        digit.className = "odo-digit";
+        var strip = document.createElement("span");
+        strip.className = "odo-strip";
+        strip.style.setProperty("--d", ch);
+        for (var n = 0; n < 10; n++) {
+          var cell = document.createElement("span");
+          cell.textContent = String(n);
+          strip.appendChild(cell);
+        }
+        digit.appendChild(strip);
+        odo.appendChild(digit);
+      } else {
+        var sep = document.createElement("span");
+        sep.className = "odo-sep";
+        sep.textContent = ch;
+        odo.appendChild(sep);
+      }
+    });
+    if (sr) sr.textContent = ", " + total.toLocaleString() + (total === 1 ? " download" : " downloads");
+    el.setAttribute("title", total.toLocaleString() + (total === 1 ? " download" : " downloads") + " so far");
+    el.hidden = false;
+    if (calm || !("IntersectionObserver" in window)) { el.classList.add("odo-go"); return; }
+    // Laid out at 0 first (a forced layout), then rolled to the count.
+    var roll = function () {
+      setTimeout(function () {
+        void el.offsetWidth;
+        el.classList.add("odo-go");
+      }, 80);
+    };
+    var r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) { roll(); return; }
+    var seen = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { roll(); seen.disconnect(); }
+    }, { threshold: 0.6 });
+    seen.observe(el);
+  }
+  Object.keys(byRepo).forEach(function (repo) {
+    fetch("https://api.github.com/repos/" + repo + "/releases?per_page=100", { headers: { Accept: "application/vnd.github+json" } })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (rels) {
+        var total = 0;
+        rels.forEach(function (rel) {
+          (rel.assets || []).forEach(function (a) {
+            if (!/^SHA256SUMS|\.sig$|\.json$|\.txt$/i.test(a.name)) total += a.download_count || 0;
+          });
+        });
+        if (total > 0) byRepo[repo].forEach(function (el) { render(el, total); });
+      })
+      .catch(function () {});
+  });
+
   // Sections rise in as they arrive; items in a group follow each other.
   var items = [];
   document.querySelectorAll("[data-reveal-group]").forEach(function (g) {

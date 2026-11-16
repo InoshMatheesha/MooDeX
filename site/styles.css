@@ -450,3 +450,8 @@ h3 { font-size: 18px; font-weight: 650; letter-spacing: -0.02em; }
 .nav-links a[aria-current] { color: var(--text); }
 .nav .ios-indicator { background: var(--surface-2); box-shadow: none; }
 .cell[data-tilt] { overflow: hidden; }
+
+/* --- Compact nav: a capsule as wide as its content, centred (as MyNoX's) --- */
+.nav { max-width: none; width: fit-content; gap: 6px; padding: 0 8px 0 16px; }
+.nav-links { margin-left: 18px; }
+.nav-end { margin-left: 10px; }

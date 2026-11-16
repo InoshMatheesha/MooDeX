@@ -86,3 +86,26 @@
   [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
   .ios-indicator, .ios-press { transition: none; }
 }
+
+/* Download count on a download button: a split segment whose digits roll in like an odometer. */
+.dl-count {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 -8px 0 6px; padding: 0 0 0 14px;
+  border-left: 1px solid currentColor; border-left-color: color-mix(in srgb, currentColor 22%, transparent);
+  font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: 0.01em; white-space: nowrap;
+}
+.dl-count[hidden] { display: none; }
+.dl-count svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.75; }
+.dl-count .odo { display: inline-flex; height: 1.15em; line-height: 1.15em; overflow: hidden; }
+.dl-count .odo-digit { display: inline-block; height: 1.15em; overflow: hidden; }
+.dl-count .odo-strip { display: flex; flex-direction: column; transform: translateY(0); transition: transform 1.6s var(--spring); }
+.dl-count .odo-strip > span { height: 1.15em; line-height: 1.15em; text-align: center; }
+.dl-count.odo-go .odo-strip { transform: translateY(calc(var(--d) * -1.15em)); }
+.dl-count .odo-sep { opacity: 0.6; }
+/* The arrow falls in once the count has rolled, as if a download just landed. */
+.dl-count.odo-go svg { animation: ios-land 0.7s 1.3s var(--spring) both; }
+@keyframes ios-land { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 0.75; } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .dl-count .odo-strip { transition: none; }
+  .dl-count.odo-go svg { animation: none; }
+}

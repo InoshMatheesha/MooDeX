@@ -18,7 +18,7 @@ A fast, private game library for Windows. Keep every PC game in one list, track 
 
 [![Download for Windows](https://img.shields.io/badge/Download%20for%20Windows-0b0b0f?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/InoshMatheesha/MooDeX/releases/latest)
 &nbsp;
-[![Website](https://img.shields.io/badge/Website-moodex--web.vercel.app-3b82f6?style=for-the-badge)](https://moodex-web.vercel.app)
+[![Website](https://img.shields.io/badge/Website-getmoodex.vercel.app-3b82f6?style=for-the-badge)](https://getmoodex.vercel.app)
 
 <br>
 
@@ -226,7 +226,7 @@ flowchart LR
 | `moodex-rawg` | RAWG client with stale-while-revalidate caching. |
 | `moodex-images` | Two-tier cover cache and WebP thumbnails. |
 | `app/` | Tauri shell, IPC commands and the TypeScript UI. |
-| `site/` | The website at [moodex-web.vercel.app](https://moodex-web.vercel.app). |
+| `site/` | The website at [getmoodex.vercel.app](https://getmoodex.vercel.app). |
 
 <details>
 <summary><b>Publishing a release (maintainers)</b></summary>

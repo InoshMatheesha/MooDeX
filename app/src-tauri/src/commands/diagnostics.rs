@@ -54,3 +54,18 @@ pub async fn open_folder(app: tauri::AppHandle, state: State<'_, AppState>, whic
     };
     app.opener().open_path(dir.as_str(), None::<&str>).map_err(|e| ApiError::new("io", e.to_string()))
 }
+
+// About links: a fixed allow-list, so the page can never open arbitrary URLs.
+#[tracing::instrument(level = "debug", skip_all)]
+#[tauri::command]
+pub async fn open_link(app: tauri::AppHandle, which: String) -> ApiResult<()> {
+    let url = match which.as_str() {
+        "repo" => "https://github.com/InoshMatheesha/MooDeX",
+        "releases" => "https://github.com/InoshMatheesha/MooDeX/releases",
+        "issues" => "https://github.com/InoshMatheesha/MooDeX/issues/new",
+        "site" => "https://moodex-web.vercel.app",
+        "profile" => "https://github.com/InoshMatheesha",
+        _ => return Err(ApiError::new("invalid", "unknown link")),
+    };
+    app.opener().open_url(url, None::<&str>).map_err(|e| ApiError::new("io", e.to_string()))
+}

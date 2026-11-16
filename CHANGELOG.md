@@ -1,9 +1,34 @@
 # Changelog
 
-## 2.0.5 - unreleased
+## 2.0.8
+
+### Added
+- **Themes.** Settings > Appearance has six themes, each shown as a live preview: Classic (the original look), Dark (layered slate surfaces with soft status-card glows), Black (true black for OLED), Grey, Light, and System (follows Windows light or dark mode). Your choice applies straight away, and the window title bar follows it.
+
+### Changed
+- **New app icon.** The app, taskbar and tray icon now use the new light MooDeX icon.
+- **Settings use the whole window.** Sections now sit in two or three columns, depending on how wide the window is, instead of one narrow strip.
+
+## 2.0.7
+
+### Added
+- **Smooth navigation.** The sidebar highlight now glides to the page you pick. Each page slides in from the direction you moved in the sidebar: pages further down rise from below, pages further up drop from above.
+- **Dashboard intro.** On the first visit, the dashboard's sections settle in one after another, the counters tick up to their values, and the status and playtime bars grow into place.
+- **Livelier library.** The first screen of game cards fades in with a short stagger, cards lift slightly on hover, and pressing Play sends a ring out from the button.
+- **Polished details.** Buttons and filter chips respond to presses, toggles spring, game dialogs open and close smoothly, and toasts slide in and out instead of popping.
+
+### Notes
+- Animations use only transform and opacity, so they stay smooth on any PC. If Windows has "Animation effects" turned off, MooDeX turns them off too.
+
+## 2.0.6
+
+### Changed
+- **About card.** Settings ends with an About card instead of Diagnostics: the app's identity and version, "Crafted by MoOdY69", and links to the source code, release notes, website and issue tracker. "Open logs" is still there for troubleshooting.
 
 ### Fixed
-- A stray icon (the hidden duplicates button) showed beside the search box in My PC Games. Elements marked hidden now always stay hidden.
+- **Update button.** "Download & install" now only appears when an update is actually available.
+- **"Start minimized" kept.** Your "Start minimized" choice was sometimes dropped at startup, depending on the order settings were loaded in.
+- **No stray icon.** A stray icon (the hidden duplicates button) no longer shows beside the search box in My PC Games.
 
 ## 2.0.4
 

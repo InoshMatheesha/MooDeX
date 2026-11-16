@@ -12,6 +12,10 @@ import { libraryView } from "./views/library";
 import { discoverView } from "./views/discover";
 import { settingsView } from "./views/settings";
 import { openGame } from "./dialogs/game";
+import { applyTheme, initTheme } from "./theme";
+
+// Paint the cached theme before anything renders, then confirm it from settings.
+initTheme();
 
 const NAV: [Route, string, string][] = [
   ["dashboard", "Dashboard", I.dash],
@@ -30,7 +34,12 @@ function boot(): void {
   const side = h(
     "aside",
     { class: "side" },
-    h("div", { class: "brand" }, h("img", { src: "/logo-wordmark.png", alt: "MooDeX", class: "wordmark" })),
+    h(
+      "div",
+      { class: "brand" },
+      h("img", { src: "/logo-wordmark.png", alt: "MooDeX", class: "wordmark on-dark" }),
+      h("img", { src: "/logo-wordmark-light.png", alt: "MooDeX", class: "wordmark on-light" }),
+    ),
     nav,
     h("section", { class: "now", "aria-label": "Playing now" }, nowTitle, nowList),
     foot,
@@ -46,7 +55,23 @@ function boot(): void {
     nav.append(b);
   }
 
-  function mount(route: Route): void {
+  // Sliding highlight behind the active sidebar item.
+  const indicator = h("span", { class: "nav-ind", "aria-hidden": "true" });
+  nav.prepend(indicator);
+  function moveIndicator(route: Route, instant = false): void {
+    const b = buttons.get(route);
+    if (!b) return;
+    indicator.classList.toggle("instant", instant);
+    indicator.style.transform = `translateY(${b.offsetTop}px)`;
+    indicator.style.height = `${b.offsetHeight}px`;
+    indicator.classList.add("ready");
+  }
+
+  const order: Route[] = NAV.map(([r]) => r);
+  let currentRoute: Route | null = null;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function swap(route: Route): void {
     current?.dispose();
     const v =
       route === "dashboard" ? dashboardView() :
@@ -56,13 +81,36 @@ function boot(): void {
       settingsView();
     current = v;
     main.replaceChildren(v.el);
+  }
+
+  // Page changes travel in the direction of the sidebar: down the list rises, up the list falls.
+  function mount(route: Route): void {
+    if (route === currentRoute) return;
+    const from = currentRoute === null ? -1 : order.indexOf(currentRoute);
+    const to = order.indexOf(route);
+    const first = currentRoute === null;
+    currentRoute = route;
     buttons.forEach((b, r) => b.setAttribute("aria-current", r === route ? "page" : "false"));
+    moveIndicator(route, first);
+    document.documentElement.dataset.navDir = to >= from ? "down" : "up";
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+    if (!first && !reduceMotion.matches && typeof doc.startViewTransition === "function") {
+      doc.startViewTransition(() => swap(route));
+    } else {
+      swap(route);
+      if (!first && !reduceMotion.matches) {
+        main.classList.remove("page-enter");
+        void main.offsetWidth;
+        main.classList.add("page-enter");
+      }
+    }
     try {
       sessionStorage.setItem("moodex.route", route);
     } catch {
       // Route memory is a convenience only.
     }
   }
+  window.addEventListener("resize", () => currentRoute && moveIndicator(currentRoute, true));
   setMount(mount);
 
   // Live timer ticks client-side from SessionStarted; totals are reconciled by PlaytimeTick.
@@ -152,3 +200,4 @@ void listen<ScanEvent>("scan-event", (e) => {
 startStore()
   .catch((e) => toastError(e, "Could not connect to the library"))
   .finally(boot);
+void api.getSettings().then((v) => applyTheme(v.settings.theme)).catch(() => {});

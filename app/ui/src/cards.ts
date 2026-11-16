@@ -59,6 +59,10 @@ function playButton(g: GameView, onPlay?: PlayFn): HTMLElement | null {
   ) as HTMLButtonElement;
   b.addEventListener("click", (e) => {
     e.stopPropagation();
+    // A short ring confirms the launch before the game window appears.
+    b.classList.remove("launch");
+    void b.offsetWidth;
+    b.classList.add("launch");
     onPlay(g, b);
   });
   b.addEventListener("keydown", (e) => e.stopPropagation());

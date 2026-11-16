@@ -71,6 +71,7 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
                 tracing::warn!(error = %e, "tray icon unavailable");
             }
             commands::settings::sync_autostart(app.handle(), settings.launch_at_startup);
+            commands::settings::sync_window_theme(app.handle(), &settings.theme);
             let hide = started_minimized && settings.start_minimized;
             if !hide {
                 tray::show_main(app.handle());
@@ -118,6 +119,7 @@ fn run(dirs: AppDirs) -> anyhow::Result<()> {
             commands::settings::test_rawg,
             commands::diagnostics::diagnostics,
             commands::diagnostics::open_folder,
+            commands::diagnostics::open_link,
             commands::data::v1_status,
             commands::data::v1_plan,
             commands::data::v1_apply,

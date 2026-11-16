@@ -7,7 +7,8 @@ use moodex_library::Settings;
 use serde::Serialize;
 use std::sync::atomic::Ordering;
 use std::time::Duration;
-use tauri::{AppHandle, State};
+use tauri::window::Color;
+use tauri::{AppHandle, Manager, State, Theme};
 use tauri_plugin_autostart::ManagerExt;
 
 #[derive(Debug, Serialize)]
@@ -48,6 +49,27 @@ pub fn sync_autostart(app: &AppHandle, want: bool) {
     }
 }
 
+// Match the native title bar and window background to the UI theme.
+pub fn sync_window_theme(app: &AppHandle, theme: &str) {
+    let Some(w) = app.get_webview_window("main") else { return };
+    let (native, bg) = match theme {
+        "light" => (Some(Theme::Light), Some(Color(0xf4, 0xf5, 0xf8, 255))),
+        "dark" => (Some(Theme::Dark), Some(Color(0x13, 0x16, 0x1b, 255))),
+        "black" => (Some(Theme::Dark), Some(Color(0, 0, 0, 255))),
+        "grey" => (Some(Theme::Dark), Some(Color(0x1c, 0x1c, 0x1f, 255))),
+        "system" => (None, None),
+        _ => (Some(Theme::Dark), Some(Color(0x08, 0x08, 0x0a, 255))),
+    };
+    if let Err(e) = w.set_theme(native) {
+        tracing::warn!(error = %e, theme, "could not set window theme");
+    }
+    if let Some(c) = bg {
+        if let Err(e) = w.set_background_color(Some(c)) {
+            tracing::warn!(error = %e, theme, "could not set window background");
+        }
+    }
+}
+
 #[tracing::instrument(level = "debug", skip_all)]
 #[tauri::command]
 pub async fn set_setting(
@@ -59,6 +81,7 @@ pub async fn set_setting(
     let s = state.library.set_setting(key.clone(), value).await?;
     match key.as_str() {
         "launch_at_startup" => sync_autostart(&app, s.launch_at_startup),
+        "theme" => sync_window_theme(&app, &s.theme),
         "minimize_to_tray" => state.minimize_to_tray.store(s.minimize_to_tray, Ordering::Relaxed),
         "rawg_key_source" | "rawg_proxy_url" => state.rawg.set_source(keys::key_source(&s)),
         "stub_threshold_seconds" => {

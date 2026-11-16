@@ -24,6 +24,7 @@ moodex-winproc.workspace = true
 moodex-library.workspace = true
 anyhow.workspace = true
 camino.workspace = true
+image.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

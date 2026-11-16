@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.10
+
+### Added
+- **Game icons in the tray menu.** Every game in the tray's right-click menu now shows its icon: the game's own icon taken from its .exe (the same logo Windows shows for it), or a small rounded tile of its cover art, or a colourful letter tile when neither is available. A game that is running gets a green "playing" dot. "Show MooDeX" carries the MooDeX icon.
+
+### Changed
+- **Left-click the tray icon to open or close MooDeX.** One click opens the window; clicking again while it is open in front hides it to the tray. If the window is open but behind other windows, a click brings it to the front instead of hiding it.
+
 ## 2.0.9
 
 ### Added

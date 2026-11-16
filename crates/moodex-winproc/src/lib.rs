@@ -6,6 +6,7 @@
 mod canon;
 mod cmdline;
 mod handle;
+mod icon;
 mod job;
 mod launch;
 mod scan;
@@ -14,6 +15,7 @@ mod watch;
 pub use canon::{canonicalize, is_process_alive, process_image_path};
 pub use cmdline::build_command_line;
 pub use handle::OwnedHandle;
+pub use icon::exe_icon_rgba;
 pub use job::JobObject;
 pub use launch::{launch_tracked, ExitReason, LaunchError, LaunchMethod, TrackedLaunch};
 pub use scan::scan_running;

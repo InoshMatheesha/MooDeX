@@ -1,12 +1,16 @@
-// tray.rs - Tray icon: launch recent and installed games straight from the menu (like Steam), show, quit.
+// tray.rs - Tray icon: left click toggles the window; the menu launches games (with their icons), like Steam.
 
 use crate::state::AppState;
-use moodex_core::{GameFilter, GameId, SortOrder};
+use crate::tray_icons::{self, Source};
+use moodex_core::{ContentHash, GameFilter, GameId, SortOrder};
+use moodex_images::Variant;
 use moodex_library::GameView;
+use std::collections::HashSet;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::Duration;
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use tauri::image::Image;
+use tauri::menu::{IconMenuItem, Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Emitter, Manager, Wry};
 use time::format_description::well_known::Rfc3339;
@@ -18,9 +22,16 @@ const PLAY_PREFIX: &str = "play:";
 const RECENT_MAX: usize = 6;
 const ALL_MAX: usize = 40;
 const TITLE_MAX: usize = 42;
+// Clicking the tray takes focus from the window first; a blur this recent still counts as "in front".
+const BLUR_GRACE_MS: u64 = 600;
 
 // Bumped on every refresh request so a burst of library events rebuilds the menu once.
 static GENERATION: AtomicU64 = AtomicU64::new(0);
+static LAST_BLUR_MS: AtomicU64 = AtomicU64::new(0);
+
+fn now_ms() -> u64 {
+    SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX))
+}
 
 pub fn show_main(app: &AppHandle) {
     if let Some(w) = app.get_webview_window("main") {
@@ -31,8 +42,28 @@ pub fn show_main(app: &AppHandle) {
     }
 }
 
+// Called when the main window loses focus.
+pub fn note_focus_lost() {
+    LAST_BLUR_MS.store(now_ms(), Ordering::Relaxed);
+}
+
+// Left click: hide the window when it is open in front, otherwise bring it up.
+fn toggle_main(app: &AppHandle) {
+    let Some(w) = app.get_webview_window("main") else { return };
+    let shown = w.is_visible().unwrap_or(false) && !w.is_minimized().unwrap_or(false);
+    let recent_blur = now_ms().saturating_sub(LAST_BLUR_MS.load(Ordering::Relaxed)) < BLUR_GRACE_MS;
+    let in_front = w.is_focused().unwrap_or(false) || recent_blur;
+    if shown && in_front {
+        if let Err(e) = w.hide() {
+            tracing::warn!(error = %e, "could not hide main window");
+        }
+    } else {
+        show_main(app);
+    }
+}
+
 pub fn create(app: &AppHandle) -> tauri::Result<()> {
-    let menu = build_menu(app, &[], &[])?;
+    let menu = build_menu(app, &[], &[], 0, &[])?;
     let mut b = TrayIconBuilder::with_id(TRAY_ID)
         .tooltip("MooDeX")
         .menu(&menu)
@@ -40,7 +71,7 @@ pub fn create(app: &AppHandle) -> tauri::Result<()> {
         .on_menu_event(|app, ev| on_menu(app, ev.id().as_ref()))
         .on_tray_icon_event(|tray, ev| {
             if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, .. } = ev {
-                show_main(tray.app_handle());
+                toggle_main(tray.app_handle());
             }
         });
     if let Some(icon) = app.default_window_icon() {
@@ -87,39 +118,69 @@ fn label(title: &str) -> String {
     t.replace('&', "&&")
 }
 
-fn game_item(app: &AppHandle, g: &GameView) -> tauri::Result<MenuItem<Wry>> {
-    let running = g.running_since.is_some();
-    let text = if running { format!("{}  (playing)", label(&g.title)) } else { label(&g.title) };
-    MenuItem::with_id(app, format!("{PLAY_PREFIX}{}", g.id), text, !running, None::<&str>)
+// A game with its pre-rendered 16 px icon.
+pub struct Entry {
+    view: GameView,
+    icon: Vec<u8>,
 }
 
-// Recent games on top, every installed game in a submenu, then Show and Quit.
-fn build_menu(app: &AppHandle, recent: &[GameView], installed: &[GameView]) -> tauri::Result<Menu<Wry>> {
+fn game_item(app: &AppHandle, e: &Entry) -> tauri::Result<IconMenuItem<Wry>> {
+    let running = e.view.running_since.is_some();
+    let text = if running { format!("{}  -  playing", label(&e.view.title)) } else { label(&e.view.title) };
+    let icon = Image::new_owned(e.icon.clone(), tray_icons::SIZE, tray_icons::SIZE);
+    IconMenuItem::with_id(app, format!("{PLAY_PREFIX}{}", e.view.id), text, !running, Some(icon), None::<&str>)
+}
+
+// Recent games on top, installed games (up to ALL_MAX of `total`) in a submenu, then Show and Quit.
+fn build_menu(
+    app: &AppHandle,
+    recent: &[Entry],
+    shown: &[Entry],
+    total: usize,
+    app_icon: &[u8],
+) -> tauri::Result<Menu<Wry>> {
     let menu = Menu::new(app)?;
-    if installed.is_empty() {
+    if shown.is_empty() {
         menu.append(&MenuItem::with_id(app, "none", "No installed games yet", false, None::<&str>)?)?;
     } else {
         if !recent.is_empty() {
             menu.append(&MenuItem::with_id(app, "recent", "Recent games", false, None::<&str>)?)?;
-            for g in recent {
-                menu.append(&game_item(app, g)?)?;
+            for e in recent {
+                menu.append(&game_item(app, e)?)?;
             }
             menu.append(&PredefinedMenuItem::separator(app)?)?;
         }
-        let all = Submenu::with_id(app, "all", format!("Installed games ({})", installed.len()), true)?;
-        for g in installed.iter().take(ALL_MAX) {
-            all.append(&game_item(app, g)?)?;
+        let all = Submenu::with_id(app, "all", format!("Installed games ({total})"), true)?;
+        for e in shown {
+            all.append(&game_item(app, e)?)?;
         }
-        if installed.len() > ALL_MAX {
+        if total > shown.len() {
             all.append(&PredefinedMenuItem::separator(app)?)?;
             all.append(&MenuItem::with_id(app, "more", "More in MooDeX...", true, None::<&str>)?)?;
         }
         menu.append(&all)?;
     }
     menu.append(&PredefinedMenuItem::separator(app)?)?;
-    menu.append(&MenuItem::with_id(app, "show", "Show MooDeX", true, None::<&str>)?)?;
+    let show_icon =
+        (!app_icon.is_empty()).then(|| Image::new_owned(app_icon.to_vec(), tray_icons::SIZE, tray_icons::SIZE));
+    menu.append(&IconMenuItem::with_id(app, "show", "Show MooDeX", true, show_icon, None::<&str>)?)?;
     menu.append(&MenuItem::with_id(app, "quit", "Quit MooDeX", true, None::<&str>)?)?;
     Ok(menu)
+}
+
+// Everything the icon renderer may draw from for one game; the cover is read only if already cached.
+async fn source_for(state: &AppState, g: &GameView) -> Source {
+    let exe = g.install.as_ref().and_then(|i| i.effective_detect().cloned()).filter(|p| p.exists());
+    let key = format!("{}|{}|{}", g.id, exe.as_ref().map_or("", |p| p.as_str()), g.cover_key.as_deref().unwrap_or(""));
+    let mut cover = None;
+    if exe.is_none() && !tray_icons::is_cached(&key) {
+        if let Some(k) = &g.cover_key {
+            if state.images.is_cached(&ContentHash(k.clone())) {
+                cover = state.images.load(k, Variant::Thumb).await.ok().map(|b| b.to_vec());
+            }
+        }
+    }
+    Source { key, title: g.title.clone(), exe, cover }
 }
 
 // Rebuild the game list shortly after the library changes (debounced).
@@ -144,7 +205,33 @@ pub fn refresh_menu(app: &AppHandle) {
         let when = |g: &GameView| g.last_played.as_deref().and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok());
         recent.sort_by_key(|g| std::cmp::Reverse(when(g)));
         recent.truncate(RECENT_MAX);
-        let menu = match build_menu(&app, &recent, &installed) {
+
+        // Icons for every game the menu shows, rendered off the async runtime.
+        let mut wanted: Vec<GameView> = recent.clone();
+        let seen: HashSet<GameId> = recent.iter().map(|g| g.id).collect();
+        wanted.extend(installed.iter().take(ALL_MAX).filter(|g| !seen.contains(&g.id)).cloned());
+        let mut sources = Vec::with_capacity(wanted.len());
+        for g in &wanted {
+            sources.push((source_for(&state, g).await, g.running_since.is_some()));
+        }
+        let app_icon = app.default_window_icon().map(|i| (i.rgba().to_vec(), i.width(), i.height()));
+        let rendered = tauri::async_runtime::spawn_blocking(move || {
+            let icons: Vec<Vec<u8>> = sources.iter().map(|(s, running)| tray_icons::render(s, *running)).collect();
+            let app_icon = app_icon.and_then(|(px, w, h)| tray_icons::app_icon(&px, w, h)).unwrap_or_default();
+            (icons, app_icon)
+        })
+        .await;
+        let Ok((icons, app_icon)) = rendered else {
+            tracing::warn!("tray: icon rendering failed");
+            return;
+        };
+        let by_id: std::collections::HashMap<GameId, Vec<u8>> = wanted.iter().map(|g| g.id).zip(icons).collect();
+        let entry = |g: &GameView| Entry { view: g.clone(), icon: by_id.get(&g.id).cloned().unwrap_or_default() };
+        let recent: Vec<Entry> = recent.iter().map(entry).collect();
+        let all: Vec<Entry> = installed.iter().take(ALL_MAX).map(entry).collect();
+        let total = installed.len();
+
+        let menu = match build_menu(&app, &recent, &all, total, &app_icon) {
             Ok(m) => m,
             Err(e) => {
                 tracing::warn!(error = %e, "tray: could not build menu");

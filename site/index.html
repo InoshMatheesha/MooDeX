@@ -29,18 +29,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/ios.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
   <!-- Floating navigation -->
   <header class="nav-wrap" id="nav">
-    <nav class="nav" aria-label="Main">
-      <a class="logo" href="/" aria-label="MooDeX home">
+    <nav class="nav glass" aria-label="Main">
+      <a class="logo" href="/" data-scroll-top aria-label="MooDeX, back to the top">
         <img src="/img/mark.png" alt="" width="26" height="26">
         <span>MooDeX</span>
       </a>
-      <div class="nav-links">
+      <div class="nav-links" data-ios-nav>
         <a href="#tour">Tour</a>
         <a href="#features">Features</a>
         <a href="#download">Download</a>
@@ -54,7 +55,6 @@
           <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
         </button>
-        <a class="btn btn-primary btn-sm" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Download</a>
       </div>
     </nav>
   </header>
@@ -64,7 +64,7 @@
     <section class="hero">
       <div class="hero-bg" aria-hidden="true"><div class="grid-fade"></div><div class="spot"></div></div>
       <div class="container hero-copy">
-        <a class="pill" href="#changes">
+        <a class="pill glass" href="#changes">
           <span class="pill-tag">New</span>
           <span data-pill>In-app updates in <span data-version-text>v2.0.6</span></span>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -72,11 +72,11 @@
         <h1>Every game you own.<br><span class="muted">Every hour you actually played.</span></h1>
         <p class="lede">A fast, private game library for Windows. One list for every PC game, playtime that is measured instead of guessed (Steam and Epic included), and new installs found on their own.</p>
         <div class="cta-row">
-          <a class="btn btn-primary btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
+          <a class="btn btn-primary btn-lg btn-shine" data-magnetic data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.5 10.5 3.4v8.1H3zm0 15 7.5 1.1v-8H3zm8.6 1.3L21 22v-9.5h-9.4zm0-17.6v8.3H21V2z"/></svg>
             Download for Windows
           </a>
-          <a class="btn btn-ghost btn-lg" href="https://github.com/InoshMatheesha/MooDeX">View source</a>
+          <a class="btn btn-ghost btn-lg glass" data-magnetic href="https://github.com/InoshMatheesha/MooDeX">View source</a>
         </div>
         <p class="meta mono"><span data-version-text>v2.0.6</span> <i></i> <span data-size>5.1 MB</span> <i></i> Windows 10 and 11 <i></i> Free and open source</p>
       </div>
@@ -92,7 +92,7 @@
             <img class="window-shot" src="/img/dashboard.webp" srcset="/img/dashboard-sm.webp 900w, /img/dashboard.webp 1600w" sizes="(max-width: 1000px) 100vw, 1100px" width="1600" height="799" alt="The MooDeX dashboard: library status cards, total playtime, the G.O.A.T. game and the most played games." fetchpriority="high">
           </div>
 
-          <div class="float float-now" aria-hidden="true">
+          <div class="float float-now glass" aria-hidden="true">
             <img src="/img/cover-onimusha.webp" alt="" width="96" height="54">
             <div>
               <small><span class="dot"></span>Playing now</small>
@@ -101,14 +101,14 @@
             </div>
           </div>
 
-          <div class="float float-toast" aria-hidden="true">
+          <div class="float float-toast glass" aria-hidden="true">
             <span class="check">
               <svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
             <div><b>Session recorded</b><small>Crimson Desert <span class="mono">+2h 05m</span></small></div>
           </div>
 
-          <div class="float float-scan" aria-hidden="true">
+          <div class="float float-scan glass" aria-hidden="true">
             <small class="mono">D:\SteamLibrary</small>
             <b>3 new games detected</b>
           </div>
@@ -132,7 +132,7 @@
           <h2>Built for people with more games than free evenings.</h2>
         </header>
         <div class="tour">
-          <div class="tabs" role="tablist" aria-label="Screens">
+          <div class="tabs glass" role="tablist" aria-label="Screens">
             <button role="tab" aria-selected="true" aria-controls="tour-panel" data-shot="dashboard" data-caption="Your whole library at a glance: what you are playing, what you finished, total hours and your all-time favourite.">Dashboard</button>
             <button role="tab" aria-selected="false" aria-controls="tour-panel" data-shot="library" data-caption="Every game in one list with real cover art, status, rating and notes. Filter, search and sort in an instant.">Library</button>
             <button role="tab" aria-selected="false" aria-controls="tour-panel" data-shot="pc-games" data-caption="Installed games with a play button right on the card. Launch from MooDeX and every minute is counted.">PC Games</button>
@@ -158,7 +158,7 @@
 
         <div class="bento">
           <!-- Playtime -->
-          <article class="cell cell-wide">
+          <article class="cell cell-wide glass" data-tilt="4">
             <div class="cell-copy">
               <h3>Playtime that is actually right</h3>
               <p>Launchers like Steam quit seconds after starting a game, so most trackers log a whole evening as six seconds. MooDeX follows the hand-off to the real game and keeps counting until it closes.</p>
@@ -172,7 +172,7 @@
           </article>
 
           <!-- Auto-detect -->
-          <article class="cell">
+          <article class="cell glass" data-tilt="7">
             <div class="viz scan" aria-hidden="true">
               <div class="scan-path mono">D:\SteamLibrary\steamapps\common</div>
               <ul>
@@ -188,7 +188,7 @@
           </article>
 
           <!-- Play from card -->
-          <article class="cell">
+          <article class="cell glass" data-tilt="7">
             <div class="viz play" aria-hidden="true">
               <div class="mini-card">
                 <img src="/img/cover-crimson.webp" alt="" width="240" height="135">
@@ -203,7 +203,7 @@
           </article>
 
           <!-- Updates -->
-          <article class="cell">
+          <article class="cell glass" data-tilt="7">
             <div class="viz update" aria-hidden="true">
               <div class="upd">
                 <div class="upd-row"><b>MooDeX <span data-version-plain>2.0.6</span></b><span class="badge">Available</span></div>
@@ -218,7 +218,7 @@
           </article>
 
           <!-- Private -->
-          <article class="cell">
+          <article class="cell glass" data-tilt="7">
             <div class="viz private" aria-hidden="true">
               <div class="stat"><b>0</b><small>accounts</small></div>
               <div class="stat"><b>0</b><small>telemetry</small></div>
@@ -231,7 +231,7 @@
           </article>
 
           <!-- Native -->
-          <article class="cell cell-band">
+          <article class="cell cell-band glass" data-tilt="3">
             <div class="viz native" aria-hidden="true">
               <div class="chip-row"><span>Rust</span><span>Tauri 2</span><span>SQLite</span></div>
               <div class="size"><b data-size>5.1 MB</b><small>installer</small></div>
@@ -259,12 +259,12 @@
     <!-- Download -->
     <section class="section" id="download">
       <div class="container">
-        <div class="dl">
+        <div class="dl glass">
           <div class="dl-glow" aria-hidden="true"></div>
           <img class="dl-icon" src="/img/apple-touch-icon.png" alt="" width="88" height="88">
           <h2>Get MooDeX for Windows</h2>
           <p class="dl-sub">Free, open source, and yours to keep.</p>
-          <a class="btn btn-primary btn-lg" data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
+          <a class="btn btn-primary btn-lg btn-shine" data-magnetic data-download href="https://github.com/InoshMatheesha/MooDeX/releases/latest">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Download <span data-version-text>v2.0.6</span>
           </a>
@@ -384,6 +384,7 @@
     </div>
   </footer>
 
+  <script src="/ios.js" defer></script>
   <script src="/main.js" defer></script>
 </body>
 </html>

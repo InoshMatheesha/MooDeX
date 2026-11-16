@@ -1,0 +1,88 @@
+/* ios.css - iOS-style glass, gloss and motion shared by MoOdY69's product sites. */
+
+/* A site sets these per theme: --glass-bg, --glass-border, --glass-hi, --glass-shadow,
+   --aurora-1, --aurora-2, --aurora-3, --ios-accent. */
+:root {
+  --spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --glide: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Scroll progress: a hairline at the top of the window. */
+.ios-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 80; pointer-events: none;
+  transform-origin: 0 50%; transform: scaleX(0);
+  background: linear-gradient(90deg, var(--aurora-1), var(--aurora-2), var(--aurora-3));
+}
+
+/* Aurora: slow light behind the glass, so it has something to frost. */
+.ios-aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ios-aurora i {
+  position: absolute; width: 46vmax; height: 46vmax; border-radius: 50%;
+  filter: blur(90px); opacity: 0.5; will-change: transform;
+}
+.ios-aurora i:nth-child(1) { left: -12vmax; top: -14vmax; background: var(--aurora-1); animation: ios-drift-a 26s var(--glide) infinite alternate; }
+.ios-aurora i:nth-child(2) { right: -16vmax; top: 18vh; background: var(--aurora-2); animation: ios-drift-b 32s var(--glide) infinite alternate; }
+.ios-aurora i:nth-child(3) { left: 30vw; bottom: -24vmax; background: var(--aurora-3); animation: ios-drift-c 38s var(--glide) infinite alternate; }
+@keyframes ios-drift-a { to { transform: translate(14vw, 12vh) scale(1.15); } }
+@keyframes ios-drift-b { to { transform: translate(-12vw, 18vh) scale(0.9); } }
+@keyframes ios-drift-c { to { transform: translate(-10vw, -16vh) scale(1.1); } }
+
+/* Glass: frosted, with a glossy top light and a fine bright edge. */
+.glass {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow);
+}
+.glass::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, var(--glass-hi), transparent 42%);
+  opacity: 0.55;
+}
+
+/* The nav's sliding highlight: under the hovered link, else the current section's. */
+.ios-nav { position: relative; }
+.ios-indicator {
+  position: absolute; top: 50%; left: 0; height: 34px; width: 0; margin-top: -17px; z-index: 0;
+  border-radius: 999px; pointer-events: none; opacity: 0;
+  background: var(--glass-hi); box-shadow: inset 0 0 0 1px var(--glass-border);
+  transition: transform 0.55s var(--spring), width 0.55s var(--spring), opacity 0.3s ease;
+}
+.ios-nav a { position: relative; z-index: 1; }
+
+/* Buttons: a press that gives like iOS, and a light that sweeps across on hover. */
+.ios-press { transition: transform 0.35s var(--spring), box-shadow 0.3s var(--glide), background-color 0.2s; }
+.ios-press:active { transform: scale(0.96) !important; }
+.btn-shine { position: relative; overflow: hidden; isolation: isolate; }
+.btn-shine::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 45%; z-index: -1; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg) translateX(0); opacity: 0;
+}
+.btn-shine:hover::after { animation: ios-shine 0.9s var(--glide); }
+@keyframes ios-shine { from { opacity: 1; transform: skewX(-20deg) translateX(0); } to { opacity: 1; transform: skewX(-20deg) translateX(420%); } }
+
+/* Tilt: 3D toward the pointer with a glare where it is (ios.js sets the angles). */
+[data-tilt] { transform-style: preserve-3d; will-change: transform; }
+[data-tilt]::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: 2;
+  background: radial-gradient(460px circle at var(--mx, 50%) var(--my, 50%), var(--glass-hi), transparent 42%);
+  transition: opacity 0.3s ease;
+}
+[data-tilt]:hover::after { opacity: 0.9; }
+
+/* Reveal: rises in with a soft blur and a spring, one after another. */
+[data-reveal] {
+  opacity: 0; transform: translateY(26px) scale(0.985); filter: blur(8px);
+  transition: opacity 0.8s var(--glide), transform 0.9s var(--spring), filter 0.8s var(--glide);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+[data-reveal].ios-in { opacity: 1; transform: none; filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ios-aurora i, .btn-shine:hover::after { animation: none !important; }
+  [data-reveal] { opacity: 1; transform: none; filter: none; transition: none; }
+  .ios-indicator, .ios-press { transition: none; }
+}

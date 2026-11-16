@@ -26,7 +26,7 @@
   --line-2: rgba(255, 255, 255, 0.13);
   --text: #f4f4f5;
   --text-2: #a1a1aa;
-  --text-3: #6b6b74;
+  --text-3: #8a8a94;
   --primary-bg: #fafafa;
   --primary-fg: #09090b;
   --primary-hover: #e4e4e7;
@@ -35,6 +35,13 @@
   --spot-b: rgba(139, 92, 246, 0.24);
   --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.06);
   --float-bg: rgba(20, 20, 26, 0.82);
+  --glass-bg: rgba(22, 22, 28, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-hi: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 16px 50px -22px rgba(0, 0, 0, 0.75);
+  --aurora-1: rgba(59, 130, 246, 0.24);
+  --aurora-2: rgba(139, 92, 246, 0.24);
+  --aurora-3: rgba(236, 72, 153, 0.1);
 }
 
 [data-theme="light"] {
@@ -57,6 +64,13 @@
   --spot-b: rgba(139, 92, 246, 0.14);
   --shadow: 0 30px 70px -32px rgba(15, 15, 30, 0.35), 0 0 0 1px rgba(9, 9, 11, 0.08);
   --float-bg: rgba(255, 255, 255, 0.86);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(9, 9, 11, 0.08);
+  --glass-hi: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 12px 40px -20px rgba(15, 15, 30, 0.3);
+  --aurora-1: rgba(59, 130, 246, 0.18);
+  --aurora-2: rgba(139, 92, 246, 0.16);
+  --aurora-3: rgba(236, 72, 153, 0.08);
 }
 
 /* --- Base --- */
@@ -134,7 +148,7 @@ b { font-weight: 600; }
 }
 .pill:hover { border-color: var(--text-3); color: var(--text); }
 .pill svg { width: 14px; height: 14px; }
-.pill-tag { height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; background: linear-gradient(90deg, var(--brand-a), var(--brand-b)); }
+.pill-tag { height: 24px; padding: 0 9px; display: inline-flex; align-items: center; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; background: linear-gradient(90deg, #2563eb, #7c3aed); }
 h1 { margin-top: 26px; font-size: clamp(36px, 5.5vw, 70px); line-height: 1.05; font-weight: 700; letter-spacing: -0.045em; max-width: 24ch; text-wrap: balance; }
 h1 .muted { color: var(--text-3); }
 .lede { margin-top: 22px; max-width: 56ch; font-size: clamp(16.5px, 1.6vw, 19px); color: var(--text-2); }
@@ -426,3 +440,13 @@ h3 { font-size: 18px; font-weight: 650; letter-spacing: -0.02em; }
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* --- Glass (ios.css) --- */
+.float.glass { position: absolute; }
+.nav.glass { background: var(--glass-bg); }
+.cell.glass, .dl.glass, .tabs.glass, .pill.glass { background: var(--glass-bg); }
+.steps li { background: var(--glass-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.log-card, .log article { background: var(--glass-bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.nav-links a[aria-current] { color: var(--text); }
+.nav .ios-indicator { background: var(--surface-2); box-shadow: none; }
+.cell[data-tilt] { overflow: hidden; }

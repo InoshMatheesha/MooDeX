@@ -23,7 +23,12 @@ pub struct Settings {
     pub scan_ignored: Vec<String>,
     // Look for a new release on GitHub at startup.
     pub auto_update_check: bool,
+    // UI colour theme; see THEMES.
+    pub theme: String,
 }
+
+// Accepted values for the theme setting ("system" follows Windows light/dark).
+pub const THEMES: [&str; 6] = ["classic", "dark", "black", "grey", "light", "system"];
 
 impl Default for Settings {
     fn default() -> Self {
@@ -41,6 +46,7 @@ impl Default for Settings {
             scan_folders: Vec::new(),
             scan_ignored: Vec::new(),
             auto_update_check: true,
+            theme: "classic".into(),
         }
     }
 }
@@ -121,6 +127,13 @@ impl Settings {
             "auto_update_check" => self.auto_update_check = as_bool(key, v)?,
             "scan_folders" => self.scan_folders = as_paths(key, v, 32)?,
             "scan_ignored" => self.scan_ignored = as_paths(key, v, 5000)?,
+            "theme" => {
+                let t = v.as_str().unwrap_or_default();
+                if !THEMES.contains(&t) {
+                    return Err(LibraryError::Invalid(format!("theme must be one of {}", THEMES.join(", "))));
+                }
+                self.theme = t.to_string();
+            }
             "rawg_key_source" => {
                 let s = v.as_str().unwrap_or_default();
                 if !matches!(s, "proxy" | "user" | "none") {
@@ -180,6 +193,11 @@ mod tests {
             json!("https://p.example/api/rawg")
         );
         assert!(s.apply("nope", &json!(1)).is_err());
+        assert_eq!(s.theme, "classic");
+        assert_eq!(s.apply("theme", &json!("light")).unwrap(), json!("light"));
+        assert!(s.apply("theme", &json!("neon")).is_err());
+        assert!(s.apply("theme", &json!(3)).is_err());
+        assert_eq!(s.theme, "light");
         let f = s.apply("scan_folders", &json!(["D:/Games/", " d:/games ", "E:/SteamLibrary"])).unwrap();
         assert_eq!(f, json!(["D:/Games", "E:/SteamLibrary"]));
         assert!(s.apply("scan_folders", &json!(["relative/path"])).is_err());

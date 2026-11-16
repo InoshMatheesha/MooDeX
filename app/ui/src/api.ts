@@ -175,6 +175,7 @@ export interface Settings {
   scan_folders: string[];
   scan_ignored: string[];
   auto_update_check: boolean;
+  theme: "classic" | "dark" | "black" | "grey" | "light" | "system";
 }
 
 export interface UpdateInfo {

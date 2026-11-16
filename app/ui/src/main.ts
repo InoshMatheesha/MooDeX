@@ -12,6 +12,10 @@ import { libraryView } from "./views/library";
 import { discoverView } from "./views/discover";
 import { settingsView } from "./views/settings";
 import { openGame } from "./dialogs/game";
+import { applyTheme, initTheme } from "./theme";
+
+// Paint the cached theme before anything renders, then confirm it from settings.
+initTheme();
 
 const NAV: [Route, string, string][] = [
   ["dashboard", "Dashboard", I.dash],
@@ -30,7 +34,12 @@ function boot(): void {
   const side = h(
     "aside",
     { class: "side" },
-    h("div", { class: "brand" }, h("img", { src: "/logo-wordmark.png", alt: "MooDeX", class: "wordmark" })),
+    h(
+      "div",
+      { class: "brand" },
+      h("img", { src: "/logo-wordmark.png", alt: "MooDeX", class: "wordmark on-dark" }),
+      h("img", { src: "/logo-wordmark-light.png", alt: "MooDeX", class: "wordmark on-light" }),
+    ),
     nav,
     h("section", { class: "now", "aria-label": "Playing now" }, nowTitle, nowList),
     foot,
@@ -191,3 +200,4 @@ void listen<ScanEvent>("scan-event", (e) => {
 startStore()
   .catch((e) => toastError(e, "Could not connect to the library"))
   .finally(boot);
+void api.getSettings().then((v) => applyTheme(v.settings.theme)).catch(() => {});

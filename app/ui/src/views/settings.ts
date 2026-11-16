@@ -1,10 +1,43 @@
-// settings.ts - Preferences, folders, RAWG source, data tools, updates and About (spec 11, Appendix A).
+// settings.ts - Appearance, preferences, folders, RAWG source, data tools, updates and About (spec 11, Appendix A).
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { listen } from "@tauri-apps/api/event";
 import { api, type Settings, type SettingsView, type UpdateInfo, type UpdateProgress } from "../api";
 import { githubMark, h, icon, I } from "../dom";
 import { toast, toastError } from "../ui";
 import { openImportV1 } from "../dialogs/importv1";
+import { applyTheme, THEMES, type Theme } from "../theme";
+
+// Section heading with a leading icon.
+function head(title: string, path: string): HTMLElement {
+  return h("h2", {}, icon(path), title);
+}
+
+// A miniature MooDeX window drawn with one theme's own tokens.
+function themePreview(id: Exclude<Theme, "system">): HTMLElement {
+  return h(
+    "div",
+    { class: "tp", "data-theme": id },
+    h("div", { class: "tp-side" }, h("i", { class: "tp-logo" }), h("i", { class: "on" }), h("i", {}), h("i", {}), h("i", {})),
+    h(
+      "div",
+      { class: "tp-main" },
+      h("i", { class: "tp-title" }),
+      h("div", { class: "tp-stats" }, ...["playing", "completed", "backlog", "dropped"].map((c) => h("i", { class: c }))),
+      h("div", { class: "tp-cards" }, h("i", {}), h("i", {}), h("i", {})),
+    ),
+  );
+}
+
+// Which sections sit in which column, for 1, 2 or 3 columns.
+type Key = "updates" | "general" | "folders" | "tracking" | "discover" | "data" | "v1" | "about";
+const LAYOUT: Record<number, Key[][]> = {
+  1: [["updates", "general", "folders", "tracking", "discover", "data", "v1", "about"]],
+  2: [["updates", "general", "tracking", "data"], ["folders", "discover", "v1", "about"]],
+  3: [["updates", "general", "tracking"], ["folders", "discover", "v1"], ["data", "about"]],
+};
+function columnsFor(width: number): number {
+  return width >= 1480 ? 3 : width >= 880 ? 2 : 1;
+}
 
 function toggleRow(title: string, help: string, checked: boolean, onChange: (v: boolean) => void, disabled = false): HTMLElement {
   const input = h("input", { type: "checkbox", role: "switch", "aria-label": title, checked, disabled });
@@ -27,7 +60,67 @@ function numberField(label: string, value: number, min: number, max: number, onC
 
 export function settingsView(): { el: HTMLElement; dispose: () => void } {
   const body = h("div", { class: "settings" });
-  const el = h("section", { class: "view", "aria-label": "Settings" }, h("header", { class: "view-head" }, h("h1", {}, "Settings")), h("div", { class: "scroll" }, h("div", { class: "pad" }, body)));
+  const el = h(
+    "section",
+    { class: "view", "aria-label": "Settings" },
+    h("header", { class: "view-head" }, h("h1", {}, "Settings", h("span", { class: "sub" }, "Appearance, tracking and your data"))),
+    h("div", { class: "scroll" }, h("div", { class: "pad" }, body)),
+  );
+
+  // Sections are laid out into columns that follow the available width.
+  const cols = h("div", { class: "set-cols" });
+  let parts: Partial<Record<Key, HTMLElement>> = {};
+  let ncols = 0;
+  // Keyboard theme changes keep focus on the chosen card across the re-render.
+  let refocusTheme = false;
+  function layout(force = false): void {
+    const n = columnsFor(body.clientWidth || window.innerWidth);
+    if (n === ncols && !force) return;
+    ncols = n;
+    cols.style.setProperty("--cols", String(n));
+    const groups = LAYOUT[n] ?? LAYOUT[1] ?? [];
+    cols.replaceChildren(...groups.map((keys) => h("div", { class: "set-col" }, ...keys.map((k) => parts[k] ?? null))));
+  }
+  const ro = new ResizeObserver(() => layout());
+  ro.observe(body);
+
+  // Appearance: theme cards drawn in their own colours; the choice applies instantly.
+  function appearanceSection(s: Settings): HTMLElement {
+    const grid = h("div", { class: "theme-grid", role: "radiogroup", "aria-label": "Theme" });
+    for (const t of THEMES) {
+      const on = s.theme === t.id;
+      const preview = t.id === "system" ? h("div", { class: "tp-split" }, themePreview("dark"), themePreview("light")) : themePreview(t.id);
+      const opt = h(
+        "button",
+        { class: "theme-opt", role: "radio", "aria-checked": on ? "true" : "false", "aria-label": `${t.name} theme. ${t.blurb}`, tabindex: on ? "0" : "-1" },
+        preview,
+        h("span", { class: "theme-meta" }, h("b", {}, t.name), h("small", {}, t.blurb)),
+        h("span", { class: "theme-check", "aria-hidden": "true" }, icon(I.check)),
+      );
+      opt.addEventListener("click", () => {
+        if (s.theme === t.id) return;
+        applyTheme(t.id, true);
+        void set("theme", t.id);
+      });
+      grid.append(opt);
+    }
+    // Arrow keys move between themes, as in any radio group.
+    grid.addEventListener("keydown", (e) => {
+      const opts = [...grid.querySelectorAll<HTMLButtonElement>(".theme-opt")];
+      const i = opts.indexOf(document.activeElement as HTMLButtonElement);
+      const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+      if (i < 0 || step === 0) return;
+      e.preventDefault();
+      refocusTheme = true;
+      opts[(i + step + opts.length) % opts.length]?.click();
+    });
+    return h(
+      "section",
+      { class: "appearance" },
+      h("div", { class: "app-head" }, head("Appearance", I.palette), h("p", { class: "note" }, "Pick a theme. It applies straight away and is saved with your settings.")),
+      grid,
+    );
+  }
 
   async function set(key: keyof Settings, value: unknown): Promise<void> {
     try {
@@ -45,7 +138,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     const general = h(
       "section",
       {},
-      h("h2", {}, "General"),
+      head("General", I.sliders),
       toggleRow("Minimize to tray", "Closing the window keeps MooDeX running in the tray so playtime is still recorded.", s.minimize_to_tray, (x) => void set("minimize_to_tray", x)),
       toggleRow("Launch at startup", "Start MooDeX when you sign in to Windows.", s.launch_at_startup, (x) => void set("launch_at_startup", x)),
       toggleRow("Start minimized", "When launched at startup, stay in the tray.", s.start_minimized, (x) => void set("start_minimized", x), !s.launch_at_startup),
@@ -54,7 +147,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     const tracking = h(
       "section",
       {},
-      h("h2", {}, "Play tracking"),
+      head("Play tracking", I.clock),
       h(
         "div",
         { class: "line" },
@@ -103,7 +196,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     const discover = h(
       "section",
       {},
-      h("h2", {}, "Discover (RAWG)"),
+      head("Discover (RAWG)", I.discover),
       h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Source"), source), test),
       s.rawg_key_source === "proxy" ? h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Proxy URL"), proxy), saveProxy) : null,
       s.rawg_key_source === "user" ? h("div", { class: "line" }, h("label", { class: "field" }, h("span", {}, "Personal API key"), key), saveKey, clearKey) : null,
@@ -113,7 +206,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     const data = h(
       "section",
       {},
-      h("h2", {}, "Your data"),
+      head("Your data", I.database),
       h(
         "div",
         { class: "line" },
@@ -162,7 +255,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     const folders = h(
       "section",
       {},
-      h("h2", {}, "Auto-detect games"),
+      head("Auto-detect games", I.folder),
       h("p", { class: "note", style: "padding-top:6px" }, "Pick the folders your games are installed in. MooDeX finds each game's executable, adds it with a matching cover, and watches the folders - new installs appear automatically."),
       folderList,
       h("div", { class: "line", style: "padding-top:0" }, addFolder, scanBtn, resetIgnored),
@@ -170,7 +263,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     );
 
     // One-time import of the old library; you review it before anything is written.
-    const v1 = h("section", {}, h("h2", {}, "Import from MooDeX v1"), h("p", { class: "note", style: "padding:6px 0 10px" }, "Checking for a v1 library..."));
+    const v1 = h("section", {}, head("Import from MooDeX v1", I.upload), h("p", { class: "note", style: "padding:6px 0 10px" }, "Checking for a v1 library..."));
     void api.v1Status().then((st) => {
       const text = st.already_imported
         ? "Your v1 library has been imported. You can run it again - games already present are skipped."
@@ -178,13 +271,19 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
           ? `Found a v1 library at ${st.path}. Import your games and playtime; you'll review everything first.`
           : "No v1 library found in the default location. You can choose the file manually.";
       v1.replaceChildren(
-        h("h2", {}, "Import from MooDeX v1"),
+        head("Import from MooDeX v1", I.upload),
         h("p", { class: "note", style: "padding:6px 0 4px" }, text),
         h("div", { class: "line" }, h("button", { class: `btn ${st.path && !st.already_imported ? "primary" : ""}`, onclick: () => void openImportV1() }, icon(I.upload), st.already_imported ? "Import again" : "Review import")),
       );
     }).catch(() => {});
 
-    body.replaceChildren(updatesSection(s), general, folders, tracking, discover, data, v1, about);
+    parts = { updates: updatesSection(s), general, folders, tracking, discover, data, v1, about };
+    layout(true);
+    body.replaceChildren(appearanceSection(s), cols);
+    if (refocusTheme) {
+      refocusTheme = false;
+      body.querySelector<HTMLButtonElement>('.theme-opt[aria-checked="true"]')?.focus();
+    }
     if (firstRender) {
       firstRender = false;
       body.classList.add("intro");
@@ -258,7 +357,7 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     return h(
       "section",
       {},
-      h("h2", {}, "Updates"),
+      head("Updates", I.refresh),
       h("div", { class: "line" }, h("div", { style: "flex:1;min-width:200px" }, h("p", {}, "Installed version ", ver), status), checkBtn, installBtn),
       bar,
       notes,
@@ -351,5 +450,5 @@ export function settingsView(): { el: HTMLElement; dispose: () => void } {
     }
   }
   void load();
-  return { el, dispose: () => {} };
+  return { el, dispose: () => ro.disconnect() };
 }

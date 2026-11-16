@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.8
+
+### Added
+- **Themes.** Settings > Appearance has six themes, each shown as a live preview: Classic (the original look), Dark (layered slate surfaces with soft status-card glows), Black (true black for OLED), Grey, Light, and System (follows Windows light or dark mode). Your choice applies straight away, and the window title bar follows it.
+
+### Changed
+- **New app icon.** The app, taskbar and tray icon now use the new light MooDeX icon.
+- **Settings use the whole window.** Sections now sit in two or three columns, depending on how wide the window is, instead of one narrow strip.
+
 ## 2.0.7
 
 ### Added

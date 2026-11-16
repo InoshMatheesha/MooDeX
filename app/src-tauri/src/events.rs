@@ -34,6 +34,15 @@ pub fn bridge(app: AppHandle, library: &LibraryHandle, rawg: &RawgClient, scanne
                     if matches!(ev, LibraryEvent::SessionStarted { .. } | LibraryEvent::SessionEnded { .. }) {
                         crate::tray::refresh_tooltip(&lib_app);
                     }
+                    // The tray's game list follows installs, renames, deletions and play state.
+                    if matches!(
+                        ev,
+                        LibraryEvent::GamesChanged { .. }
+                            | LibraryEvent::SessionStarted { .. }
+                            | LibraryEvent::SessionEnded { .. }
+                    ) {
+                        crate::tray::refresh_menu(&lib_app);
+                    }
                 }
                 // Missed some: tell the UI to re-hydrate rather than guess.
                 Err(RecvError::Lagged(n)) => {

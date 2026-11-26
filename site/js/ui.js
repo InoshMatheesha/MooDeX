@@ -2,14 +2,20 @@
 import { $, $$, env } from './engine.js';
 
 const REPO = 'InoshMatheesha/MooDeX';
-const later = (fn, ms) => setTimeout(fn, env.reduce ? 0 : ms);
 
 /* ---------- theme: saved choice > system; circular reveal from the toggle ---------- */
 export function initTheme(onChange) {
   const root = document.documentElement;
-  const btn = $('#theme-btn');
+  const btns = $$('[data-theme-toggle]');
   const metas = $$('meta[name="theme-color"]');
-  const label = () => btn.setAttribute('aria-label', root.dataset.theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+  const label = () => {
+    const light = root.dataset.theme === 'light';
+    for (const b of btns) {
+      b.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+      const name = b.querySelector('.theme-name');
+      if (name) name.textContent = light ? 'Dark mode' : 'Light mode';
+    }
+  };
   const apply = (t, save) => {
     root.dataset.theme = t;
     if (save) {
@@ -21,7 +27,7 @@ export function initTheme(onChange) {
   };
   label();
 
-  btn.addEventListener('click', () => {
+  for (const btn of btns) btn.addEventListener('click', () => {
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
     if (!document.startViewTransition || env.reduce) {
       root.classList.add('theme-fade');
@@ -47,32 +53,44 @@ export function initTheme(onChange) {
   });
 }
 
-/* ---------- mobile menu ---------- */
+/* ---------- island: the phone menu grows out of it ---------- */
 export function initMenu() {
-  const nav = $('#nav'), btn = $('#menu-btn'), menu = $('#menu');
-  const isOpen = () => btn.getAttribute('aria-expanded') === 'true';
-  const open = () => {
-    menu.hidden = false;
-    menu.classList.remove('closing');
-    btn.setAttribute('aria-expanded', 'true');
-    btn.setAttribute('aria-label', 'Close menu');
-    nav.classList.add('menu-open');
-    menu.querySelector('a').focus({ preventScroll: true });
+  const island = $('#nav'), btn = $('#menu-btn'), menu = $('#menu');
+  const isOpen = () => island.classList.contains('open');
+  const set = (open, refocus) => {
+    if (open === isOpen()) return;
+    island.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    island.dispatchEvent(new Event('island:change'));
+    if (open) menu.querySelector('a').focus({ preventScroll: true });
+    else if (refocus) btn.focus();
   };
-  const close = (refocus) => {
-    if (!isOpen()) return;
-    btn.setAttribute('aria-expanded', 'false');
-    btn.setAttribute('aria-label', 'Open menu');
-    nav.classList.remove('menu-open');
-    menu.classList.add('closing');
-    later(() => { if (!isOpen()) { menu.hidden = true; menu.classList.remove('closing'); } }, 220);
-    if (refocus) btn.focus();
+  btn.addEventListener('click', () => set(!isOpen()));
+  menu.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false, true); });
+  document.addEventListener('pointerdown', (e) => { if (!island.contains(e.target)) set(false); });
+  matchMedia('(min-width: 900px)').addEventListener('change', (e) => e.matches && set(false));
+}
+
+/* ---------- island live activity: name of the section you are reading ---------- */
+export function initIslandLabel() {
+  const island = $('#nav'), box = $('#live-txt'), label = $('#live-label');
+  let current = label.textContent;
+  const show = (next) => {
+    if (next === current) return;
+    current = next;
+    if (env.reduce || !island.classList.contains('compact')) { label.textContent = next; return; }
+    const from = box.offsetWidth;
+    label.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-70%)', opacity: 0 }], { duration: 160, easing: 'ease-in' }).finished.then(() => {
+      label.textContent = current;
+      const to = label.offsetWidth;
+      box.animate([{ width: `${from}px` }, { width: `${to}px` }], { duration: 480, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+      label.animate([{ transform: 'translateY(70%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      island.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.035)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'ease-out' });
+    }).catch(() => {});
   };
-  btn.addEventListener('click', () => (isOpen() ? close() : open()));
-  menu.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(true); });
-  document.addEventListener('pointerdown', (e) => { if (isOpen() && !nav.contains(e.target)) close(); });
-  matchMedia('(min-width: 900px)').addEventListener('change', (e) => e.matches && close());
+  island.addEventListener('island:label', (e) => show(e.detail));
 }
 
 /* ---------- FAQ accordion (button + region; height animates via grid rows) ---------- */
@@ -97,8 +115,10 @@ export function initReveal() {
   $$('.rv, .wipe').forEach((el) => io.observe(el));
 
   // The download card's orb only breathes while the card is on screen.
-  const cta = $('#download');
-  new IntersectionObserver(([e]) => cta.classList.toggle('is-on', e.isIntersecting)).observe(cta);
+  // Looping accents (download orb, bento pulses) only run while on screen.
+  const loop = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('is-on', e.isIntersecting)));
+  loop.observe($('#download'));
+  loop.observe($('#bento'));
 }
 
 /* ---------- "Point at a folder" demo ---------- */
@@ -184,12 +204,12 @@ export function initPointerFx() {
     el.addEventListener('pointerleave', () => { cancelAnimationFrame(raf); raf = 0; rect = null; onLeave(); });
   };
 
-  for (const c of $$('.fc')) {
+  // bento tiles: a soft light follows the cursor (no tilt: calmer, more "product")
+  for (const c of $$('.tile')) {
     track(c, (x, y) => {
       c.style.setProperty('--mx', `${(x * 100).toFixed(1)}%`);
       c.style.setProperty('--my', `${(y * 100).toFixed(1)}%`);
-      c.style.transform = `perspective(900px) rotateX(${((0.5 - y) * 7).toFixed(2)}deg) rotateY(${((x - 0.5) * 9).toFixed(2)}deg) translateY(-4px)`;
-    }, () => (c.style.transform = ''));
+    }, () => {});
   }
   for (const b of $$('.mag')) {
     track(b, (x, y, r) => {

@@ -36,7 +36,17 @@ The Vercel project (`getmoodex`) uses `site/` as its root and has no build comma
 All copy lives in `index.html`, in the order it appears on the page. A few things are filled in at runtime:
 
 - **Version, installer size and download link** come from the GitHub API (`initRelease` in `js/ui.js`). The values written in the HTML (`v2.0.10`, `5.2 MB`, `releases/latest`) are only fallbacks, so you only need to update them occasionally.
-- **The stores marquee** list is `STORES` in `marqueeScene` (`js/scenes.js`).
+- **The stores strip** has two lists in `marqueeScene` (`js/scenes.js`): `STORES` (logos) and `PERKS` (highlight pills).
+- **The nav island's section names** come from each `<section data-label="...">` in `index.html`.
+
+## Icons
+
+All icons live in the SVG sprite at the top of `index.html` and are used as `<svg class="i"><use href="#i-name"/></svg>`.
+
+- **Line icons** (`i-*`) follow Lucide's geometry (ISC licence). The `.i` class gives them one stroke weight (1.75) so they all match.
+- **Brand marks** (`b-*`: GitHub, Steam, Epic Games, Ubisoft, GOG, EA) come from Simple Icons (CC0). They are trademarks of their owners and appear only to name the supported stores.
+
+To add an icon, copy its 24×24 path data into a new `<symbol>`.
 - **The scan demo** folder path and file names are `PATH` and `FILES` in `initScan` (`js/ui.js`).
 - **The changelog** is static. Add the newest release at the top of the `<ol class="log">` and drop the oldest entry.
 
@@ -63,6 +73,7 @@ The script needs Pillow 11.2 or later (for AVIF). It writes AVIF and WebP at 640
 - **One loop.** `engine.js` runs a single `requestAnimationFrame` loop. It reads `scrollY` once per frame, uses section positions cached on resize, and goes to sleep when nothing is moving. Each scene only runs while its section is near the viewport (IntersectionObserver).
 - **Only compositor properties.** Scenes write `transform` and `opacity`. Progress bars use `translate`/`scale`, never `width`.
 - **Native scroll.** Scroll is never hijacked. Scroll values are smoothed with a frame-rate-independent lerp, so it also feels right on phones.
+- **The nav is a Dynamic Island.** At the top of the page it shows the full links. Once you scroll, it shrinks to the logo, the current section's name and a page-progress ring. Hover or keyboard focus expands it again, and on phones the menu grows out of it. The state is set in `chromeScene`, and the folding is CSS grid columns and rows animating between `0fr` and `1fr`.
 - **Pinned sections** are `position: sticky` inside tall sections sized in `svh`. On phones (under 820 px wide) the gallery switches to a native swipe carousel.
 - **Reduced motion.** With `prefers-reduced-motion`, nothing is pinned or animated and every scene shows its final state as a still layout (see the end of `site.css`).
 - **Themes.** Every colour is a CSS custom property, set under `:root[data-theme="dark"]` and `:root[data-theme="light"]`. An inline script in `<head>` applies the saved theme, or the system theme, before first paint. The toggle uses the View Transitions API for a circular reveal, with a crossfade as the fallback.

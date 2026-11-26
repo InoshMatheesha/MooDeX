@@ -292,21 +292,24 @@ export function galleryScene() {
 export function marqueeScene() {
   const el = $('#stores');
   const rows = [$('#m1'), $('#m2')];
-  const STORES = [['Steam', '#60A5FA'], ['Epic Games', 'var(--mute)'], ['Ubisoft Connect', '#A78BFA'], ['GOG', '#C084FC'], ['EA app', '#F87171'], ['Standalone .exe', '#4ADE80']];
-  const set = (list) => `<div class="mset">${list.map(([n, c]) => `<span style="--dot:${c}"><i></i>${n}</span>`).join('')}</div>`;
-  rows[0].innerHTML = set(STORES).repeat(5);
-  rows[1].innerHTML = set([...STORES].reverse()).repeat(5);
-  let w = 1, x = 0;
+  const STORES = [['Steam', 'b-steam'], ['Epic Games', 'b-epic'], ['Ubisoft Connect', 'b-ubisoft'], ['GOG', 'b-gog'], ['EA app', 'b-ea'], ['Any .exe', 'i-terminal']];
+  const PERKS = [['Real playtime', 'i-clock'], ['Auto-detect', 'i-folder'], ['Launch from the tray', 'i-inbox'], ['Cover art', 'i-sparkles'], ['Daily backups', 'i-database'], ['Signed updates', 'i-shield'], ['No telemetry', 'i-eye-off']];
+  const set = (list) => `<div class="mset">${list.map(([n, ic]) => `<span><svg class="i"><use href="#${ic}"/></svg>${n}</span>`).join('')}</div>`;
+  rows[0].innerHTML = set(STORES).repeat(4);
+  rows[1].innerHTML = set(PERKS).repeat(4);
+  let w0 = 1, w1 = 1, x = 0;
 
   return scene({
     el,
-    measure() { w = rows[0].firstElementChild.offsetWidth || 1; },
+    measure() {
+      w0 = rows[0].firstElementChild.offsetWidth || 1;
+      w1 = rows[1].firstElementChild.offsetWidth || 1;
+    },
     update() {
       if (env.reduce) return false;
-      x += (0.55 + Math.min(14, Math.abs(env.vel) * 0.45)) * (env.dt / 16.7);
-      const off = x % w;
-      rows[0].style.transform = `translate3d(${fx(-off)}px,0,0)`;
-      rows[1].style.transform = `translate3d(${fx(off - w)}px,0,0)`;
+      x += (0.5 + Math.min(14, Math.abs(env.vel) * 0.45)) * (env.dt / 16.7);
+      rows[0].style.transform = `translate3d(${fx(-(x % w0))}px,0,0)`;
+      rows[1].style.transform = `translate3d(${fx((x % w1) - w1)}px,0,0)`;
       return true;
     },
   });
@@ -333,23 +336,40 @@ export function stepsScene() {
   });
 }
 
-/* ---------- page chrome: top progress bar, nav hides on scroll down ---------- */
+/* ---------- Dynamic Island: compact while reading, full at the top or when held ---------- */
 export function chromeScene() {
-  const bar = $('#progress');
-  const nav = $('#nav');
-  let lastP = -1, hidden = false, acc = 0;
-  const setHidden = (h) => { if (h !== hidden) { hidden = h; nav.classList.toggle('hide', h); } };
-  nav.addEventListener('focusin', () => setHidden(false));
+  const island = $('#nav');
+  const ring = $('#ring');
+  const marks = $$('section[data-label]');
+  let lastP = -1, compact = null, hover = false, focus = false, leaveTimer = 0, tops = [], label = '';
+
+  const sync = () => {
+    const c = env.y > 120 && !hover && !focus && !island.classList.contains('open');
+    if (c !== compact) { compact = c; island.classList.toggle('compact', c); }
+  };
+  if (env.fine) {
+    island.addEventListener('pointerenter', () => { clearTimeout(leaveTimer); hover = true; sync(); });
+    island.addEventListener('pointerleave', () => { leaveTimer = setTimeout(() => { hover = false; sync(); }, 260); });
+  }
+  // Keyboard focus keeps the island open; a tap that leaves focus on a link does not.
+  island.addEventListener('focusin', () => { focus = !!island.querySelector(':focus-visible'); sync(); });
+  island.addEventListener('focusout', (e) => { if (!island.contains(e.relatedTarget)) { focus = false; sync(); } });
+  island.addEventListener('island:change', sync);
 
   return scene({
+    measure() { tops = marks.map((m) => [m.getBoundingClientRect().top + env.y, m.dataset.label]); },
     update(_, force) {
       const p = clamp(env.y / Math.max(1, env.docH - env.vh));
-      if (p !== lastP || force) { lastP = p; bar.style.transform = `scaleX(${fx(p, 4)})`; }
-      if (env.dy) {
-        acc = Math.sign(env.dy) === Math.sign(acc) ? acc + env.dy : env.dy;
-        if (env.y < 140 || nav.classList.contains('menu-open') || acc < -24) setHidden(false);
-        else if (acc > 24) setHidden(true);
+      if (p !== lastP || force) {
+        lastP = p;
+        ring.style.strokeDashoffset = fx(100 - p * 100, 2);
+        // live activity: the section crossing the upper part of the screen
+        const line = env.y + env.vh * 0.45;
+        let next = 'Overview';
+        for (const [top, name] of tops) if (top <= line) next = name;
+        if (next !== label) { label = next; island.dispatchEvent(new CustomEvent('island:label', { detail: next })); }
       }
+      sync();
       return false;
     },
   });

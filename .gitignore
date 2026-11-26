@@ -23,3 +23,6 @@ api.txt
 *.key
 *.pem
 secrets*
+
+# Full-quality promo video (99 MB): the site and README use the compressed copies in site/video and assets/readme
+assets/MooDeX_TikTok_30s.mp4

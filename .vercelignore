@@ -1,0 +1,4 @@
+# Only the website goes to Vercel (project root directory is site/).
+/*
+!/site
+/site/README.md

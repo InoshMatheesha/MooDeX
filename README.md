@@ -6,6 +6,12 @@ MooDeX keeps every PC game you own in one place. It records how long you really 
 
 This is the Rust rewrite of MooDeX, built with Tauri 2. The design contract it follows is [MOODEX_RUST_MVP.md](MOODEX_RUST_MVP.md).
 
+<p align="center">
+  <a href="https://getmoodex.vercel.app/video/moodex-30s.mp4"><img src="assets/readme/moodex-30s-preview.webp" alt="MooDeX in 30 seconds: launchers log 6 seconds, MooDeX records the real 4 hours; point it at a folder, every store in one library, no accounts, 5 MB, free and open source." width="300"></a>
+  <br>
+  <sub><a href="https://getmoodex.vercel.app/video/moodex-30s.mp4"><b>Watch the 30-second video with sound</b></a> · <a href="https://getmoodex.vercel.app/">Website</a> · <a href="https://github.com/InoshMatheesha/MooDeX/releases/latest">Download for Windows</a></sub>
+</p>
+
 ## Requirements
 
 - Windows 10 or 11, 64-bit.

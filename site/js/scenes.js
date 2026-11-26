@@ -336,40 +336,14 @@ export function stepsScene() {
   });
 }
 
-/* ---------- Dynamic Island: compact while reading, full at the top or when held ---------- */
+/* ---------- nav island: a touch more opaque once content scrolls behind it ---------- */
 export function chromeScene() {
   const island = $('#nav');
-  const ring = $('#ring');
-  const marks = $$('section[data-label]');
-  let lastP = -1, compact = null, hover = false, focus = false, leaveTimer = 0, tops = [], label = '';
-
-  const sync = () => {
-    const c = env.y > 120 && !hover && !focus && !island.classList.contains('open');
-    if (c !== compact) { compact = c; island.classList.toggle('compact', c); }
-  };
-  if (env.fine) {
-    island.addEventListener('pointerenter', () => { clearTimeout(leaveTimer); hover = true; sync(); });
-    island.addEventListener('pointerleave', () => { leaveTimer = setTimeout(() => { hover = false; sync(); }, 260); });
-  }
-  // Keyboard focus keeps the island open; a tap that leaves focus on a link does not.
-  island.addEventListener('focusin', () => { focus = !!island.querySelector(':focus-visible'); sync(); });
-  island.addEventListener('focusout', (e) => { if (!island.contains(e.relatedTarget)) { focus = false; sync(); } });
-  island.addEventListener('island:change', sync);
-
+  let scrolled = null;
   return scene({
-    measure() { tops = marks.map((m) => [m.getBoundingClientRect().top + env.y, m.dataset.label]); },
-    update(_, force) {
-      const p = clamp(env.y / Math.max(1, env.docH - env.vh));
-      if (p !== lastP || force) {
-        lastP = p;
-        ring.style.strokeDashoffset = fx(100 - p * 100, 2);
-        // live activity: the section crossing the upper part of the screen
-        const line = env.y + env.vh * 0.45;
-        let next = 'Overview';
-        for (const [top, name] of tops) if (top <= line) next = name;
-        if (next !== label) { label = next; island.dispatchEvent(new CustomEvent('island:label', { detail: next })); }
-      }
-      sync();
+    update() {
+      const sc = env.y > 8;
+      if (sc !== scrolled) { scrolled = sc; island.classList.toggle('scrolled', sc); }
       return false;
     },
   });

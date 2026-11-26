@@ -77,14 +77,9 @@ def logos() -> None:
         for w in (360, 840):
             h = round(im.height * w / im.width)
             im.resize((w, h), Image.LANCZOS).save(OUT / f"logo-{variant}-{w}.webp", quality=92, method=6)
-    # Icon-only mark (the "M"), cropped from the logo, for the playtime lane and the nav island.
+    # Icon-only mark (the "M"), cropped from the logo, for the playtime lane and the tray mock-up.
     mark = src.crop((0, 0, src.height, src.height))
     mark.resize((96, 96), Image.LANCZOS).save(OUT / "mark-96.webp", quality=92, method=6)
-    # White wordmark only (no "M"), for the always-dark nav island.
-    word = src.crop((round(src.height * 1.02), 0, src.width, src.height))
-    word = word.crop(word.getbbox())
-    h = 44
-    word.resize((round(word.width * h / word.height), h), Image.LANCZOS).save(OUT / "wordmark-white.webp", quality=92, method=6)
     print("logos:", src.size)
 
 

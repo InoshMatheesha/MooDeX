@@ -37,7 +37,6 @@ All copy lives in `index.html`, in the order it appears on the page. A few thing
 
 - **Version, installer size and download link** come from the GitHub API (`initRelease` in `js/ui.js`). The values written in the HTML (`v2.0.10`, `5.2 MB`, `releases/latest`) are only fallbacks, so you only need to update them occasionally.
 - **The stores strip** has two lists in `marqueeScene` (`js/scenes.js`): `STORES` (logos) and `PERKS` (highlight pills).
-- **The nav island's section names** come from each `<section data-label="...">` in `index.html`.
 
 ## Icons
 
@@ -73,7 +72,8 @@ The script needs Pillow 11.2 or later (for AVIF). It writes AVIF and WebP at 640
 - **One loop.** `engine.js` runs a single `requestAnimationFrame` loop. It reads `scrollY` once per frame, uses section positions cached on resize, and goes to sleep when nothing is moving. Each scene only runs while its section is near the viewport (IntersectionObserver).
 - **Only compositor properties.** Scenes write `transform` and `opacity`. Progress bars use `translate`/`scale`, never `width`.
 - **Native scroll.** Scroll is never hijacked. Scroll values are smoothed with a frame-rate-independent lerp, so it also feels right on phones.
-- **The nav is a Dynamic Island.** At the top of the page it shows the full links. Once you scroll, it shrinks to the logo, the current section's name and a page-progress ring. Hover or keyboard focus expands it again, and on phones the menu grows out of it. The state is set in `chromeScene`, and the folding is CSS grid columns and rows animating between `0fr` and `1fr`.
+- **The nav is a floating glass island.** It always shows the full nav as a centred pill with a frosted-glass background (`backdrop-filter`), using its own tokens for light and dark (`--isl-*` in `site.css`). On phones the menu grows out of it.
+- **Sized to fit one screen.** The hero, playtime race, app tour, scan demo and download card size their type and images from the viewport height (`svh`) as well as its width, so each fits in one screen on laptops (from 1280×720) and phones.
 - **Pinned sections** are `position: sticky` inside tall sections sized in `svh`. On phones (under 820 px wide) the gallery switches to a native swipe carousel.
 - **Reduced motion.** With `prefers-reduced-motion`, nothing is pinned or animated and every scene shows its final state as a still layout (see the end of `site.css`).
 - **Themes.** Every colour is a CSS custom property, set under `:root[data-theme="dark"]` and `:root[data-theme="light"]`. An inline script in `<head>` applies the saved theme, or the system theme, before first paint. The toggle uses the View Transitions API for a circular reveal, with a crossfade as the fallback.

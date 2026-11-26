@@ -62,7 +62,6 @@ export function initMenu() {
     island.classList.toggle('open', open);
     btn.setAttribute('aria-expanded', String(open));
     btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    island.dispatchEvent(new Event('island:change'));
     if (open) menu.querySelector('a').focus({ preventScroll: true });
     else if (refocus) btn.focus();
   };
@@ -71,26 +70,6 @@ export function initMenu() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false, true); });
   document.addEventListener('pointerdown', (e) => { if (!island.contains(e.target)) set(false); });
   matchMedia('(min-width: 900px)').addEventListener('change', (e) => e.matches && set(false));
-}
-
-/* ---------- island live activity: name of the section you are reading ---------- */
-export function initIslandLabel() {
-  const island = $('#nav'), box = $('#live-txt'), label = $('#live-label');
-  let current = label.textContent;
-  const show = (next) => {
-    if (next === current) return;
-    current = next;
-    if (env.reduce || !island.classList.contains('compact')) { label.textContent = next; return; }
-    const from = box.offsetWidth;
-    label.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-70%)', opacity: 0 }], { duration: 160, easing: 'ease-in' }).finished.then(() => {
-      label.textContent = current;
-      const to = label.offsetWidth;
-      box.animate([{ width: `${from}px` }, { width: `${to}px` }], { duration: 480, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-      label.animate([{ transform: 'translateY(70%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
-      island.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.035)' }, { transform: 'scale(1)' }], { duration: 420, easing: 'ease-out' });
-    }).catch(() => {});
-  };
-  island.addEventListener('island:label', (e) => show(e.detail));
 }
 
 /* ---------- FAQ accordion (button + region; height animates via grid rows) ---------- */

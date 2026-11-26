@@ -22,11 +22,19 @@ A fast, private game library for Windows. Keep every PC game in one list, track 
 
 <br>
 
-<img src="site/img/dashboard.webp" alt="MooDeX dashboard showing library status, total playtime, the G.O.A.T. game and the most played games" width="900">
+<img src="site/img/dashboard-1800.webp" alt="MooDeX dashboard showing library status, total playtime, the G.O.A.T. game and the most played games" width="900">
 
 </div>
 
 <br>
+
+## See it in 30 seconds
+
+<p align="center">
+  <a href="https://getmoodex.vercel.app/video/moodex-30s.mp4"><img src="assets/readme/moodex-30s-preview.webp" alt="MooDeX in 30 seconds: launchers log 6 seconds, MooDeX records the real 4 hours; point it at a folder, every store in one library, no accounts, 5 MB, free and open source." width="300"></a>
+  <br>
+  <sub><a href="https://getmoodex.vercel.app/video/moodex-30s.mp4"><b>Watch the full video with sound</b></a></sub>
+</p>
 
 ## Highlights
 
@@ -84,16 +92,16 @@ gantt
 
 <table>
   <tr>
-    <td><img src="site/img/library.webp" alt="My Library"></td>
-    <td><img src="site/img/pc-games.webp" alt="My PC Games with play buttons"></td>
+    <td><img src="site/img/library-1080.webp" alt="My Library"></td>
+    <td><img src="site/img/pc-games-1080.webp" alt="My PC Games with play buttons"></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Library:</b> every game, one list</sub></td>
     <td align="center"><sub><b>PC Games:</b> play straight from the card</sub></td>
   </tr>
   <tr>
-    <td><img src="site/img/game-detail.webp" alt="Game details"></td>
-    <td><img src="site/img/dashboard.webp" alt="Dashboard"></td>
+    <td><img src="assets/readme/game-detail.webp" alt="Game details"></td>
+    <td><img src="site/img/dashboard-1080.webp" alt="Dashboard"></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Game details:</b> sessions, rating, notes, launch settings</sub></td>
